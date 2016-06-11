@@ -21,13 +21,17 @@ def ldos0d(h,e=0.0,delta=0.01):
 
 
 
-def ldos0d_wf(h,e=0.0,delta=0.01,num_wf = 10):
+def ldos0d_wf(h,e=0.0,delta=0.01,num_wf = 10,robust=False):
   """Calculates the local density of states of a hamiltonian and
      writes it in file, using arpack"""
   if h.dimensionality==0:  # only for 0d
     intra = csc_matrix(h.intra) # matrix
   else: raise # not implemented...
-  eig,eigvec = slg.eigsh(intra,k=int(num_wf),which="LM",sigma=e) # number of wfs
+  if robust: # go to the imaginary axis for stability
+    eig,eigvec = slg.eigs(intra,k=int(num_wf),which="LM",sigma=e+1j*10*delta) 
+    eig = eig.real # real part only
+  else: # Hermitic Hamiltonian
+    eig,eigvec = slg.eigsh(intra,k=int(num_wf),which="LM",sigma=e) 
   d = np.array([0.0 for i in range(intra.shape[0])]) # initialize
   for (v,ie) in zip(eigvec.transpose(),eig): # loop over wavefunctions
     v2 = (np.conjugate(v)*v).real # square of wavefunction
@@ -100,9 +104,9 @@ def spatial_dos(h,dos):
   else: raise
 
 
-def write_ldos(x,y,dos):
+def write_ldos(x,y,dos,output_file="LDOS.OUT"):
   """ Write LDOS in a file"""
-  fd = open("LDOS.OUT","w")   # open file
+  fd = open(output_file,"w")   # open file
   fd.write("# x,  y, local density of states\n")
   for (ix,iy,idos) in zip(x,y,dos): # write everything
     fd.write(str(ix) +"   "+ str(iy) + "   "+ str(idos)+"\n")

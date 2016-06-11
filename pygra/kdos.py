@@ -35,3 +35,42 @@ def kdos1d_sites(h,sites=[0],scale=10.,nk=100,npol=100,kshift=0.,
     ys = kpm.generate_profile(mus,xs) # generate the profile
     write_kdos(k,xs*scale,ys,new=False) # write in file (append)
     if info: print "Done",k
+
+
+def surface(h,surft,nk=50,ne=50,ewindow=[-.5,.5]):
+  klist = np.linspace(0.,1.,nk) # number of kpoints
+  energies = np.linspace(ewindow[0],ewindow[1],ne) # number of energies
+  # get the different matrices
+  tx = surft["tx"]
+  intra = surft["intra"]
+  ty = surft["ty"]
+  txy = surft["txy"]
+  txmy = surft["txmy"]
+  # perform the loop
+  for k in klist:
+    # this is for the edge cell
+    tky = ty*np.exp(1j*np.pi*2.*k)
+    tkx = ty*np.exp(1j*np.pi*2.*k)
+    tkxy = txy*np.exp(1j*np.pi*2.*k)
+    tkxmy = txmy*np.exp(-1j*np.pi*2.*k)  # notice the minus sign !!!!
+    # chain in the x direction
+    onsk = intra + tky + tky.H  # intra of k dependent chain
+    hopk = tx + tkxy + tkxmy  # hopping of k-dependent chain
+    for energy in energies:
+      dosb,doss = green.green_kchain(h,k=ki,energy=energy,delta=0.0002,only_bulk=False)
+      # now calculate the selfenergy
+      raise
+      selfe = hopk 
+
+
+  fkd = open("KDOS.OUT","w") # open file
+  p = Pool(5)  # create pool
+  list_dosk = p.map(kdos,kpoints)  # compute kpoints in parallel
+  for (k,dosk) in zip(kpoints,list_dosk):
+    for (energy,doss) in zip(energies,dosk):
+      fkd.write(str(k)+"   ")
+      fkd.write(str(energy)+"   ")
+      fkd.write(str(doss)+"\n")
+      print "Done",k,energy
+  fkd.close()
+

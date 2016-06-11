@@ -1,3 +1,4 @@
+from __future__ import print_function
 import geometry
 from copy import deepcopy
 import numpy as np
@@ -67,7 +68,9 @@ def circle(r=1.0,out=False):
 
 def rotate(g,angle):
   """ Rotates a geometry"""
-#  phi = np.pi*angle # angle in radians
+  if np.abs(angle)<0.0001: 
+    print("No rotation performed")
+    return g
   phi = angle
   go = g.copy()
   # modify x and y, z is the same
@@ -86,7 +89,9 @@ def rotate(g,angle):
     go.a1 = np.array([c*x + s*y,-s*x + c*y,z])
     x,y,z = go.a2
     go.a2 = np.array([c*x + s*y,-s*x + c*y,z])
-  elif go.dimensionality==1: raise
+  elif go.dimensionality==1: 
+    x,y,z = go.a1
+    go.a1 = np.array([c*x + s*y,-s*x + c*y,z])
   elif go.dimensionality==0: pass
   return go
 
@@ -119,7 +124,6 @@ def remove_central(g,n):
   inds = range(len(rr)) # indexes
   sort_inds = [x for (y,x) in sorted(zip(rr,inds))] # indexes sorted by distance
   rind = [sort_inds[i] for i in range(n)]
-#  print "remove",rind
   return remove(g,rind)  # return geometry with removed 
 
 
@@ -172,7 +176,7 @@ def rotate_a2b(g,a,b):
   db = b/np.sqrt(db) # unit vector
   angle = da.dot(db) # angle to rotate
   if np.abs(angle)>1.0: 
-    print "Warning, angle is ",angle
+    print("Warning, angle is ",angle)
     angle = 1.0
   angle = np.arccos(angle)
   return rotate(g,angle)

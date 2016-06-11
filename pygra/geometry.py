@@ -293,6 +293,40 @@ def honeycomb_zigzag_ribbon(ntetramers):
   return g
 
 
+
+def honeycomb_lattice_zigzag_cell():
+  """ Return a honeyomb lattice with 4 atoms per unit cell"""
+  from numpy import array, sqrt
+  x=array([0.0 for i in range(4)])
+  y=array([0.0 for i in range(4)])
+  s3=sqrt(3.0)/2.0
+  for ii in range(1):
+    fi=-float(ii)*3.0
+    i=4*ii
+    x[i]=0.0
+    x[i+1]=s3
+    x[i+2]=s3
+    x[i+3]=0.0
+    y[i]=fi
+    y[i+1]=fi-0.5
+    y[i+2]=fi-1.5
+    y[i+3]=fi-2.0
+  g = geometry() # create geometry class
+  g.x = x  # add to the x atribute
+  g.y = -y  # add to the y atribute
+  g.z = y*0.0  # add to the z atribute
+  g.a1 = np.array([sqrt(3.0),0.,0.]) # a1 distance
+  g.a2 = np.array([0.,3.,0.]) # a1 distance
+  g.has_sublattice = True # has sublattice index
+  g.sublattice = [(-1.)**i for i in range(len(x))] # subattice number
+  g.name = "honeycomb_zigzag_ribbon"
+  g.xyz2r() # create r coordinates
+  g.dimensionality = 2
+  g.center()
+  return g
+
+
+
 def plot_geometry(g):
    """Shows a 2d plot of the current geometry,
       returns a figure"""
@@ -382,6 +416,30 @@ def triangular_lattice():
   return g
 
 
+
+def triangular_ribbon(n):
+  g = triangular_lattice() # create geometry
+  go = g.copy() # copy geometry
+  r0 = [] # empty list
+  for ir in g.r:
+    r0.append(ir) # supercell
+    r0.append(ir+g.a1) # supercell
+  rs = []
+  dr = g.a1+g.a2 # displacement vector
+  for i in range(n): # loop over replicas
+    for ir in r0: # loop over unit cell
+      rs.append(dr*i + ir) # append atom
+  go.r = np.array(rs) # save coordinates
+  go.r2xyz() # update
+  go.a1 = g.a1 - g.a2 #
+  go.center()
+  go.dimensionality = 1
+  # now rotate the geometry
+  import sculpt
+  go = sculpt.rotate_a2b(go,go.a1,np.array([1.0,0.0,0.0]))
+  # setup the cell dis parameter (deprecated)
+  go.celldis = go.a1[0]
+  return go
 
 
 

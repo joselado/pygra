@@ -1,8 +1,10 @@
 from __future__ import print_function
 import numpy as np
-from scipy.sparse import csc_matrix,bmat
+from scipy.sparse import csc_matrix,bmat,csr_matrix
 import multicell
 import scipy.linalg as lg
+import numpy as np
+import inout
 
 optimal = False
 
@@ -10,14 +12,16 @@ class hamiltonian():
   """ Class for a hamiltonian """
   has_spin = True # has spin degree of freedom
   has_eh = False # has electron hole pairs
+  get_eh_sector = None # no function for getting electrons
   fermi_energy = 0.0 # fermi energy at zero
+  dimensionality = 0 # dimensionality of the Hamiltonian
   is_sparse = False
   is_multicell = False # for hamiltonians with hoppings to several neighbors
   hopping_dict = {} # hopping dictonary
   def eigenvectors(self,nk=10):
     return eigenvectors(self,nk=nk)
   def __init__(self,geometry=None):
-    if not geometry == None:
+    if not geometry is None:
 # dimensionality of the system
       self.dimensionality = geometry.dimensionality 
       self.geometry = geometry # add geometry object
@@ -59,6 +63,7 @@ class hamiltonian():
   def add_swave(self,delta=0.0,mu=0.0,phi=0.0):
     """ Adds spin mixing insite electron hole pairing"""
    # self.intra = add_swave(self.intra,delta=delta,mu=mu,phi=phi)
+    self.get_eh_sector = get_eh_sector_odd_even # assign function
     (self.intra,a) = add_swave_electron_hole_pairing(self,
                                 delta=delta,mu=mu,phi=phi)
     if self.is_multicell: # for multicell hamiltonians
@@ -84,14 +89,31 @@ class hamiltonian():
   def write(self,output_file="hamiltonian.in"):
     """ Write the hamiltonian in hamiltonian_0.in"""
     from input_tb90 import write_hamiltonian
-    write_hamiltonian(self,output_file=output_file)
+    if self.is_sparse: # for sparse matrices
+      if self.dimensionality == 0:  # zero dimensional
+        print("Saving as sparse")
+        inout.save_sparse_csr("INTRA.npz",csr_matrix(self.intra))
+      else: raise
+    else: # normal Hamiltonians
+      if not self.is_multicell: 
+        write_hamiltonian(self,output_file=output_file)
     self.geometry.write()
 #    from input_tb90 import write_lattice
 #    write_lattice(self.geometry)
   def read(self,input_file="hamiltonian.in"):
     """ Write the hamiltonian in hamiltonian_0.in"""
-    from input_tb90 import read_hamiltonian
-    read_hamiltonian(self,input_file=input_file)
+    try: 
+      import geometry
+      self.geometry = geometry.read(input_file="POSITIONS.OUT")
+    except: print("No geometry found")
+    if self.is_sparse: # for sparse matrices
+      if self.dimensionality == 0:  # zero dimensional
+        print("Reading as sparse")
+        self.intra = csc_matrix(inout.load_sparse_csr("INTRA.npz"))
+      else: raise
+    else:
+      from input_tb90 import read_hamiltonian
+      read_hamiltonian(self,input_file=input_file)
   def total_energy(self,nkpoints=100):
     """ Get total energy of the system"""
     return total_energy(self,nkpoints=nkpoints)
@@ -198,6 +220,7 @@ class hamiltonian():
     if self.is_sparse: return # if it is sparse return
     self.is_sparse = True # sparse flag to true
     self.intra = csc_matrix(self.intra)
+    if self.is_multicell: raise
     if self.dimensionality == 1: # for one dimensional
       self.inter = csc_matrix(self.inter)
     if self.dimensionality == 2: # for one dimensional
@@ -308,7 +331,7 @@ sz = coo_matrix([[1.,0.],[0.,-1.]])
 def rashba(r1,r2=None,c=0.,d=[0.,0.,1.]):
   """Add Rashba coupling, returns a spin polarized matrix"""
   zero = coo_matrix([[0.,0.],[0.,0.]])
-  if r2==None:
+  if r2 is None:
     r2 = r1
   nat = len(r1) # number of atoms
   m = [[zero for i in range(nat)] for j in range(nat)] # cretae amtrix
@@ -333,13 +356,13 @@ def haldane(x1,y1,x2=None,y2=None,xm=None,ym=None):
   from scipy.sparse import coo_matrix, bmat
   from numpy import array, matrix, sqrt
   # use x1,y1 as default if the others not provided
-  if x2==None:
+  if x2 is None:
     x2=x1
-  if y2==None:
+  if y2 is None:
     y2=y1
-  if xm==None:
+  if xm is None:
     xm=x1
-  if ym==None:
+  if ym is None:
     ym=y1
   # do all the stuff
   s3=sqrt(3.0)
@@ -422,10 +445,10 @@ def kane_mele(x1,y1,x2=None,y2=None,x3=None,y3=None,has_spin=True):
   """ Generate Kane Mele matrices"""
   xs,ys = [x2,x3],[y2,y3]
   for ix in xs: 
-    if ix==None: 
+    if ix is None: 
       ix=x1
   for iy in ys: 
-    if iy==None: 
+    if iy is None: 
       iy=y1
   m = get_hal_hop_sec_neigh(x1,y1,x2,y2,x3,y3)
   from increase_hilbert import m2spin
@@ -713,7 +736,7 @@ def get_bands_2d(h,kpath=None,operator=None):
   if operator!=None: operator=np.matrix(operator) # convert to matrix
   for k in range(len(kpath)): # loop over kpoints
     hk = hkgen(kpath[k]) # get hamiltonian
-    if operator==None:
+    if operator is None:
       es = lg.eigvalsh(hk)
       for e in es:  # loop over energies
         f.write(str(k)+"   "+str(e)+"\n") # write in file
@@ -899,16 +922,16 @@ def add_pwave_electron_hole_pairing(h,delta=0.0,mu=0.0,phi=0.0):
   h.intra = nambu(h.intra,coupling=matrix_sc)
   if h.dimensionality == 1:   # if 1 dimensional return
     matrix_sc = get_pwave_matrix(g.r,g.r+g.a1) # get intercell pairing
-    h.inter = nambu(h.inter,c1=matrix_sc)
+    h.inter = nambu(h.inter,coupling=matrix_sc)
   if h.dimensionality == 2:   # if 2 dimensional return
     matrix_sc = get_pwave_matrix(g.r,g.r+g.a1) # get intercell pairing
-    h.tx = nambu(h.tx,c1=matrix_sc)
+    h.tx = nambu(h.tx,coupling=matrix_sc)
     matrix_sc = get_pwave_matrix(g.r,g.r+g.a2) # get intercell pairing
-    h.ty = nambu(h.ty,c1=matrix_sc)
+    h.ty = nambu(h.ty,coupling=matrix_sc)
     matrix_sc = get_pwave_matrix(g.r,g.r+g.a1+g.a2) # get intercell pairing
-    h.txy = nambu(h.txy,c1=matrix_sc)
+    h.txy = nambu(h.txy,coupling=matrix_sc)
     matrix_sc = get_pwave_matrix(g.r,g.r+g.a1-g.a2) # get intercell pairing
-    h.txmy = nambu(h.txmy,c1=matrix_sc)
+    h.txmy = nambu(h.txmy,coupling=matrix_sc)
   return h
 
 
@@ -988,7 +1011,7 @@ def build_eh(hin,coupling=None):
     for j in range(n):
       hout[2*i,2*j] = hin[i,j]  # electron term
       hout[2*i+1,2*j+1] = -np.conjugate(hin[i,j])  # hole term
-  if not coupling == None: # if there is coupling
+  if not coupling is None: # if there is coupling
     for i in range(n):
       for j in range(n):
         # couples electron in i with hole in j
@@ -1116,36 +1139,54 @@ def des_spin(m,component=0):
 def shift_fermi(h,fermi):
   """ Moves the fermi energy of the system, the new value is at zero"""
   intra = h.intra # get intraterm
-  if h.is_sparse: # if the hamiltonian is sparse 
-    intra = intra.todense() # dense matrix
   n = intra.shape[0] # number of elements in the matrix
   if is_number(fermi):  # if fermi is a number
-#    print "Shifting FERMI energy, input is NUMBER"
-    if h.has_eh:  # change signs for electrons and holes
-      for i in range(n/2):      
-        intra[2*i,2*i] += fermi
-        intra[2*i+1,2*i+1] += -fermi
-    else:  # same sign for everyone
-      for i in range(n):
-        h.intra[i,i] += fermi
+    if h.is_sparse: # for sparse matrix
+      if h.has_eh: raise # only without eh
+      rc = [i for i in range(n)] 
+      data = [fermi for i in range(n)] 
+      h.intra = h.intra + csc_matrix((data,(rc,rc)),shape=(n,n)) # add shift
+      return
+    else: # not sparse matrix
+      if h.has_eh:  # change signs for electrons and holes
+        for i in range(n/2):      
+          intra[2*i,2*i] += fermi
+          intra[2*i+1,2*i+1] += -fermi
+      else:  # same sign for everyone
+        for i in range(n):
+          h.intra[i,i] += fermi
   if callable(fermi):  # if fermi is a function
-    print("Shifting FERMI energy, input is FUNCTION")
+#    print("Shifting FERMI energy, input is FUNCTION")
     x = h.geometry.x
     y = h.geometry.y
     z = h.geometry.z
-    if h.has_spin: indd = 2  # with spin
-    else: indd = 1   # without spin
-    if h.has_eh:  # change signs for electrons and holes
-      for i in range(n/2):      
-        intra[2*i,2*i] += fermi(x[i/indd],y[i/indd],z[i/indd])
-        intra[2*i+1,2*i+1] += -fermi(x[i/indd],y[i/indd],z[i/indd])
-    else:  # same sign for everyone
-      for i in range(n):
-        intra[i,i] += fermi(x[i/indd],y[i/indd],z[i/indd])
+    if h.is_sparse: # for sparse matrix
+      if h.has_eh: raise # only without eh
+      rc = [i for i in range(n)] 
+      datatmp = [] # data
+      r = h.geometry.r # positions
+      for i in range(len(r)): # loop over positions 
+        fshift = fermi(r[i][0],r[i][1],r[i][2]) # fermi shift
+        datatmp.append(fshift) # append value
+      if h.has_spin: # spinful case
+        data = [0. for i in range(n)] # list
+        for i in range(len(fshift)): 
+          data[2*i] = fshift[i]
+          data[2*i+1] = fshift[i]
+      else: data = datatmp # spinless case
+      h.intra = h.intra + csc_matrix((data,(rc,rc)),shape=(n,n)) # add shift
+      return
+    else: # dense matrix
+      if h.has_spin: indd = 2  # with spin
+      else: indd = 1   # without spin
+      if h.has_eh:  # change signs for electrons and holes
+        for i in range(n/2):      
+          intra[2*i,2*i] += fermi(x[i/indd],y[i/indd],z[i/indd])
+          intra[2*i+1,2*i+1] += -fermi(x[i/indd],y[i/indd],z[i/indd])
+      else:  # same sign for everyone
+        for i in range(n):
+          intra[i,i] += fermi(x[i/indd],y[i/indd],z[i/indd])
 
-  if h.is_sparse: # if the hamiltonian is sparse 
-    intra = csc_matrix(intra) # convert to sparse
-    print("Warning, you might have memory problems..")
   h.intra = intra # assign new matrix
 
 
@@ -1266,7 +1307,7 @@ def nambu(m,coupling=None):
   mo = [[None,None],[None,None]] # create output matrix
   mo[0][0] = csc_matrix(m) # electron 
   mo[1][1] = -np.conjugate(csc_matrix(m)) # hole
-  if not coupling == None:
+  if not coupling is None:
     mo[0][1] = csc_matrix(coupling) # electron-hole 
     mo[1][0] = csc_matrix(coupling.H) # hole-electron 
   return bmat(mo).todense() # return matrix
@@ -1301,7 +1342,7 @@ def lowest_bands(h,nkpoints=100,nbands=10,operator = None,
   import scipy.sparse.linalg as lg
   import gc # garbage collector
   fo = open("BANDS.OUT","w")
-  if operator==None: # if there is not an operator
+  if operator is None: # if there is not an operator
     if h.dimensionality==0:  # dot
       eig,eigvec = lg.eigsh(csc_matrix(h.intra),k=nbands,which="LM",sigma=0.0)
       for i in range(len(eig)):
@@ -1429,5 +1470,15 @@ def parametric_hopping(r1,r2,f):
 
 
 
+def get_eh_sector_odd_even(m,i=0,j=0):
+  """ Return the electron hole sector of a matrix, 
+  assuming the form is even index for electrons and odd for holes"""
+  if i>1 or j>1: raise # meaningless
+  n = m.shape[0]/2 # size of the matrix 
+  mout = np.matrix(np.zeros((n,n)),dtype=np.complex) # define matrix
+  for ii in range(n): # loop over index
+    for jj in range(n): # loop over index
+      mout[ii,jj] = m[2*ii+i,2*jj+j] # assign
+  return mout # return matrix
 
 

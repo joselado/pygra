@@ -14,6 +14,8 @@ import dos
 import ldos
 import kpm
 import current
+import spectrum
+import topology
 
 def get_qhroot():
   """Gets the root path of quantum honeycomp"""

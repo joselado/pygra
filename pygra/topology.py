@@ -91,8 +91,8 @@ def occ_states2d(h,k):
   occwf = []
   for (ie,iw) in zip(es,wfs):  # loop over states
     if ie < 0:  # if below fermi
-      if np.abs(iw[0])>0.0001:
-        iw = iw*np.conjugate(iw[0])/np.abs(iw[0])
+#      if np.abs(iw[0])>0.0001:
+#        iw = iw*np.conjugate(iw[0])/np.abs(iw[0])
       occwf.append(iw)  # add to the list
   return np.array(occwf)
 
@@ -226,7 +226,7 @@ def z2_vanderbilt(h,nk=30,nt=100,nocc=None):
     evals = lg.eigvals(m) # eigenvalues of the rotation 
     x = np.angle(evals) # phase of the eigenvalues
     fo.write(str(t)+"    ") # write pumping variable
-    print t
+#    print t
     for ix in x: # loop over phases
       fo.write(str(ix)+"  ")
     fo.write("\n")

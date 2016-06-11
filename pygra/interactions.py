@@ -236,5 +236,14 @@ def tb90_scf(h,ab,old_mf,nkpoints=100,error=0.0000001,filling=.5,do_dos=False):
 
 
 
-
+def hubbard0d(intra,mag_ini=None,mixing=0.8,U=1.0,
+               error=0.00001,info=False):
+  """ Perform a collinear SCF calculation in a 0d system"""
+  from mean_fieldf90 import mean_field_collinear0d
+  if mag_ini is None: mag_ini = np.random.random(intra.shape[0])-0.5 # random
+  mfin = np.array([1.0+mag_ini,1.0-mag_ini]) # initial mean field
+  nocc = intra.shape[0] # number of electrons
+  mfout,fermi,energy = mean_field_collinear0d(intra.real,nocc,mixing,
+                                               mfin,U,error,info)
+  print energy
 

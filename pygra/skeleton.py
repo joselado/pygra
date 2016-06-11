@@ -8,7 +8,7 @@ from scipy.sparse import bmat
 import sculpt
 import numpy as np
 
-def build_ribbon(h,g=None,n=20):
+def build_ribbon(hin,g=None,n=20):
   """ Build a supercell using a certain geometry as skeleton"""
   if g is None: # if skeleton not provided
     h.geometry.get_lattice_name()
@@ -16,6 +16,26 @@ def build_ribbon(h,g=None,n=20):
       g = geometry.square_ribbon(n) 
     else: raise # not implemented
   # now build the hamiltonian
+  h = hin.copy() # generate hamiltonian
+  # if the hamiltonian is not multicell, turn it so
+  if not h.is_multicell: h = multicell.turn_multicell(h)
+  gin = h.geometry # geometry of the hamiltonian input
+# use the same axis
+  gh = sculpt.rotate_a2b(h.geometry,h.geometry.a1,np.array([0.,1.,0.])) 
+#  if np.abs(h.geometry.a1.dot(h.geometry.a2)) > 0.01: raise # orthogonal
+#  gh = h.geometry
+  def normalize(v): # normalize a vector
+    return v/np.sqrt(v.dot(v))
+# get reciprocal vectors
+  (w1,w2,w3) = sculpt.reciprocal(normalize(gh.a1),normalize(gh.a2)) 
+#  exit()
+  def get_rij(r):
+    """Provide a vector r, return this vector expressed in the basis cell""" 
+    i = r.dot(w1) # first projection
+    j = r.dot(w2) # second projection
+    i,j = round(i),round(j)
+    print i,j
+    return [i,j,0] # return indexes
   ho = h.copy() # generate hamiltonian
   intra = [[None for i in range(len(g.r))] for j in range(len(g.r))]
   hoppings = [] # empty list for the hoppings
@@ -24,15 +44,20 @@ def build_ribbon(h,g=None,n=20):
   for i in range(len(g.r)): # hopping up to third cells
     for j in range(len(g.r)): # hopping up to third cells
       rij = g.r[i] - g.r[j] # distance between replicas
-      intra[i][j] = multicell.get_tij(h,rij=rij) 
+      intra[i][j] = multicell.get_tij(h,rij=get_rij(rij)) 
   ho.intra = csc_matrix(bmat(intra)) # add the intracell matrix
   for nn in [-3,-2,-1,1,2,3]: # hopping up to third cells
     inter = [[None for i in range(len(g.r))] for j in range(len(g.r))]
+    print "Next"
     for i in range(len(g.r)): # hopping up to third cells
       for j in range(len(g.r)): # hopping up to third cells
         rij = g.r[i] - g.r[j] # distance between replicas
-        rij += np.array([nn,0.,0.]) # add the displacement
-        inter[i][j] = multicell.get_tij(h,rij=rij) 
+        rij += nn*h.geometry.a1 # add the displacement
+        if i==j: # for diagonal, at least zeros
+          mm = multicell.get_tij(h,rij=get_rij(rij)) 
+          if mm is None: inter[i][j] = h.intra*0.0 # store zero
+          else: inter[i][j] = mm # store matrix
+        else: inter[i][j] = multicell.get_tij(h,rij=get_rij(rij)) 
     hopping = multicell.Hopping() # create object
     hopping.m = csc_matrix(bmat(inter)) # store matrix
     hopping.dir = np.array([nn,0.,0.]) # store vector

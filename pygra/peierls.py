@@ -22,6 +22,8 @@ def add_peierls(h,mag_field=0.0):
         data[k] *= p # add phase
       h.intra = csc_matrix((data,(row,col)),shape=(norb,norb)) # convert to csc
     if h.dimensionality==1: # one dimensional
+      # check that celldis is right
+      if np.abs(h.geometry.celldis - h.geometry.a1[0])>0.001: raise
       def phaseize(inter,numn=1):
         m = coo_matrix(inter) # convert to sparse matrix
         row,col = m.row,m.col
@@ -36,8 +38,11 @@ def add_peierls(h,mag_field=0.0):
         return csc_matrix((data,(row,col)),shape=(norb,norb)) # convert to csc
       # for normal hamiltonians
       if not h.is_multicell: h.inter = phaseize(h.inter,numn=1) 
-      else: # for multicell hamiltonians
-        for t in h.hopping:  t.m = phaseize(t.m,numn=t.dir[0])
+      # for multicell hamiltonians
+      if h.is_multicell: 
+        hopping = [] # empty list
+        for i in range(len(h.hopping)):
+          h.hopping[i].m = phaseize(h.hopping[i].m,numn=h.hopping[i].dir[0]) 
     if h.dimensionality>1: raise # error if greater than 1
   else: # not sparse
     def gaugeize(m,d=0.0):
@@ -55,6 +60,7 @@ def add_peierls(h,mag_field=0.0):
     gaugeize(h.intra,d=0.0)  # gaugeize intraterm
     if h.dimensionality==0: pass # if zero dimensional
     elif h.dimensionality==1: # if one dimensional
+      if h.is_multicell: raise
       gaugeize(h.inter,d=celldis) # gaugeize interterm
     elif h.dimensionality==2: # if bigger dimensional
       print("WARNING, is your gauge periodic?")

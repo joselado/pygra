@@ -286,10 +286,12 @@ def read_sparse(f,sparse=True):
 
 
 
-def gauss_inverse(m,i=0,j=0):
+def gauss_inverse(m,i=0,j=0,test=False):
   from gauss_inv import gauss_inv as ginv
   """ Calculates the inverso of a block diagonal
       matrix """
+#  if test: # check whetehr the inversion worked 
+#   return block_inverse(m,i=i,j=j)
   nb = len(m) # number of blocks
   ca = [None for ii in range(nb)]
   ua = [None for ii in range(nb-1)]
@@ -299,16 +301,51 @@ def gauss_inverse(m,i=0,j=0):
   for ii in range(nb-1):
     ua[ii] = m[ii][ii+1]
     da[ii] = m[ii+1][ii]
+  # in case you use the -1 notation of python
+  if i<0: i += nb 
+  if j<0: j += nb 
+  # now call the actual fortran routine
   mout = ginv(ca,da,ua,i+1,j+1)
-  return np.matrix(mout)
+  mout = np.matrix(mout)
+  if test: # check whetehr the inversion worked 
+    mout2 = block_inverse(m,i=i,j=j)
+    diff = np.sum(np.abs(mout-mout2))
+#    if diff>0.001: raise
+  return mout
 
 
+
+
+def block_inverse(m,i=0,j=0):
+  """ Calculate a certain element of the inverse of a block matrix"""
+  from scipy.sparse import csc_matrix,bmat
+  nb = len(m) # number of blocks
+  if i<0: i += nb 
+  if j<0: j += nb 
+  mt = [[None for ii in range(nb)] for jj in range(nb)]
+  for ii in range(nb): # diagonal part
+    mt[ii][ii] = csc_matrix(m[ii][ii])
+  for ii in range(nb-1):
+    mt[ii][ii+1] = csc_matrix(m[ii][ii+1])
+    mt[ii+1][ii] = csc_matrix(m[ii+1][ii])
+  mt = bmat(mt).todense() # create dense matrix
+  # select which elements you need
+  ilist = [m[ii][ii].shape[0] for ii in range(i)] 
+  jlist = [m[jj][jj].shape[1] for jj in range(j)] 
+  imin = sum(ilist)
+  jmin = sum(jlist)
+  mt = mt.I # calculate inverse
+  imax = imin + m[i][i].shape[0]
+  jmax = jmin + m[j][j].shape[1]
+  mo = [ [mt[ii,jj] for jj in range(jmin,jmax)] for ii in range(imin,imax) ] 
+  mo = np.matrix(mo)
+  return mo
 
 
 
 
 def green_renormalization(intra,inter,energy=0.0,nite=None,
-                            error=0.0001,info=False,delta=0.001):
+                            error=0.000001,info=False,delta=0.001):
   """ Calculates bulk and surface Green function by a renormalization
   algorithm, as described in I. Phys. F: Met. Phys. 15 (1985) 851-858 """
 
@@ -411,7 +448,6 @@ def green_kchain(h,k=0.,energy=0.,delta=0.01,only_bulk=True,error=0.0001):
     if only_bulk:  return gf
     else:  return gf,sf
   tky = h.ty*np.exp(1j*np.pi*2.*k)
-  tkx = h.ty*np.exp(1j*np.pi*2.*k)
   tkxy = h.txy*np.exp(1j*np.pi*2.*k)
   tkxmy = h.txmy*np.exp(-1j*np.pi*2.*k)  # notice the minus sign !!!!
   # chain in the x direction
