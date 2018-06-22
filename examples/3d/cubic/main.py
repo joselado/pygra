@@ -9,4 +9,5 @@ g = geometry.cubic_lattice()
 h = g.get_hamiltonian()
 
 # A well converged DOS requires more k-points
-dos.dos3d(h,nk=50,delta=0.1,random=False,ndos=1000)
+h.turn_dense()
+dos.dos3d(h,nk=10,delta=0.1,random=False,ndos=1000)

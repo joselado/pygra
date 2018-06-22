@@ -11,7 +11,7 @@ import kpm
 import densitymatrix
 import time
 
-g = geometry.bichain()
+g = geometry.chain()
 g = g.supercell(100)
 g.dimensionality = 0
 h = g.get_hamiltonian()

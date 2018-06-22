@@ -35,8 +35,6 @@ for U in Us: # loop over Us
                 mix=0.9,mf=mf,mode="U")
   h = scf.hamiltonian # get the Hamiltonian
 #  h.get_bands() # calculate band structure
-  print(scf.interactions[0].g) 
-  print(len(scf.interactions)) 
 #  import groundstate
   f.write(str(U)+"   "+str(scf.gap)+"\n")
 #  groundstate.swave(h)
