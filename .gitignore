@@ -1,4 +1,5 @@
 *.so
+*.pyc
 *.o
 *.OUT
 *.in
