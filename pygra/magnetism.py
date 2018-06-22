@@ -115,6 +115,8 @@ def add_frustrated_antiferromagnetism(h,m):
     g = geometry.kagome_lattice()
   elif h.geometry.sublattice_number==4:
     g = geometry.pyrochlore_lattice()
+    import films
+    g = films.geometry_film(g,nz=1)
   else: raise # not implemented
   ms = []
   for i in range(len(h.geometry.r)): # loop

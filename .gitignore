@@ -3,3 +3,4 @@
 *.o
 *.OUT
 *.in
+__pycache__

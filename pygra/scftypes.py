@@ -690,6 +690,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
     if scf.error<maxerror or os.path.exists("STOP"): # if converged break
       stop_scf = True # stop the calculation after the next iteration
       scf.mixing = 1.0 # last iteration with mixing one
+      scf.smearing = None # last iteration without smearing
   file_etot.close() # close file
   file_error.close() # close file
   file_gap.close() # close file
