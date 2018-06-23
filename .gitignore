@@ -3,4 +3,5 @@
 *.o
 *.OUT
 *.in
+*.pkl
 __pycache__
