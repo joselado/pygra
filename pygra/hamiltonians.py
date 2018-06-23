@@ -136,6 +136,10 @@ class hamiltonian():
   def set_finite_system(self,periodic=True):
     """ Transforms the system into a finite system"""
     return set_finite_system(self,periodic=periodic) 
+  def get_gap(self):
+    """Returns the gap of the Hamiltonian"""
+    import gap
+    return gap.indirect_gap(self) # return the gap
   def write(self,output_file="hamiltonian.in"):
     """ Write the hamiltonian in hamiltonian_0.in"""
     from input_tb90 import write_hamiltonian
