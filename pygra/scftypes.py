@@ -33,6 +33,9 @@ def load(input_file="SCF.pkl"):
 
 class scfclass(): 
   """Class for a selfconsistent calculation"""
+  def copy(self):
+    from copy import deepcopy
+    return deepcopy(self)
   def save(self,output_file="SCF.pkl"):
     inout.save(self,output_file)
   def __init__(self,h):

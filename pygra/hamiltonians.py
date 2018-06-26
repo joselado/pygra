@@ -12,6 +12,7 @@ import superconductivity
 import kanemele 
 import magnetism
 import checkclass
+import extract
 
 from bandstructure import get_bands_0d
 from bandstructure import get_bands_1d
@@ -46,6 +47,11 @@ class hamiltonian():
   def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
                                  sparse=sparse,numw=numw)
+  def set_filling(self,filling=0.5,nk=10):
+    """Set the Fillign of the Hamiltonian"""
+    es,ws = self.eigenvectors(nk=nk)
+    from scftypes import get_fermi_energy
+    self.shift_fermi(-get_fermi_energy(es,filling)) # shift the fermi energy
   def __init__(self,geometry=None):
     self.has_spin = True # has spin degree of freedom
     self.prefix = "" # a string used a prefix for different files
@@ -429,11 +435,22 @@ class hamiltonian():
       ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
       return operators.get_valley(ht)
     else: raise
+  def extract(self,name="mz"): 
+    """Extract somethign from the Hamiltonian"""
+    if self.has_eh: raise # not implemented
+    if name=="density":
+      return extract.onsite(self.intra,has_spin=self.has_spin)
+    elif name=="mx" and self.has_spin:
+      return extract.mx(self.intra)
+    elif name=="my" and self.has_spin:
+      return extract.my(self.intra)
+    elif name=="mz" and self.has_spin:
+      return extract.mz(self.intra)
+    else: raise
   def write_magnetization(self):
     """Extract the magnetization and write in in a file"""
     if not self.has_eh: # without electron hole
       if self.has_spin: # for spinful
-        import extract
         mx = extract.mx(self.intra)
         my = extract.my(self.intra)
         mz = extract.mz(self.intra)
