@@ -64,14 +64,14 @@ def berry_curvature(h,k,dk=0.01,window=None,max_waves=None):
 # get the function that returns the occ states
   occf = occ_states_generator(h,k,window=window,max_waves=max_waves)  
   # get the waves
-  print("Doing k-point",k)
+#  print("Doing k-point",k)
   wf1 = occf(k-dx-dy) 
   wf2 = occf(k+dx-dy) 
   wf3 = occf(k+dx+dy) 
   wf4 = occf(k-dx+dy) 
   dims = [len(wf1),len(wf2),len(wf3),len(wf4)] # number of vectors
   if max(dims)!=min(dims): # check that the dimensions are fine 
-    print("WARNING, skipping this k-point",k)
+#    print("WARNING, skipping this k-point",k)
     return 0.0 # if different number of vectors
   # get the uij  
   m = uij(wf1,wf2)*uij(wf2,wf3)*uij(wf3,wf4)*uij(wf4,wf1)
@@ -131,15 +131,28 @@ def uij_slow(wf1,wf2):
 def precise_chern(h,dk=0.01):
   """ Calculates the chern number of a 2d system """
   from scipy import integrate
-  err = {"epsabs" : 0.01, "epsrel": 0.01,"limit" : 10}
+  err = {"epsabs" : 1.0, "epsrel": 1.0,"limit" : 10}
 #  err = [err,err]
   def f(x,y): # function to integrate
     return berry_curvature(h,np.array([x,y]),dk=dk)
-  c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=1.,
-                          epsrel=1.)
+  c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=10.,
+                          epsrel=10.)
   chern = c[0]/(2.*np.pi)
   open("CHERN.OUT","w").write(str(chern)+"\n")
   return chern
+
+
+def hall_conductivity(h,dk=-1,n=1000):
+  c = 0.0 
+  nk = int(np.sqrt(n)) # estimate
+  if dk<0: dk = 1./float(2*nk) # automatic dk
+  for i in range(n):
+    k = np.random.random(2) # random kpoint
+    c += berry_curvature(h,k,dk=dk)
+  c = c/(2*np.pi*n) # normalize
+  return c
+
+
 
 
 def chern(h,dk=-1,nk=10):
@@ -165,6 +178,7 @@ def chern(h,dk=-1,nk=10):
   open("CHERN.OUT","w").write(str(c)+"\n")
   return c
 
+hall_conductivity = chern
 
 
 def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
