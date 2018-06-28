@@ -449,12 +449,12 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05):
 
 
 
-def berry_green(f,emin=-4.0,k=[0.,0.,0.],ne=100,dk=0.05):
+def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.05):
   """Return the Berry curvature using Green functions"""
   import scipy.integrate as integrate
   fint = berry_green_generator(f,k=k,dk=dk) # get the function
   es = np.linspace(emin,0.,ne) # energies used for the integration
-  return integrate.quad(fint,emin,0.0,limit=20,epsabs=0.01,epsrel=0.01)[0]
+  return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
   return np.sum([fint(e) for e in es]) # return
 #  for e in es: # loop over energies
 
