@@ -465,7 +465,7 @@ def kchain(h,k=[0.,0.,0.]):
   """Return the onsite and hopping for a particular k"""
 #  h = h0.copy() # copy Hamiltonian
 #  h = turn_multicell(h0) # multicell form
-  if not h.is_multicell: raise
+  if not h.is_multicell: h = h.get_multicell()
   dim = h.dimensionality # dimensionality
   if dim>1: # 2D or 3D
     intra = np.zeros(h.intra.shape) # zero amtrix

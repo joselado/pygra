@@ -16,7 +16,7 @@ arpack_maxiter = 10000
 
 
 def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
-      mode="Wilson",delta=0.1):
+      mode="Wilson",delta=0.1,reciprocal=False):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   fo = open("BERRY_CURVATURE.OUT","w") # open file
@@ -24,6 +24,7 @@ def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
   ik = 0
   for k in kpath:
     tr.remaining(ik,len(kpath))
+    if reciprocal:  k = h.geometry.get_k2K_generator()(k) # convert
     ik += 1
     if mode=="Wilson":
       b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
@@ -442,7 +443,7 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05):
     # Now apply the formula
     omega = g*(gxp.I-gxm.I)*(gyp-gym)
     omega += -g*(gyp.I-gym.I)*(gxp-gxm)
-    return omega.trace()[0,0].real # return contribution
+    return omega.trace()[0,0].real/(dk*dk) # return contribution
   return fint # return the function
 
 
@@ -459,8 +460,25 @@ def berry_green(f,emin=-4.0,k=[0.,0.,0.],ne=100,dk=0.05):
 
 
 
-def berry_energy_map(h,delta):
+def berry_density(h,delta=0.2,es=np.linspace(-3.0,3.0,100),nk=100,
+                     dk = 0.02):
   """Write in a file an energy map of the Berry curvature"""
+  f = h.get_gk_gen(delta=delta)
+  ks = [np.random.random(3) for i in range(nk)] # random kpoints
+  out = [] # empty list
+  from scipy import integrate
+  for e in es:
+    def fint(kx,ky): # function to integrate
+      k = [kx,ky,0.]
+      fint2 = berry_green_generator(f,k=k,dk=dk) # get the function
+      return fint2(e)
+    o = integrate.dblquad(fint, 0, 1, lambda x: 0, lambda x: 1,epsabs=10.0,
+                epsrel=10.0)[0]
+    print(e,o)
+    out.append(o)
+  np.savetxt("BERRY_DENSITY.OUT",np.matrix([es,out]).T) 
+  return (es,outm)
+
 
 
 
