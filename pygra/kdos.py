@@ -179,20 +179,33 @@ def write_surface_kpm(h,ne=400,klist=None,scale=4.,npol=200,w=20,ntries=20):
 
 
 
-def interface(h1,h2,energies=np.linspace(-1.,1.,40),operator=None,
-                    delta=0.01,klist=np.linspace(0.,1.0,40)):
+def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
+                    delta=0.01,kpath=None):
   """Get the surface DOS of an interface"""
   from scipy.sparse import csc_matrix,bmat
+  if kpath is None: 
+    if h1.dimensionality==3:
+      g2d = h1.geometry.copy() # copy Hamiltonian
+      import sculpt
+      g2d = sculpt.set_xy_plane(g2d)
+      kpath = klist.default(g2d,nk=100)
+    elif h1.dimensionality==2:
+      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,40)]
+    else: raise
   fo = open("KDOS_INTERFACE.OUT","w")
   fo.write("# k, E, Bulk1, Surf1, Bulk2, Surf2, interface\n")
   tr = timing.Testimator("KDOS") # generate object
   ik = 0
-  for k in klist:
-    tr.remaining(ik,len(klist)) # generate object
+  h1 = h1.get_multicell() # multicell Hamiltonian
+  h2 = h2.get_multicell() # multicell Hamiltonian
+  for k in kpath:
+    tr.remaining(ik,len(kpath)) # generate object
     ik += 1
-    for energy in energies:
+#    for energy in energies:
 #  (b1,s1,b2,s2,b12) = green.interface(h1,h2,k=k,energy=energy,delta=delta)
-      out = green.interface(h1,h2,k=k,energy=energy,delta=delta)
+#      out = green.interface(h1,h2,k=k,energy=energy,delta=delta)
+    outs = green.interface_multienergy(h1,h2,k=k,energies=energies,delta=delta)
+    for (energy,out) in zip(energies,outs):
       if operator is None: 
         op = np.identity(h1.intra.shape[0]*2) # normal cell
         ops = np.identity(h1.intra.shape[0]) # supercell 
@@ -201,7 +214,7 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,40),operator=None,
         op = operator # normal cell 
         ops = bmat([[csc_matrix(operator),None],[None,csc_matrix(operator)]])
       # write everything
-      fo.write(str(k)+"   "+str(energy)+"   ")
+      fo.write(str(ik)+"   "+str(energy)+"   ")
       for g in out: # loop
         if g.shape[0]==op.shape[0]: d = -(g*op).trace()[0,0].imag # bulk
         else: d = -(g*ops).trace()[0,0].imag # interface
@@ -216,3 +229,39 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,40),operator=None,
 
 
 
+def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
+                    delta=0.01,kpath=None,hs=None):
+  """Get the surface DOS of an interface"""
+  from scipy.sparse import csc_matrix,bmat
+  if kpath is None: 
+    if h1.dimensionality==3:
+      g2d = h1.geometry.copy() # copy Hamiltonian
+      import sculpt
+      g2d = sculpt.set_xy_plane(g2d)
+      kpath = klist.default(g2d,nk=100)
+    elif h1.dimensionality==2:
+      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,40)]
+    else: raise
+  fo = open("KDOS.OUT","w")
+  fo.write("# k, E, Surface, Bulk\n")
+  tr = timing.Testimator("KDOS") # generate object
+  ik = 0
+  h1 = h1.get_multicell() # multicell Hamiltonian
+  for k in kpath:
+    tr.remaining(ik,len(kpath)) # generate object
+    ik += 1
+    outs = green.surface_multienergy(h1,k=k,energies=energies,delta=delta,hs=hs)
+    for (energy,out) in zip(energies,outs):
+      if operator is None: 
+        op = np.identity(h1.intra.shape[0]) # supercell 
+#      elif callable(operator): op = callable(op)
+      else:
+        op = operator # normal cell 
+      # write everything
+      fo.write(str(ik)+"   "+str(energy)+"   ")
+      for g in out: # loop
+        d = -(g*op).trace()[0,0].imag # interface
+        fo.write(str(d)+"   ")
+      fo.write("\n")
+      fo.flush() # flush
+  fo.close()

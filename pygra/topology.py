@@ -8,21 +8,32 @@ import multicell
 import klist
 import operators
 import inout
+import timing
 
 
 arpack_tol = 1e-5
 arpack_maxiter = 10000
 
 
-def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None):
+def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
+      mode="Wilson",delta=0.1):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   fo = open("BERRY_CURVATURE.OUT","w") # open file
+  tr = timing.Testimator("BERRY CURVATURE")
+  ik = 0
   for k in kpath:
-    b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+    tr.remaining(ik,len(kpath))
+    ik += 1
+    if mode=="Wilson":
+      b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+    if mode=="Green":
+      f = h.get_gk_gen(delta=delta) # get generator
+      b = berry_green(f,k=k) 
     fo.write(str(k[0])+"   ")
     fo.write(str(k[1])+"   ")
     fo.write(str(b)+"\n")
+    fo.flush()
   fo.close() # close file
 
 
@@ -182,7 +193,7 @@ hall_conductivity = chern
 
 
 def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
-               max_waves=None):
+               max_waves=None,mode="Wilson",delta=0.05):
   """ Calculates the chern number of a 2d system """
   c = 0.0
   ks = [] # array for kpoints
@@ -190,12 +201,22 @@ def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
   if reciprocal: R = h.geometry.get_k2K()
   else: R = np.matrix(np.identity(3))
   fo = open("BERRY_MAP.OUT","w") # open file
+  nt = nk*nk # total number of points
+  tr = timing.Testimator("BERRY CURVATURE")
+  ik = 0
   for x in np.linspace(-nsuper,nsuper,nk,endpoint=False):
     for y in np.linspace(-nsuper,nsuper,nk,endpoint=False):
+      tr.remaining(ik,nt)
+      ik += 1
       r = np.matrix([x,y,0.]).T # real space vectors
       k = np.array((R*r).T)[0] # change of basis
-      b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+      if mode=="Wilson":
+         b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+      if mode=="Green":
+         f = h.get_gk_gen(delta=delta) # get generator
+         b = berry_green(f,k=k) 
       fo.write(str(x)+"   "+str(y)+"     "+str(b)+"\n")
+      fo.flush()
   fo.close() # close file
 
 
@@ -403,3 +424,45 @@ def precise_spin_chern(h,delta=0.00001,tol=0.1):
   c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=tol,
                           epsrel=tol)
   return c[0]/(2.*np.pi)
+
+
+
+
+def berry_green_generator(f,k=[0.,0.,0.],dk=0.05):
+  """Function that returns the energy resolved Berry curvature"""
+  k = np.array(k) # set as array
+  dx = np.array([dk,0.,0.])
+  dy = np.array([0.,dk,0.])
+  def fint(e): # function to integrate
+    g = f(e=e,k=k) # compute at this k and this energy
+    gxp = f(e=e,k=k+dx) # compute at this k and this energy
+    gxm = f(e=e,k=k-dx) # compute at this k and this energy
+    gyp = f(e=e,k=k+dy) # compute at this k and this energy
+    gym = f(e=e,k=k-dy) # compute at this k and this energy
+    # Now apply the formula
+    omega = g*(gxp.I-gxm.I)*(gyp-gym)
+    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
+    return omega.trace()[0,0].real # return contribution
+  return fint # return the function
+
+
+
+
+def berry_green(f,emin=-4.0,k=[0.,0.,0.],ne=100,dk=0.05):
+  """Return the Berry curvature using Green functions"""
+  import scipy.integrate as integrate
+  fint = berry_green_generator(f,k=k,dk=dk) # get the function
+  es = np.linspace(emin,0.,ne) # energies used for the integration
+  return integrate.quad(fint,emin,0.0,limit=20,epsabs=0.01,epsrel=0.01)[0]
+  return np.sum([fint(e) for e in es]) # return
+#  for e in es: # loop over energies
+
+
+
+def berry_energy_map(h,delta):
+  """Write in a file an energy map of the Berry curvature"""
+
+
+
+
+

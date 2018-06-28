@@ -72,6 +72,14 @@ class hamiltonian():
     """ Generate kdependent hamiltonian"""
     if self.is_multicell: return multicell.hk_gen(self) # for multicell
     else: return hk_gen(self) # for normal cells
+  def get_gk_gen(self,delta=0.05,operator=None):
+    """Return the Green function generator"""
+    hkgen = self.get_hk_gen() # Hamiltonian generator
+    def f(k=[0.,0.,0.],e=0.0):
+      hk = hkgen(k) # get matrix
+      if operator is not None: hk = operator.H*hk*operator # project
+      return (np.identity(hk.shape[0])*(e+1j*delta) - hkgen(k)).I 
+    return f
   def print_hamiltonian(self):
     """Print hamiltonian on screen"""
     print_hamiltonian(self)
