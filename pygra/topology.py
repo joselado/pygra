@@ -16,7 +16,7 @@ arpack_maxiter = 10000
 
 
 def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
-      mode="Wilson",delta=0.00001,reciprocal=False,operator=None):
+      mode="Wilson",delta=0.001,reciprocal=False,operator=None):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   fo = open("BERRY_CURVATURE.OUT","w") # open file
@@ -141,7 +141,7 @@ def uij_slow(wf1,wf2):
   return m
 
 
-def precise_chern(h,dk=0.01, mode="Wilson",delta=0.01):
+def precise_chern(h,dk=0.01, mode="Wilson",delta=0.0001,operator=None):
   """ Calculates the chern number of a 2d system """
   from scipy import integrate
   err = {"epsabs" : 1.0, "epsrel": 1.0,"limit" : 10}
@@ -151,9 +151,9 @@ def precise_chern(h,dk=0.01, mode="Wilson",delta=0.01):
       return berry_curvature(h,np.array([x,y]),dk=dk)
     if mode=="Green":
        f2 = h.get_gk_gen(delta=delta) # get generator
-       return berry_green(f2,k=[x,y,0.]) 
-  c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=10.,
-                          epsrel=10.)
+       return berry_green(f2,k=[x,y,0.],operator=operator) 
+  c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=0.01,
+                          epsrel=0.01)
   chern = c[0]/(2.*np.pi)
   open("CHERN.OUT","w").write(str(chern)+"\n")
   return chern
@@ -172,19 +172,22 @@ def hall_conductivity(h,dk=-1,n=1000):
 
 
 
-def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson"):
+def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
   """ Calculates the chern number of a 2d system """
   c = 0.0
   ks = [] # array for kpoints
   bs = [] # array for berrys
   if dk<0: dk = 1./float(2*nk) # automatic dk
+  if operator is not None and mode=="Wilson":
+    print("Swuitching to Green mode in topology")
+    mode="Green"
   # create the function
   def fberry(k): # function to integrate
     if mode=="Wilson":
       return berry_curvature(h,k,dk=dk)
     if mode=="Green":
        f2 = h.get_gk_gen(delta=delta) # get generator
-       return berry_green(f2,k=[k[0],k[1],0.]) 
+       return berry_green(f2,k=[k[0],k[1],0.],operator=operator) 
   ##################
   for x in np.linspace(0.,1.,nk,endpoint=False):
     for y in np.linspace(0.,1.,nk,endpoint=False):
@@ -213,7 +216,7 @@ hall_conductivity = chern
 
 
 def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
-               max_waves=None,mode="Wilson",delta=0.05):
+               max_waves=None,mode="Wilson",delta=0.001,operator=None):
   """ Calculates the chern number of a 2d system """
   c = 0.0
   ks = [] # array for kpoints
@@ -234,7 +237,7 @@ def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
          b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
       if mode=="Green":
          f = h.get_gk_gen(delta=delta) # get generator
-         b = berry_green(f,k=k) 
+         b = berry_green(f,k=k,operator=operator) 
       fo.write(str(x)+"   "+str(y)+"     "+str(b)+"\n")
       fo.flush()
   fo.close() # close file
@@ -466,7 +469,7 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,fh=None):
 #    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
 #    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
     if operator is not None: omega = operator(omega,k=k) 
-    return omega.trace()[0,0]/(dk*dk) # return contribution
+    return omega.trace()[0,0]/(4.*dk*dk*2.*np.pi) # return contribution
   return fint # return the function
 
 
@@ -485,8 +488,8 @@ def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
     """Function to integrate using a complex contour, from 0 to 1"""
     z0 = emin*np.exp(-1j*x*np.pi)/2.
     z = z0 + emin/2.
-    return -(fint(z)*z0).imag/np.pi # integral after the change of variables
-  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.1,epsrel=0.1)[0]/np.pi
+    return -(fint(z)*z0).imag*np.pi # integral after the change of variables
+  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.1,epsrel=0.1)[0]
 #  return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
 #  return np.sum([fint(e) for e in es]) # return
 
