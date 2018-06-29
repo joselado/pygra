@@ -16,7 +16,7 @@ arpack_maxiter = 10000
 
 
 def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
-      mode="Wilson",delta=0.1,reciprocal=False,operator=None):
+      mode="Wilson",delta=0.00001,reciprocal=False,operator=None):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   fo = open("BERRY_CURVATURE.OUT","w") # open file
@@ -466,7 +466,7 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,fh=None):
 #    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
 #    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
     if operator is not None: omega = operator(omega,k=k) 
-    return omega.trace()[0,0].real/(dk*dk) # return contribution
+    return omega.trace()[0,0]/(dk*dk) # return contribution
   return fint # return the function
 
 
@@ -478,12 +478,15 @@ def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
   import scipy.integrate as integrate
   fint = berry_green_generator(f,k=k,dk=dk,operator=operator,fh=fh) 
   es = np.linspace(emin,0.,ne) # energies used for the integration
+  ### The original function is defined in the coplex plane,
+  # we will do a change of variables of the form z = re^(iphi) - r0
+  # so that dz = re^(iphi) i dphi
   def fint2(x):
     """Function to integrate using a complex contour, from 0 to 1"""
-    z = emin*np.exp(-1j*x*np.pi)/2. + emin/2.
-#    z = z.real + 1j*z.imag*4
-    return fint(z)*emin # function
-  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.1,epsrel=0.1)[0]
+    z0 = emin*np.exp(-1j*x*np.pi)/2.
+    z = z0 + emin/2.
+    return -(fint(z)*z0).imag/np.pi # integral after the change of variables
+  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.1,epsrel=0.1)[0]/np.pi
 #  return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
 #  return np.sum([fint(e) for e in es]) # return
 
