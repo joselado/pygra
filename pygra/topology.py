@@ -449,7 +449,7 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05):
 
 
 
-def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.05):
+def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001):
   """Return the Berry curvature using Green functions"""
   import scipy.integrate as integrate
   fint = berry_green_generator(f,k=k,dk=dk) # get the function
