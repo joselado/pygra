@@ -16,12 +16,13 @@ arpack_maxiter = 10000
 
 
 def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
-      mode="Wilson",delta=0.1,reciprocal=False):
+      mode="Wilson",delta=0.1,reciprocal=False,operator=None):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   fo = open("BERRY_CURVATURE.OUT","w") # open file
   tr = timing.Testimator("BERRY CURVATURE")
   ik = 0
+  if operator is not None: mode="Green" # Green function mode
   for k in kpath:
     tr.remaining(ik,len(kpath))
     if reciprocal:  k = h.geometry.get_k2K_generator()(k) # convert
@@ -30,7 +31,7 @@ def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
       b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
     if mode=="Green":
       f = h.get_gk_gen(delta=delta) # get generator
-      b = berry_green(f,k=k) 
+      b = berry_green(f,k=k,operator=operator) 
     fo.write(str(k[0])+"   ")
     fo.write(str(k[1])+"   ")
     fo.write(str(b)+"\n")
@@ -429,33 +430,44 @@ def precise_spin_chern(h,delta=0.00001,tol=0.1):
 
 
 
-def berry_green_generator(f,k=[0.,0.,0.],dk=0.05):
+def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,fh=None):
   """Function that returns the energy resolved Berry curvature"""
   k = np.array(k) # set as array
   dx = np.array([dk,0.,0.])
   dy = np.array([0.,dk,0.])
   def fint(e): # function to integrate
-    g = f(e=e,k=k) # compute at this k and this energy
+#    g = f(e=e,k=k) # compute at this k and this energy
     gxp = f(e=e,k=k+dx) # compute at this k and this energy
     gxm = f(e=e,k=k-dx) # compute at this k and this energy
     gyp = f(e=e,k=k+dy) # compute at this k and this energy
     gym = f(e=e,k=k-dy) # compute at this k and this energy
+    g = (gxp + gyp + gxm + gym)/4. # average Green function
     # Now apply the formula
-    omega = g*(gxp.I-gxm.I)*(gyp-gym)
-    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
+    gI = g.I # inverse
+    omega = ((gxp-gxm)*(gyp-gym) - (gyp-gym)*(gxp-gxm))*gI
+#    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
+#    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
+    if operator is not None: omega = operator(omega,k=k) 
     return omega.trace()[0,0].real/(dk*dk) # return contribution
   return fint # return the function
 
 
 
 
-def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001):
+def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
+                  fh = None):
   """Return the Berry curvature using Green functions"""
   import scipy.integrate as integrate
-  fint = berry_green_generator(f,k=k,dk=dk) # get the function
+  fint = berry_green_generator(f,k=k,dk=dk,operator=operator,fh=fh) 
   es = np.linspace(emin,0.,ne) # energies used for the integration
+  def fint2(x):
+    """Function to integrate using a complex contour, from 0 to 1"""
+    z = emin*np.exp(1j*x*np.pi)/2. + emin/2.
+#    z = z.real + 1j*z.imag*4
+    return fint(z) # function
+  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
   return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
-  return np.sum([fint(e) for e in es]) # return
+#  return np.sum([fint(e) for e in es]) # return
 #  for e in es: # loop over energies
 
 

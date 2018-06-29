@@ -399,7 +399,7 @@ class hamiltonian():
     """Clean a Hamiltonian"""
     from clean import clean_hamiltonian
     clean_hamiltonian(self)
-  def get_operator(self,name):
+  def get_operator(self,name,projector=False):
     """Return a certain operator"""
     if name=="sx": return operators.get_sx(self)
     elif name=="sy": return operators.get_sy(self)
@@ -425,7 +425,7 @@ class hamiltonian():
       return self.get_operator("sy")*self.get_operator("electron")
     elif name=="mz": 
       return self.get_operator("sz")*self.get_operator("electron")
-    elif name=="valley": return operators.get_valley(self)
+    elif name=="valley": return operators.get_valley(self,projector=projector)
     elif name=="inplane_valley": return operators.get_inplane_valley(self)
     elif name=="valley_upper": 
       print("This operator only makes sense for TBG")
