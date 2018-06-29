@@ -141,13 +141,17 @@ def uij_slow(wf1,wf2):
   return m
 
 
-def precise_chern(h,dk=0.01):
+def precise_chern(h,dk=0.01, mode="Wilson",delta=0.01):
   """ Calculates the chern number of a 2d system """
   from scipy import integrate
   err = {"epsabs" : 1.0, "epsrel": 1.0,"limit" : 10}
 #  err = [err,err]
   def f(x,y): # function to integrate
-    return berry_curvature(h,np.array([x,y]),dk=dk)
+    if mode=="Wilson":
+      return berry_curvature(h,np.array([x,y]),dk=dk)
+    if mode=="Green":
+       f2 = h.get_gk_gen(delta=delta) # get generator
+       return berry_green(f2,k=[x,y,0.]) 
   c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=10.,
                           epsrel=10.)
   chern = c[0]/(2.*np.pi)
@@ -168,16 +172,30 @@ def hall_conductivity(h,dk=-1,n=1000):
 
 
 
-def chern(h,dk=-1,nk=10):
+def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson"):
   """ Calculates the chern number of a 2d system """
   c = 0.0
   ks = [] # array for kpoints
   bs = [] # array for berrys
   if dk<0: dk = 1./float(2*nk) # automatic dk
+  # create the function
+  def fberry(k): # function to integrate
+    if mode=="Wilson":
+      return berry_curvature(h,k,dk=dk)
+    if mode=="Green":
+       f2 = h.get_gk_gen(delta=delta) # get generator
+       return berry_green(f2,k=[k[0],k[1],0.]) 
+  ##################
   for x in np.linspace(0.,1.,nk,endpoint=False):
     for y in np.linspace(0.,1.,nk,endpoint=False):
-      ks.append([x,y])
-      bs.append(berry_curvature(h,np.array([x,y]),dk=dk))
+      ks.append([x,y]) # create kpoints
+  tr = timing.Testimator("CHERN NUMBER")
+  ik = 0
+  for k in ks: # loop
+    tr.remaining(ik,len(ks))
+    ik += 1 # increase
+    b = fberry(k) # get berry curvature
+    bs.append(b)
   # write in file
   fo = open("BERRY_CURVATURE.OUT","w") # open file
   for (k,b) in zip(ks,bs):
@@ -462,13 +480,12 @@ def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
   es = np.linspace(emin,0.,ne) # energies used for the integration
   def fint2(x):
     """Function to integrate using a complex contour, from 0 to 1"""
-    z = emin*np.exp(1j*x*np.pi)/2. + emin/2.
+    z = emin*np.exp(-1j*x*np.pi)/2. + emin/2.
 #    z = z.real + 1j*z.imag*4
-    return fint(z) # function
-  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
-  return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
+    return fint(z)*emin # function
+  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.1,epsrel=0.1)[0]
+#  return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
 #  return np.sum([fint(e) for e in es]) # return
-#  for e in es: # loop over energies
 
 
 
