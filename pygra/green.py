@@ -485,7 +485,9 @@ def green_kchain(h,k=0.,energy=0.,delta=0.01,only_bulk=True,
     if hs is not None: # surface matrix provided
       ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
       sigma = hop*sf*hop.H # selfenergy
-      sf = (ez - ons - sigma).I # return Dyson
+      if callable(hs): ons2 = hs(k)
+      else: ons2 = hs
+      sf = (ez - ons2 - sigma).I # return Dyson
     if only_bulk:  return gf
     else:  return gf,sf
   (ons,hop) = get1dhamiltonian(h,k,reverse=reverse) # get 1D Hamiltonian
@@ -509,7 +511,9 @@ def green_kchain_evaluator(h,k=0.,delta=0.01,only_bulk=True,
     if hs is not None: # surface matrix provided
       ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
       sigma = hop*sf*hop.H # selfenergy
-      sf = (ez - hs - sigma).I # return Dyson
+      if callable(hs): ons2 = hs(k)
+      else: ons2 = hs
+      sf = (ez - ons2 - sigma).I # return Dyson
     if only_bulk:  return gf
     else:  return gf,sf
   (ons,hop) = get1dhamiltonian(h,k,reverse=reverse) # get 1D Hamiltonian

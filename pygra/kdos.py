@@ -41,18 +41,26 @@ def kdos1d_sites(h,sites=[0],scale=10.,nk=100,npol=100,kshift=0.,
     write_kdos(k,xs*scale,ys,new=False) # write in file (append)
     if info: print("Done",k)
 
+#
+#def surface(h,energies=None,klist=None,delta=0.01):
+#  """Return bulk and surface DOS"""
+#  bout = [] # empty list, bulk
+#  sout = [] # empty list, surface
+#  for k in klist:
+#    for energy in energies:
+#      gs,sf = green.green_kchain(h,k=k,energy=energy,delta=delta,only_bulk=False) 
+#      bout.append(gs.trace()[0,0].imag) # bulk
+#      sout.append(sf.trace()[0,0].imag) # surface
+#  bout = np.array(bout).reshape((len(energies),len(klist))) # convert to array
+#  sout = np.array(sout).reshape((len(energies),len(klist))) # convert to array
+#  return (bout.transpose(),sout.transpose())
+#
+#
+#
 
-def surface(h,energies=None,klist=None,delta=0.01):
-  bout = [] # empty list, bulk
-  sout = [] # empty list, surface
-  for k in klist:
-    for energy in energies:
-      gs,sf = green.green_kchain(h,k=k,energy=energy,delta=delta,only_bulk=False) 
-      bout.append(gs.trace()[0,0].imag) # bulk
-      sout.append(sf.trace()[0,0].imag) # surface
-  bout = np.array(bout).reshape((len(energies),len(klist))) # convert to array
-  sout = np.array(sout).reshape((len(energies),len(klist))) # convert to array
-  return (bout.transpose(),sout.transpose())
+
+
+
 
 
 def write_surface(h,energies=np.linspace(-.5,.5,100),klist=np.linspace(0.,1.,100),delta=None,operator=None,hs=None):
@@ -252,16 +260,13 @@ def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
     ik += 1
     outs = green.surface_multienergy(h1,k=k,energies=energies,delta=delta,hs=hs)
     for (energy,out) in zip(energies,outs):
-      if operator is None: 
-        op = np.identity(h1.intra.shape[0]) # supercell 
-#      elif callable(operator): op = callable(op)
-      else:
-        op = operator # normal cell 
       # write everything
       fo.write(str(ik)+"   "+str(energy)+"   ")
       for g in out: # loop
-        d = -(g*op).trace()[0,0].imag # interface
-        fo.write(str(d)+"   ")
-      fo.write("\n")
+        if operator is None: d = -g.trace()[0,0].imag # only the trace 
+        elif callable(operator): d = operator(g,k=k) # call the operator
+        else:  d = -(g*operator).trace()[0,0].imag # assume it is a matrix
+        fo.write(str(d)+"   ") # write in a file
+      fo.write("\n") # next line
       fo.flush() # flush
   fo.close()

@@ -4,10 +4,10 @@ sys.path.append("../../../pygra")  # add pygra library
 import geometry
 import dos
 
-g = geometry.diamond_lattice()
+g = geometry.diamond_lattice_minimal()
 
 h = g.get_hamiltonian()
-h.add_antiferromagnetism(1.)
+#h.add_antiferromagnetism(1.)
 
-dos.dos3d(h,nk=30,delta=0.001,random=True,ndos=1000)
-h.get_bands()
+dos.bulkandsurface(h,nk=300,delta=0.01)
+#h.get_bands()
