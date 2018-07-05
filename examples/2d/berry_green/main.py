@@ -15,10 +15,10 @@ import dos
 import topology
 op = h.get_operator("valley",projector=True) # valley operator
 op = None
-#topology.write_berry(h,mode="Green",operator=op,delta=0.00001)
+topology.write_berry(h,mode="Green",operator=op,delta=0.00001)
 #topology.write_berry(h,mode="Wilson",operator=op)
-c = topology.chern(h,mode="Green",delta=0.00001,nk=20)
-print("")
-print(c)
+#c = topology.chern(h,mode="Green",delta=0.00001,nk=20)
+#print("")
+#print(c)
 #h.get_bands()
 #dos.dos(h,nk=100,use_kpm=True)

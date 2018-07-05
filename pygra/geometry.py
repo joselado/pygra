@@ -75,6 +75,7 @@ class geometry:
       s = supercell3d(self,n1=nsuper1,n2=nsuper2,n3=nsuper3)
     else: raise
     s.center()
+    s.get_fractional()
     return s
   def xyz2r(self):
     """Updates r atributte according to xyz"""
@@ -709,10 +710,15 @@ def cubic_lattice():
   return g
 
 
+def cubic_lieb_lattice():
+  """Return a 3d Lieb lattice"""
+  g = cubic_lattice()
+  g = g.remove(0) # remove this atom
+  return g
 
 
 def lieb_lattice():
-  """ Create a Lieb lattice"""
+  """ Create a 2d Lieb lattice"""
   g = geometry() # create geometry
   g.x = np.array([-0.5,0.5,0.5])
   g.y = np.array([-0.5,-0.5,0.5])
@@ -1111,9 +1117,12 @@ def get_fractional(g):
       rn = np.array([rn.T[0,i] for i in range(dim)]) # convert to array
       store.append(rn) # store
     store = np.array(store) # convert to array
-    if dim>0: g.frac_x = (store[:,0]+0.001)%1.
-    if dim>1: g.frac_y = (store[:,1]+0.001)%1.
-    if dim>2: g.frac_z = (store[:,2]+0.001)%1.
+    for i in range(dim):
+      store[:,i] = store[:,i] - np.min(store[:,i])
+    store = (store[:,:])%1.
+    if dim>0: g.frac_x = store[:,0]
+    if dim>1: g.frac_y = store[:,1]
+    if dim>2: g.frac_z = store[:,2]
     g.frac_r = np.array([store[:,i] for i in range(dim)]).transpose()
 
 
@@ -1255,7 +1264,7 @@ def pyrochlore_lattice():
   g.dimensionality = 3 # three dimensional system
   g.has_sublattice = True
   g.sublattice_number = 4 # three sublattices
-  g.sublattice = [0,1,2,3] # the three sublattices
+  g.sublattice = [1,0,3,2] # the three sublattices
 #  g.sublattice = np.array([1,-1])
   g.r = np.array(rs) # store
   g.r2xyz() # create r coordinates
@@ -1279,7 +1288,8 @@ def tetrahedral_lattice():
 
 
 # use the cubic one as the default one
-diamond_lattice = cubic_diamond_lattice 
+#diamond_lattice = cubic_diamond_lattice 
+diamond_lattice = diamond_lattice_minimal
 
 
 

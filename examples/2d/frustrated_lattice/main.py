@@ -11,12 +11,12 @@ import films
 import ribbon
 import islands
 
-g = geometry.honeycomb_lattice() # geenrate the geometry
-g = geometry.triangular_lattice() # geenrate the geometry
-g = geometry.pyrochlore_lattice() # geenrate the geometry
+g = geometry.honeycomb_lattice() # generate the geometry
+g = geometry.triangular_lattice() # generate the geometry
+g = geometry.pyrochlore_lattice() # generate the geometry
 #g = geometry.kagome_lattice() # geenrate the geometry
-#g = geometry.diamond_lattice_minimal() # geenrate the geometry
-g = films.geometry_film(g,nz=1)
+#g = geometry.diamond_lattice_minimal() # generate the geometry
+g = films.geometry_film(g,nz=2)
 #g = g.remove(len(g.r)-1)
 #g = ribbon.bulk2ribbon(g,n=10)
 g = g.supercell(2)
@@ -33,8 +33,9 @@ sm.minimize_energy() # minimize Hamiltonian
 #exit()
 h = g.get_hamiltonian() # get the Hamiltonian
 h.add_magnetism(sm.magnetization*2.0) # add magnetization
+h.write_magnetization()
 def ffer(r): return r[2]*7
-h.shift_fermi(ffer) # electric field
+#h.shift_fermi(ffer) # electric field
 #h.add_kane_mele(1.0)
 #h.add_antiferromagnetism(5.0)
 h = ribbon.hamiltonian_ribbon(h,n=10)

@@ -14,13 +14,13 @@ dimensionalities and based on a variety of different lattices
 In the examples folder there are several examples of usage of the
 library
 
-# INSTALATION #
+# INSTALLATION #
 Parts of the code are written in Fortran for a matter of performance.
 To compile those functions you need to execute "install.sh" In case
 they are not compiled, the library will still work but certain parts
 will be substantially slower.
 
-Parts of the library rely on common Python libraries such as
+Parts of the code rely on Python libraries
  - numpy
  - scipy
 
