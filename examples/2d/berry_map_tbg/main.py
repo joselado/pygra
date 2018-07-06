@@ -11,7 +11,7 @@ import sculpt
 import specialgeometry
 
 
-g = specialgeometry.twisted_bilayer(11,center="AA",shift=[0.5,-0.333333])
+g = specialgeometry.twisted_bilayer(6,center="AA",shift=[0.5,-0.333333])
 #g.write()
 #exit()
 from specialhopping import twisted,twisted_matrix
@@ -20,10 +20,10 @@ h = g.get_hamiltonian(is_sparse=True,has_spin=False,is_multicell=False,
 h.turn_dense()
 
 
-def ff(r): return r[2]*0.1
+def ff(r): return r[2]*0.05
 
 h.shift_fermi(ff) # interlayer bias
-h.shift_fermi(-0.1)
+#h.shift_fermi(-0.08)
 #h.turn_sparse()
 #h.get_bands(num_bands=20)
 #exit()
