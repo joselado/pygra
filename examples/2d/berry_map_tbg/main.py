@@ -28,6 +28,6 @@ h.shift_fermi(ff) # interlayer bias
 #h.get_bands(num_bands=20)
 #exit()
 import topology
-topology.berry_green_map(h,k=[-0.3333333,0.3333333,0.0],nrep=3,integral=False)
+topology.berry_green_map(h,k=[0.3333333,-0.3333333,0.0],nrep=3,integral=False)
 #topology.berry_green_map(h,k=[0.5,0.0,0.0],nrep=3,integral=False)
 #topology.berry_green_map(h,k=[0.0,-0.0,0.0],nrep=3,integral=False)

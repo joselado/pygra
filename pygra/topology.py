@@ -541,11 +541,12 @@ def berry_green_map(h,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
     from integration import integrate_matrix
     out = integrate_matrix(fint2,xlim=[0.,1.],eps=1e-1)
     out = out.real # turn real
-    print("Sum",np.sum(out))
   else: # evaluate at the fermi energy
     out = fint(0.0).real
+  print("Sum",np.sum(out))
   import geometry
-  geometry.write_profile(h.geometry,out,name="BERRY_MAP.OUT",nrep=nrep)
+  from ldos import spatial_dos
+  geometry.write_profile(h.geometry,spatial_dos(h,out),name="BERRY_MAP.OUT",nrep=nrep)
   return out
 
 

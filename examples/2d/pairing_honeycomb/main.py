@@ -21,28 +21,28 @@ h = h.get_multicell()
 #h.remove_spin()
 h.shift_fermi(0.6)
 h.add_rashba(.3)
-h.add_pwave(0.2)
+h.add_swave(0.0)
 #h.get_bands()
 #exit()
 
-mf = scftypes.guess(h,mode="pwave",fun=0.02)
+mf = scftypes.guess(h,mode="swave",fun=0.02)
 #h.remove_spin()
-#mode = {"U":-4}
-mode = {"V":-3.}
+mode = {"U":-4}
+#mode = {"V":-3.}
 #exit()
 #h.turn_sparse()
-#scf = scftypes.selfconsistency(h,nkp=10,g=-2.0,
-#              mix=0.9,mf=mf,mode=mode,energy_cutoff=None)
+scf = scftypes.selfconsistency(h,nkp=10,g=-2.0,
+              mix=0.9,mf=mf,mode=mode)
 
               
 #h = scf.hamiltonian
 h.get_bands(nkpoints=500)
 #exit()
 import kdos
-kdos.write_surface(h)
+#kdos.write_surface(h)
 #exit()                                             
 #h = scf.hamiltonian
-h.check()
+#h.check()
 #exit()
 import spectrum
-spectrum.fermi_surface(h)
+#spectrum.fermi_surface(h)
