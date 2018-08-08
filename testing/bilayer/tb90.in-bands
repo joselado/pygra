@@ -1,0 +1,76 @@
+
+&electrons
+   filling = 0.5
+   shift_fermi = 0.0
+   extra_electrons = 0.0
+   /
+
+&kpoints
+   nkpoints = 100
+   expand_bz = 1.0
+   refine_kmesh_bands = 1
+   refine_kmesh_dos = 1
+   refine_kmesh_dielectric = 1
+   refine_kmesh_denmat = 1
+   /
+
+&bands
+   bands_operators_option = 'Sz'
+   use_ewindow_bands = .true.
+   emin_bands = -3.0
+   emax_bands = 3.0
+   do_bands = .true.
+   klist_bands = 'default'
+   /
+
+&scf_convergence
+   do_scf = .false.
+   mean_field_operators = 'hubbard'
+   mean_field_matrix = 'random'
+   mean_field_amplitude = 0.3
+   hubbard_scf = 2.0
+   num_old_ham = 1
+   max_ite =  1000
+   smearing =  1d-05
+   max_scf_err = 0.00001
+   mix_coef = 1.1
+   shift_to_zero = .true.
+   /
+
+&dos
+   do_dos = .false.
+   dos_operators_option = 'None'
+   num_dos = 100
+   define_num_dos = .true.
+   estep_dos = 0.02
+   use_ewindow_dos = .true.
+   emin_dos = -1.0
+   emax_dos = 1.0
+   autosmearing_dos = .false.
+   /
+
+&dielectric
+   do_dielectric = .true.
+   dielectric_type = 'local_xy_spin'
+   num_ene_chi = 100
+   ewindow_chi = 10.0
+   emin_chi = -0.5
+   emax_chi = 0.5
+   smearing_chi = 0.01
+   temperature_chi = 0.001
+   q_chi = 0.0001
+   /
+
+&density_matrix
+   do_denmat = .true.
+   /
+
+&topology
+   do_berry = .false.
+   dk_becurv = 0.01
+   klist_berry = 'default'
+   /
+
+&development
+   show_debug = .false.
+   /

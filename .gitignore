@@ -6,3 +6,5 @@
 *.in
 *.pkl
 __pycache__/
+*.npz
+*.in
