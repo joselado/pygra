@@ -14,7 +14,7 @@ import specialgeometry
 g = specialgeometry.twisted_bilayer(2) # get a small unit cell
 
 import ribbon
-g = ribbon.bulk2ribbon(g,n=4) # create a ribbon geoemtry
+g = ribbon.bulk2ribbon(g,n=4) # create a ribbon geometry
 
 h = g.get_hamiltonian(is_sparse=True,has_spin=False,
      mgenerator=twisted_matrix(ti=0.4,lambi=7.0))
