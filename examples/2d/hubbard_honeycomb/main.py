@@ -16,18 +16,15 @@ g.write()
 
 Us = np.linspace(0.,4.,10) # different Us
 
-#Us = [2.,4.]
-#Us = [2.]
-
 f = open("EVOLUTION.OUT","w") # file with the results
 
 for U in Us: # loop over Us
 #  import scftypes
   
   h = g.get_hamiltonian() # create hamiltonian of the system
-  h = h.get_multicell()
+#  h = h.get_multicell()
   
-  h.shift_fermi(0.0)
+#  h.shift_fermi(0.0)
   
   
   mf = scftypes.guess(h,mode="antiferro")

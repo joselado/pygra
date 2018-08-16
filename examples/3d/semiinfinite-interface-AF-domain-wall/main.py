@@ -8,7 +8,10 @@ import klist
 
 g = geometry.diamond_lattice_minimal()
 h = g.get_hamiltonian(has_spin=True)
-h.intra *= 1.3
-h.add_kane_mele(0.05)
+h1 = h.copy()
+h2 = h.copy()
+h1.add_antiferromagnetism(0.5)
+h2.add_antiferromagnetism(-0.5)
+
 import kdos
-kdos.surface(h,operator=None)
+kdos.interface(h1,h2)
