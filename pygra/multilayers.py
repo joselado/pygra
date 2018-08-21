@@ -273,7 +273,7 @@ def get_geometry(name,dz=2.0,armchair=True):
   elif name=="AB":
     g = bilayer_geometry(g,mvl=None,dz=1.0)
   else: raise
-#  g.has_sublattice = False # no sublattice
+  g.has_sublattice = False # no sublattice
   if armchair: g = g.supercell([[1,-1,0],[0,1,0],[0,0,1]]) # armchair unit cell
   g.z *= dz ; g.xyz2r() # increase distance
   return g
