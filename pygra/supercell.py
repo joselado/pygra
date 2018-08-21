@@ -3,17 +3,18 @@ import numpy as np
 
 
 
-def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
+def non_orthogonal_supercell(gin,m,ncheck=2,mode="brute",reducef=lambda x: x):
   """Generate a non orthogonal supercell based on a tranformation
   matrix of the unit vectors, pretty much as VESTA does"""
   # workaround
   g = gin.copy()
   if g.dimensionality==0: return
   if g.dimensionality==1:
-    g.a2 = np.array([0.,1.,0.])
-    g.a3 = np.array([0.,0.,1.])
+    g.a2 = np.array([0.,np.max(np.abs(gin.y))*2.+1.,0.])
+    g.a3 = np.array([0.,0.,np.max(np.abs(gin.z))*2.+1.])
   if g.dimensionality==2:
-    g.a3 = np.array([0.,0.,1.])
+    dz = np.max(np.abs(gin.z))*2.+1.
+    g.a3 = np.array([0.,0.,dz])
   a1,a2,a3 = g.a1,g.a2,g.a3 # cell vectors
   go = g.copy() # output unit cell
   # new cell vectors

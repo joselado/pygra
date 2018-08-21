@@ -48,11 +48,12 @@ class geometry:
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
-    try:
-      nsuper[0][0] # if matrix is given
+    if np.array(nsuper).shape==(3,3):
+#    try:
+#      nsuper[0][0] # if matrix is given
       print("Supercell",nsuper)
       return non_orthogonal_supercell(self,nsuper)
-    except: pass # continue with normal way
+#    except: pass # continue with normal way
     if self.dimensionality==1:
       s = supercell1d(self,nsuper)
     elif self.dimensionality==2:

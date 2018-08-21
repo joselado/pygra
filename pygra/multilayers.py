@@ -265,7 +265,7 @@ def bilayer_geometry(g,mvl=None,dz=2.0):
 
 
 
-def get_geometry(name,dz=2.0):
+def get_geometry(name,dz=2.0,armchair=True):
   """Return the geometry for multilayer graphene"""
   g = geometry.honeycomb_lattice() # honeycomb lattice
   if name=="AA":
@@ -273,6 +273,8 @@ def get_geometry(name,dz=2.0):
   elif name=="AB":
     g = bilayer_geometry(g,mvl=None,dz=dz)
   else: raise
+  g.has_sublattice = False # no sublattice
+  if armchair: g = g.supercell([[1,-1,0],[0,1,0],[0,0,1]]) # armchair unit cell
   return g
 
 
