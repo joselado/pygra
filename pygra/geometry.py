@@ -1373,8 +1373,9 @@ def get_sublattice(rs):
   while True: # infinite loop
     for i in range(1,n): # look for a neighbor for site i
       for j in range(n): # loop over the rest of the atoms
+        if sublattice[j]==0: continue # next one
         dr = rs[i] - rs[j] # distance to site i
-        if 0.9<dr.dot(dr)<1.01 and sublattice[j]!=0: # if NN and sublattice 
+        if 0.9<dr.dot(dr)<1.01: # if NN and sublattice 
           sublattice[i] = -sublattice[j] + 0 # opposite
           print("Found ",i,sublattice,end="\r")
           continue # next one
