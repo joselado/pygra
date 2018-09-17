@@ -409,6 +409,9 @@ class hamiltonian():
   def get_multicell(self):
     """Return a multicell Hamiltonian"""
     return multicell.turn_multicell(self)
+  def get_no_multicell(self):
+    """Return a multicell Hamiltonian"""
+    return multicell.turn_no_multicell(self)
   def clean(self):
     """Clean a Hamiltonian"""
     from clean import clean_hamiltonian

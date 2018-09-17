@@ -599,8 +599,12 @@ def create_leads_and_central_list(h_right,h_left,list_h_central,
   """ Creates an heterojunction by giving the hamiltonian
      of the leads and the list of the center """
   # check the hamiltonians
-#  h_right.check()
-#  h_left.check()
+  h_right.check()
+  h_left.check()
+  # convert to the classical way
+  h_right = h_right.get_no_multicell()
+  h_left = h_left.get_no_multicell()
+  list_h_central = [h.get_no_multicell() for h in list_h_central]
   if len(list_h_central)==1: # only one central part
     return create_leads_and_central(h_right,h_left,list_h_central[0])
   ht = heterostructure(h_right) # create heterostructure

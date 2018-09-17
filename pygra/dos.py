@@ -386,7 +386,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
       if h.dimensionality==0:
         return dos0d(h,es=energies,delta=delta)
       elif h.dimensionality==1:
-        return dos1d(h,ndos=len(energies),delta=delta)
+        return dos1d(h,ndos=len(energies),delta=delta,nk=nk)
       elif h.dimensionality==2:
         return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
             ndos=len(energies),random=True,window=np.max(np.abs(energies)))
