@@ -36,9 +36,9 @@ class hamiltonian():
     """Write the tails of the wavefunctions"""
     if self.dimensionality!=0: raise
     else: return tails.matrix_tails(self.intra,discard=discard)
-  def spinless2full(self,m):
+  def spinless2full(self,m,time_reversal=False):
     """Transform a spinless matrix in its full form"""
-    return get_spinless2full(self)(m) # return
+    return get_spinless2full(self,time_reversal=time_reversal)(m) # return
   def spinful2full(self,m):
     """Transform a spinless matrix in its full form"""
     return get_spinful2full(self)(m) # return
@@ -334,6 +334,9 @@ class hamiltonian():
   def add_modified_haldane(self,t):
     """ Adds a Haldane term"""  
     kanemele.add_modified_haldane(self,t) # return Haldane SOC
+  def add_anti_kane_mele(self,t):
+    """ Adds a Haldane term"""  
+    kanemele.add_anti_kane_mele(self,t) # return anti kane mele SOC
   def add_antihaldane(self,t): self.add_modified_haldane(t) # second name
   def add_peierls(self,mag_field,new=False):
     """Add magnetic field"""
