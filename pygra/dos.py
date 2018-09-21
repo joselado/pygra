@@ -8,20 +8,35 @@ import timing
 import kpm
 
 try:
-  import dosf90 
-  calculate_dos = dosf90.calculate_dos # use the Fortran routine
 #  raise
+  import dosf90 
+  use_fortran = True
 except:
   print("Something wrong with FORTRAN in DOS")
-  def calculate_dos(es,xs,d):
-    ndos = len(xs)
-    delta = d/10.
-    ys,xs = np.histogram(es,bins=ndos) # create the histogram
-    lorentz = np.linspace(-1.,1.,len(ys)) # number of energies
-    lorentz = delta/(delta*delta + lorentz*lorentz) # smoothing function
-    ys = np.convolve(lorentz,ys,mode="same") # convolve lorentz and histogram
-    return ys
+  use_fortran = False
 
+
+def calculate_dos(es,xs,d,use_fortran=use_fortran,w=None):
+  if w is None: w = np.zeros(len(es)) + 1.0 # initialize
+  if use_fortran: # use fortran routine
+    import dosf90 
+    return dosf90.calculate_dos(es,xs,d,w) # use the Fortran routine
+  else:
+#    if w is None: # no weights
+#      ndos = len(xs)
+#      delta = d/10.
+#      ys,xs = np.histogram(es,bins=ndos) # create the histogram
+#      lorentz = np.linspace(-1.,1.,len(ys)) # number of energies
+#      lorentz = delta/(delta*delta + lorentz*lorentz) # smoothing function
+#      ys = np.convolve(lorentz,ys,mode="same") # convolve lorentz and histogram
+#      return ys
+#    else: # conventional mode
+      ys = np.zeros(xs.shape[0]) # initialize
+      for (e,iw) in zip(es,w): # loop over energies
+         de = xs - e # E - Ei
+         de = d/(d*d + de*de) # 1/(delta^2 + (E-Ei)^2)
+         ys += de*iw # times the weight
+      return ys
 
 
 

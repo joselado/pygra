@@ -590,11 +590,11 @@ def honeycomb_lattice():
   return g
 
 
-def buckled_honeycomb_lattice():
+def buckled_honeycomb_lattice(n=1):
   """Return a buckled honeycomb lattice"""
   import films
   g = diamond_lattice_minimal()
-  g = films.geometry_film(g,nz=1)
+  g = films.geometry_film(g,nz=n)
   return g 
 
 

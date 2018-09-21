@@ -130,10 +130,13 @@ def dos_semiinfinite(intra,inter,energies=np.linspace(-1.0,1.0,100),num_rep=100,
     green function approach"""
    dos = [] # list with the density of states
    for energy in energies: # loop over energies
-     gf = dyson(intra,inter,energy=energy,num_rep=num_rep,mixing=mixing,
-          eps=eps,green_guess=green_guess,max_error=max_error)
+#     gf = dyson(intra,inter,energy=energy,num_rep=num_rep,mixing=mixing,
+     gb,gf = green_renormalization(intra,inter,energy=energy,delta=delta)
      dos.append(-gf.trace()[0,0].imag)  # calculate the trace of the Green function
    return energies,dos
+
+
+
 
 
 

@@ -284,6 +284,16 @@ def get_velocity(h):
   return f
 
 
+get_current = get_velocity
+
+def get_spin_current(h):
+  vk = current.current_operator(h)
+  sz = get_sz(h)
+  def f(w,k=[0.,0.,0.]):
+    return braket_wAw(w,vk(k)).real*braket_wAw(w,sz).real
+  return f
+
+
 
 
 
@@ -342,6 +352,14 @@ def get_inplane_valley(h):
   return fun # return function
 
 
+
+
+
+def tofunction(A):
+    """Transform this object into a callable function"""
+    if A is None: return lambda x,k=0.0: 1.0 # no input
+    if callable(A): return A # if it is a function
+    else: return lambda x,k=0.0: braket_wAw(x,A).real # if it is a matrix
 
 
 
