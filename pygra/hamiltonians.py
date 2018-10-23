@@ -98,6 +98,9 @@ class hamiltonian():
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
+  def get_dos(self,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=100):
+      import dos
+      dos.dos(self,energies=energies,delta=delta,nk=nk)
   def get_bands(self,nkpoints=100,use_lines=False,kpath=None,operator=None,
                  num_bands=None,callback=None,central_energy = 0.0):
     """ Returns a figure with teh bandstructure"""

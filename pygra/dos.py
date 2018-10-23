@@ -184,9 +184,9 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
     hk = hkgen(ks[ik]) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
-      es += [smalleig(hk,numw=numw)] # eigenvalues
+      es += smalleig(hk,numw=numw).tolist() # eigenvalues
     else: # dense Hamiltonian
-      es += [lg.eigvalsh(hk)] # get eigenvalues
+      es += lg.eigvalsh(hk).tolist() # get eigenvalues
 #  es = es.reshape(len(es)*len(es[0])) # 1d array
   es = np.array(es) # convert to array
   nk = len(ks) # number of kpoints
