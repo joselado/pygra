@@ -332,7 +332,6 @@ def get_valley(h,projector=False,delta=None):
 
 
 
-
 def get_inplane_valley(h):
   """Returns an operator that computes the absolute value
   of the intervalley mixing"""

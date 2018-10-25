@@ -27,7 +27,8 @@ import pickle
 
 #import data
 
-maxmatrix = 4000 # maximum dimension
+from limits import densedimension as maxmatrix
+#maxmatrix = 4000 # maximum dimension
 optimal = False
 
 class hamiltonian():
@@ -47,11 +48,13 @@ class hamiltonian():
   def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
                                  sparse=sparse,numw=numw)
-  def set_filling(self,filling=0.5,nk=10):
+  def set_filling(self,filling=0.5,nk=10,extrae=0.):
     """Set the filling of the Hamiltonian"""
-    es,ws = self.eigenvectors(nk=nk)
+    import spectrum
+    es = spectrum.eigenvalues(self,nk=nk)
     from scftypes import get_fermi_energy
-    self.shift_fermi(-get_fermi_energy(es,filling)) # shift the fermi energy
+    fill = filling + extrae/self.intra.shape[0] # filling
+    self.shift_fermi(-get_fermi_energy(es,fill)) # shift the fermi energy
   def __init__(self,geometry=None):
     self.has_spin = True # has spin degree of freedom
     self.prefix = "" # a string used a prefix for different files
@@ -278,30 +281,32 @@ class hamiltonian():
       if self.dimensionality > 2: raise # for one dimensional
   def turn_dense(self):
     """ Transforms the hamiltonian into a sparse hamiltonian"""
+#    if not self.is_sparse: return
     from scipy.sparse import csc_matrix
 #    if not self.is_sparse: return # if it is sparse return
     if self.intra.shape[0]>maxmatrix: raise
-    self.is_sparse = False # sparse flag to true
-    self.intra = csc_matrix(self.intra).todense()
+    self.is_sparse = False # sparse flag to false
+    from scipy.sparse import issparse
+    def densify(m):
+        if issparse(m): return m.todense()
+        else: return m
+
+    self.intra = densify(self.intra)
     if self.is_multicell: # multicell Hamiltonian 
       for i in range(len(self.hopping)): # loop
-        self.hopping[i].m = csc_matrix(self.hopping[i].m).todense()
+        self.hopping[i].m = densify(self.hopping[i].m)
       return
     else:  # no multicell
+      if self.dimensionality == 0: pass # for one dimensional
       if self.dimensionality == 1: # for one dimensional
-        self.inter = csc_matrix(self.inter).todense()
-      if self.dimensionality == 2: # for one dimensional
-        self.tx = csc_matrix(self.tx).todense()
-        self.ty = csc_matrix(self.ty).todense()
-        self.txy = csc_matrix(self.txy).todense()
-        self.txmy = csc_matrix(self.txmy).todense()
+        self.inter = densify(self.inter)
+      elif self.dimensionality == 2: # for one dimensional
+        self.tx = densify(self.tx)
+        self.ty = densify(self.ty)
+        self.txy = densify(self.txy)
+        self.txmy = densify(self.txmy)
+      else: raise
 
-  def compress(self):
-    """Compress the matrix"""
-    if not self.is_sparse: return
-    self.intra = csc_matrix(self.intra) # transport into csc_matrix
-    self.intra.eliminate_zeros() 
-    self.intra = coo_matrix(self.intra) # transport into csc_matrix
   def add_rashba(self,c):
     """Adds Rashba coupling"""
     g = self.geometry
