@@ -14,12 +14,13 @@ import specialgeometry
 
 g = geometry.honeycomb_lattice()
 
-g = g.supercell(11)
+g = g.supercell(21)
 h = g.get_hamiltonian(has_spin=False)
 
 
 
 def fm(r): 
+  r = r -np.array([0.,3.0,0.])
   if r.dot(r)<7.0: return 0.3
   else: return -0.3
 

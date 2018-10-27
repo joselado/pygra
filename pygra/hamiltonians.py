@@ -82,8 +82,9 @@ class hamiltonian():
     def f(k=[0.,0.,0.],e=0.0):
       hk = hkgen(k) # get matrix
       if canonical_phase: # use a Bloch phase in all the sites
-        U = np.diag([self.geometry.bloch_phase(k,r) for r
-                             in self.geometry.frac_r])
+        frac_r = self.geometry.frac_r # fractional coordinates
+        # start in zero
+        U = np.diag([self.geometry.bloch_phase(k,r) for r in frac_r])
         U = np.matrix(U) # this is without .H
         U = self.spinless2full(U) # increase the space if necessary
         hk = U.H*hk*U
