@@ -1,6 +1,8 @@
 from __future__ import print_function,division
 import time
 
+printall = False
+
 class Testimator:
   def __init__(self,title="",maxite=None):
     self.t0 = time.clock() # starting time
@@ -20,7 +22,8 @@ class Testimator:
     trem = dt/(i+1)*(tot-i) # remaining time
     out += " remaining time "+str(round(trem,1))+"s"
     out += ", total time "+str(round(dt,1))+"s"
-    print(out,end="\r")
+    if printall: print(out)
+    else: print(out,end="\r")
   def iterate(self):
       if self.maxite is not None: # of it has been provided
         self.remaining(self.i,self.maxite) # execute

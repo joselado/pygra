@@ -387,7 +387,7 @@ class hamiltonian():
     if self.is_multicell: # multicell Hamiltonian
       a1,a2,a3 = self.geometry.a1, self.geometry.a2,self.geometry.a3
       for i in range(len(self.hopping)): # loop 
-        ar = self.hopping.dir # direction
+        ar = self.hopping[i].dir # direction
 #        direc = a1*ar[0] + a2*ar[1] + a3*ar[2]
         self.hopping[i].m = tmprot(self.hopping[i].m,ar) # rotate matrix
     else:

@@ -3,7 +3,7 @@ import timing
 
 
 
-def magnetic_response_map(h,nk=20,nq=20,j=[2.0,0.,0.],r=[0,0,1],
+def magnetic_response_map(h,nk=20,nq=20,j=[1.0,0.,0.],r=[0,0,1],
           kp=None,qs=None):
   """Generate a magnetic susceptibility map"""
   h0 = h.copy() # copy Hamiltonian

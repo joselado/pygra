@@ -14,17 +14,17 @@ import specialgeometry
 
 g = geometry.honeycomb_lattice()
 
-g = g.supercell(21)
+g = g.supercell(11)
 h = g.get_hamiltonian(has_spin=False)
 
 
 
 def fm(r): 
-  r = r -np.array([0.,3.0,0.])
+#  r = r -np.array([0.,3.0,0.])
   if r.dot(r)<7.0: return 0.3
   else: return -0.3
 
 h.add_sublattice_imbalance(fm)
 
 import topology
-topology.berry_green_map(h,k=[0.3333333,0.3333333,0.0],nrep=3)
+topology.berry_green_map(h,k=[0.3333333,0.3333333,0.0],nrep=3,integral=True)
