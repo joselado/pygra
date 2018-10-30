@@ -168,7 +168,6 @@ def guess(h,mode="ferro",fun=0.01):
 #  h0.intra *= 0. # initialize
   h0.clean() # clean the Hamiltonian
   if mode=="ferro":
-    print("AAA")
     h0.add_zeeman(fun)
   elif mode=="random":
     h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])

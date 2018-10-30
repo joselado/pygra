@@ -3,7 +3,7 @@ import timing
 
 
 
-def magnetic_response_map(h,nk=20,nq=20,j=[1.0,0.,0.],r=[0,0,1],
+def magnetic_response_map(h,nk=20,nq=20,j=[0.1,0.,0.],r=[0,0,1],
           kp=None,qs=None):
   """Generate a magnetic susceptibility map"""
   h0 = h.copy() # copy Hamiltonian
@@ -14,8 +14,8 @@ def magnetic_response_map(h,nk=20,nq=20,j=[1.0,0.,0.],r=[0,0,1],
   k2K = h.geometry.get_k2K_generator() # get the function
   # loop over qvectors
   if qs is None: # not provided
-    xs = np.linspace(-2.0,2.0,nq) # kx
-    ys = np.linspace(-2.0,2.0,nq) # ky
+    xs = np.linspace(-4.0,4.0,nq) # kx
+    ys = np.linspace(-4.0,4.0,nq) # ky
     qs = [] # initialize qvectors
     for x in xs:
       for y in ys:

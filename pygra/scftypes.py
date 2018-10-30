@@ -47,6 +47,7 @@ class scfclass():
     self.kfac = 1.0 # normalization factor for the number of kpoints
     self.fermi = 0.0 # fermi energy
     self.error = 0.0 # error in the selfconsistency
+    self.silent = False
     self.gap = 0.0 # gap of the system
     self.smearing = None
     if use_multicorrelator: # fortran library is present
@@ -287,7 +288,7 @@ class scfclass():
       mfnew[tuple(v.dir)] = mfnew[tuple(v.dir)] + tmp  # store
     fvs.close() # close file
     accu /= len(self.interactions)*2
-    print("Average value of expectation values",accu)
+    if not self.silent: print("Average value of expectation values",accu)
     self.error = error_meanfield(self.mf,mfnew)/self.sites # get the error
     self.mf = mix_meanfield(self.mf,mfnew,mixing=mixing) # new mean field
     if self.hamiltonian.has_eh: 
@@ -295,7 +296,7 @@ class scfclass():
       print("Enforcing electron-hole symmetry")
       print("################################")
       self.mf = meanfield.enforce_eh(self.hamiltonian,self.mf)
-    print("ERROR",self.error)
+    if not self.silent: print("ERROR",self.error)
   def get_total_energy(self):
     """Return the total energy"""
     eout = np.sum(self.energies)/self.kfac 
@@ -309,7 +310,7 @@ class scfclass():
     if self.hamiltonian.has_eh: groundstate.swave(self.hamiltonian) 
   def iterate(self):
     """Perform a single iteration"""
-    print("## Iteration number ",self.iteration)
+    if not self.silent: print("## Iteration number ",self.iteration)
     mixing = self.mixing 
     self.update_hamiltonian() # update the Hamiltonian
     self.hamiltonian.check() # check that nothing weird happened
@@ -321,10 +322,11 @@ class scfclass():
     self.update_mean_field(mixing=mixing) # calculate mean field
     t4 = time.clock()
     self.iteration += 1
-    print("Time in diagonalization",t2-t1)
-    print("Time in expectation values",t3-t2)
-    print("Time in new Hamiltonian",t4-t3)
-    print("\n")
+    if not self.silent:
+      print("Time in diagonalization",t2-t1)
+      print("Time in expectation values",t3-t2)
+      print("Time in new Hamiltonian",t4-t3)
+      print("\n")
   def solve(self):
     """Solve the selfconsistent problem"""
     return
@@ -662,6 +664,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   ite = 0 # iteration counter
   scf = scfclass(h) # create scf class
   scf.nkgrid = nkp
+  scf.silent = silent
   scf.smearing = smearing
   scf.energy_cutoff = energy_cutoff # energy_cutoff
   scf.filling = filling # filling of the system
