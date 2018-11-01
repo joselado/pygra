@@ -8,6 +8,7 @@ import os
 import numpy as np
 import klist
 import operators
+import timing
 
 def ldos0d(h,e=0.0,delta=0.01):
   """Calculates the local density of states of a hamiltonian and
@@ -171,10 +172,11 @@ def ldos2d(h,e=0.0,delta=0.001,nrep=3,nk=None,mode="green",
     if nk is None: nk = 10
     hkgen = h.get_hk_gen() # get generator
     ds = [] # empty list
-    for k in klist.kmesh(h.dimensionality,nk=nk): # loop over kpoints
-      print("Doing",k)
+    ks = klist.kmesh(h.dimensionality,nk=nk)
+    ts = timing.Testimator(title="LDOS",maxite=len(ks))
+    for k in ks: # loop over kpoints
+      ts.iterate()
       if random:
-        print("Random k-point")
         k = np.random.random(3) # random k-point
       hk = csc_matrix(hkgen(k)) # get Hamiltonian
       ds += [ldos_arpack(hk,num_wf=num_wf,robust=False,

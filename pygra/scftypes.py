@@ -162,10 +162,15 @@ class scfclass():
             interactions.append(meanfield.v_pairing_uu(i,j,nat,g=g,d=d,channel="hh")) 
     else: # no electron hole symmetry
       if mode=="Hubbard" or mode=="U": # Hubbard model
-        print("Adding Hubbard interaction")
-        for i in range(nat): 
-          interactions.append(meanfield.hubbard_density(i,nat,g=g)) 
-          interactions.append(meanfield.hubbard_exchange(i,nat,g=g)) 
+        if self.hamiltonian.has_spin: # spinful
+          print("Adding Spinful Hubbard interaction")
+          for i in range(nat): 
+            interactions.append(meanfield.hubbard_density(i,nat,g=g)) 
+            interactions.append(meanfield.hubbard_exchange(i,nat,g=g)) 
+        else:
+          print("Adding spinless Hubbard interaction")
+          for i in range(nat): 
+            interactions.append(meanfield.spinless_hubbard_density(i,nat,g=g)) 
       elif mode=="Hubbard collinear": # Hubbard model
         print("Adding Hubbard collinear interaction")
         for i in range(nat): 
@@ -682,6 +687,10 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
 #  scf.solve()
   stop_scf = False # do not stop
   scf.mixing = mix
+  scf.maxerror = maxerror
+#  print("BEGINNING OF BROYDEN")
+#  scf = meanfield.broyden_solver(scf)
+#  print("END OF BROYDEN")
   while True: # infinite loop
     scf.iterate() # do an iteration
     scf.hamiltonian.write_magnetization() # write the magnetization
@@ -700,11 +709,11 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
       print("Error in SCF =",scf.error)
       print("Fermi energy =",scf.fermi)
       print("Gap =",scf.gap)
-    if stop_scf: break # stop the calculation
     if scf.error<maxerror or os.path.exists("STOP") or scf.iteration==maxite: 
       stop_scf = True # stop the calculation after the next iteration
       scf.mixing = 1.0 # last iteration with mixing one
       scf.smearing = None # last iteration without smearing
+    if stop_scf: break # stop the calculation
   file_etot.close() # close file
   file_error.close() # close file
   file_gap.close() # close file

@@ -38,14 +38,14 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
       ts = -ts[0:nout]
       ii = ii[0:nout]
       jj = jj[0:nout]
-      out = csc_matrix((ts,(ii-1,jj-1)),shape=(nr,nr)) # matrix
+      out = csc_matrix((ts,(ii-1,jj-1)),shape=(nr,nr),dtype=np.complex) # matrix
       return out
   except:
     print("FORTRAN not working in specialhopping")
     def funhop(r1,r2):
       fh = twisted(cutoff=cutoff,ti=ti,lambi=lambi,lamb=lamb)
       m = np.matrix([[fh(r1i,r2j) for r1i in r1] for r2j in r2])
-      return csc_matrix(m)
+      return csc_matrix(m,dtype=np.complex)
 #      raise
   return funhop # function
 

@@ -76,6 +76,9 @@ class hamiltonian():
     """ Generate kdependent hamiltonian"""
     if self.is_multicell: return multicell.hk_gen(self) # for multicell
     else: return hk_gen(self) # for normal cells
+  def get_ldos(self,nk=4,e=0.0,mode="arpack",delta=0.05,nrep=3):
+      import ldos
+      ldos.ldos(self,e=e,delta=delta,nk=nk,mode=mode,nrep=nrep)
   def get_gk_gen(self,delta=0.05,operator=None,canonical_phase=False):
     """Return the Green function generator"""
     hkgen = self.get_hk_gen() # Hamiltonian generator
@@ -299,7 +302,7 @@ class hamiltonian():
       return
     else:  # no multicell
       if self.dimensionality == 0: pass # for one dimensional
-      if self.dimensionality == 1: # for one dimensional
+      elif self.dimensionality == 1: # for one dimensional
         self.inter = densify(self.inter)
       elif self.dimensionality == 2: # for one dimensional
         self.tx = densify(self.tx)
@@ -1006,15 +1009,6 @@ def hk_gen(h):
 
 
 
-def ldos(h,e=0.0,delta=0.01):
-  """Calculates the local density of states of a hamiltonian and
-     writes it in file"""
-  if h.dimensionality==0:
-    from ldos import ldos0d
-    ldos0d(h,e=e,delta=delta)
-  else: raise
-
-
 
 
 
@@ -1040,7 +1034,7 @@ def generate_parametric_hopping(h,f=None,mgenerator=None,
       return generator(r1,r2,f,is_sparse=is_sparse)
   else:
     if h.dimensionality==3: raise
-    print("Generator matrix given on input")
+#    print("Generator matrix given on input")
   h.intra = mgenerator(rs,rs)
   if h.dimensionality == 0: pass
   elif h.dimensionality == 1:

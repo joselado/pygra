@@ -25,11 +25,16 @@ def fhop(r1,r2):
     return tmax*(1.-lamb) + tmin*lamb
   else: return 0.0
 
+fhop = None
 
 
 h = g.get_hamiltonian(fun=fhop,has_spin=True) # get the Hamiltonian
-
+h.add_zeeman([0.,.4,0.])
 g.write()
+
 import scftypes
-scf = scftypes.hubbardscf(h,U=1.0,mag=[[1,0,0] for r in g.r])
-scf.hamiltonian.get_bands()
+mf = scftypes.guess(h,mode="antiferro")
+scf = scftypes.selfconsistency(h,filling=0.5,g=1.0,
+                mix=0.9,mf=mf,mode="U")
+
+#scf.hamiltonian.get_bands()

@@ -110,6 +110,8 @@ def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
   return g
 
 
+def twisted_trilayer(m0=3):
+  return twisted_multilayer(m0=m0,shift=[-1.,0.,1.])
 
 
 def rotate_layer(g,theta,dr=[0.,0.,0.]):
