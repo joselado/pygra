@@ -1,10 +1,7 @@
 import os
 import sys
 sys.path.append(os.environ["PYGRAROOT"]) # Path with libraries
-import geometry
-import hamiltonians
 import numpy as np
-
 import specialgeometry
 
 n = 7 # this is a parameter that controls the size of the moire unit cell

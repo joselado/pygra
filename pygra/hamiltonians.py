@@ -105,9 +105,10 @@ class hamiltonian():
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
-  def get_dos(self,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=100):
+  def get_dos(self,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=100,
+          use_kpm=False):
       import dos
-      dos.dos(self,energies=energies,delta=delta,nk=nk)
+      dos.dos(self,energies=energies,delta=delta,nk=nk,use_kpm=use_kpm)
   def get_bands(self,nkpoints=100,use_lines=False,kpath=None,operator=None,
                  num_bands=None,callback=None,central_energy = 0.0):
     """ Returns a figure with teh bandstructure"""
@@ -313,6 +314,7 @@ class hamiltonian():
 
   def add_rashba(self,c):
     """Adds Rashba coupling"""
+    if not self.has_spin: raise
     g = self.geometry
     is_sparse = self.is_sparse # saprse Hamiltonian
     self.intra = self.intra + rashba(g.r,c=c,is_sparse=is_sparse)
@@ -684,7 +686,8 @@ def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     else: # dense Hamiltonians
       import parallel
       if parallel.cores>1: # in parallel
-        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
+#        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
+        vvs = parallel.pcall(lambda k: lg.eigh(f(k)),kp)
       else: vvs = [lg.eigh(f(k)) for k in kp] # 
     nume = sum([len(v[0]) for v in vvs]) # number of eigenvalues calculated
     eigvecs = np.zeros((nume,h.intra.shape[0]),dtype=np.complex) # eigenvectors

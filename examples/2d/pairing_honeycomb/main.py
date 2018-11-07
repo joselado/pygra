@@ -27,11 +27,11 @@ h.add_swave(0.0)
 
 mf = scftypes.guess(h,mode="swave",fun=0.02)
 #h.remove_spin()
-mode = {"U":-4}
+mode = {"U":-10}
 #mode = {"V":-3.}
 #exit()
 #h.turn_sparse()
-scf = scftypes.selfconsistency(h,nkp=10,g=-2.0,
+scf = scftypes.selfconsistency(h,nkp=10,g=-10.0,
               mix=0.9,mf=mf,mode=mode)
 
               

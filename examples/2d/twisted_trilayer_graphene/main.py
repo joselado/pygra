@@ -11,7 +11,7 @@ import sculpt
 import specialgeometry
 
 
-g = specialgeometry.twisted_multilayer(9,rot=[0,1])
+g = specialgeometry.twisted_multilayer(9,rot=[0,1,0])
 #g = g.supercell(2)
 #g = geometry.honeycomb_lattice()
 g.write()

@@ -51,3 +51,15 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
 
 
 
+
+def multilayer(ti=0.3,dz=3.0):
+    """Return hopping for a multilayer"""
+    def fhop(ri,rj):
+      """Function to compute the hopping"""
+      dr = ri-rj ; dr2 = dr.dot(dr) # distance
+      if abs(1.0-dr2)<0.01: return 1.0 # first neighbors
+      # interlayer hopping (distance between the layers is 3)
+      if abs(dz**2-dr2)<0.01 and abs(dz-abs(dr[2]))<0.01: return ti
+      return 0.0 # else
+    return fhop
+
