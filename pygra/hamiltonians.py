@@ -1055,12 +1055,12 @@ def generate_parametric_hopping(h,f=None,mgenerator=None,
     multicell.parametric_hopping_hamiltonian(h,fc=f)
   else: raise
   # check that the sparse mde is set ok
-  if is_sparse and type(h.intra)==type(np.matrix):
-    print("Sparse type is not ok, fixing")
+  if is_sparse and type(h.intra)==type(np.matrix([[]])):
+    print("Matrices should be sparse, fixing")
     h.is_sparse = False
     h.turn_sparse() # turn the matrix sparse 
-  if not is_sparse and type(h.intra)!=type(np.matrix):
-    print("Sparse type is not ok, fixing")
+  if not is_sparse and type(h.intra)!=type(np.matrix([[]])):
+    print("Matrices should be dense, fixing",type(h.intra),type(np.matrix))
     h.is_sparse = True
     h.turn_dense() # turn the matrix sparse 
   if has_spin: # Hamiltonian should be spinful

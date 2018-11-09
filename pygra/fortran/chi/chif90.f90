@@ -59,7 +59,7 @@ subroutine elementchi(wf_chi_i,ene_chi_i,&
         call occupation(etmp1,temperature_chi,occ1)
         call occupation(etmp2,temperature_chi,occ2)
         occ_fac = occ2-occ1  ! occupation factor
-        if (dabs(occ_fac).lt.1.d-04)  cycle  ! next iteration if too far
+!        if (dabs(occ_fac).lt.1.d-04)  cycle  ! next iteration if too far
         ! if contribution is different from zero continue
         wftmp2(:) = wf_chi_j(iwf2,:)
 ! compute element of linear response
