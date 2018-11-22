@@ -28,12 +28,13 @@ for U in Us: # loop over Us
   
   
   mf = scftypes.guess(h,mode="antiferro")
-  scf = scftypes.selfconsistency(h,nkp=10,filling=0.5,g=U,
-                mix=0.9,mf=mf,mode="U")
+  scf = scftypes.selfconsistency(h,nkp=20,filling=0.5,g=U,
+                mix=0.9,mf=mf,mode="U",broyden=True)
   h = scf.hamiltonian # get the Hamiltonian
 #  h.get_bands() # calculate band structure
 #  import groundstate
-  f.write(str(U)+"   "+str(scf.gap)+"\n")
+  gap = h.get_gap()
+  f.write(str(U)+"   "+str(gap)+"\n")
 #  groundstate.swave(h)
   #groundstate.hopping(h)
   

@@ -69,11 +69,17 @@ def project_holes(m):
 def eh_operator(m):
   """Return the electron hole symmetry operator, as a function"""
   n = m.shape[0]//4 # number of sites 
-  out = [[None for i in range(n)] for j in range(n)] # output matrix
-  tau = csc_matrix([[0.,0.,0.,-1.],[0,0,1,0],[0,1,0,0],[-1,0,0,0]])
-  for i in range(n):
-    out[i][i] = tau
+  from hamiltonians import sy
+  msy = [[None for ri in range(n)] for j in range(n)]
+  for i in range(n): msy[i][i] = sy # add sy
+  msy = bmat(msy) # sy matrix in the electron subspace
+  out = [[None,1j*msy],[-1j*msy,None]]
+#  out = [[None for i in range(n)] for j in range(n)] # output matrix
+#  tau = csc_matrix([[0.,0.,0.,-1.],[0,0,1,0],[0,1,0,0],[-1,0,0,0]])
+#  for i in range(n):
+#    out[i][i] = tau
   out = bmat(out) # sparse matrix
+  out = reorder(out) # reshufle the matrix
   def ehop(inm):
     """Function that applies electron-hole symmetry to a matrix"""
     return out*np.conjugate(inm)*out # return matrix
@@ -230,30 +236,37 @@ def dvector2deltas(ds):
   return deltas
 
 
-def add_pairing(deltas=[0.,0.,0.],is_sparse=True,r1=[],r2=[]):
+def add_pairing(deltas=[[0.,0],[0.,0.]],is_sparse=True,r1=[],r2=[]):
   """ Adds a general pairing in real space"""
   def get_pmatrix(r1i,r2j): # return the different pairings
     if callable(deltas): dv = deltas(r1i,r2j) # get the components
     else: dv = deltas
-    duu = dv[0] # delta up up
-    ddd = dv[1] # delta dn dn
-    dud = dv[2] # delta up dn
+    duu = dv[0,1] # delta up up
+    ddd = dv[1,0] # delta dn dn
+    dud = dv[0,0] # delta up dn
+    ddu = dv[1,1] # delta up dn
     # be aware of the minus signs coming from the definition of the
     # Nambu spinor!!!!!!!!!!!!!!!!!
     # c_up d_dn d^\dagger_dn -d^\dagger_up
-    D = csc_matrix([[dud,-duu],[ddd,-dud]]) # SC matrix
-    D = bmat([[None,D],[-D.H,None]]) # the minus sign comes from triplet
+    D = csc_matrix([[dud,duu],[ddd,ddu]]) # SC matrix
+#    D = bmat([[None,D],[-D.H,None]]) # the minus sign comes from triplet
     return D
   # superconducting coupling
   n = len(r1)  # number of sites
-  bout = [[None for i in range(n)] for j in range(n)] # initialize None matrix
+  pout = [[None for i in range(n)] for j in range(n)] # initialize None matrix
   # zeros in the diagonal
-  for i in range(n): bout[i][i] = csc_matrix(np.zeros((4,4),dtype=np.complex))
+#  for i in range(n): bout[i][i] = csc_matrix(np.zeros((4,4),dtype=np.complex))
   for i in range(n): # loop over sites
     for j in range(n): # loop over sites
-      bout[i][j] = get_pmatrix(r1[i],r2[j]) # get this pairing
-  return bmat(bout) # return pairing matrix
-
+      pout[i][j] = get_pmatrix(r1[i],r2[j]) # get this pairing
+  diag = csc_matrix(np.zeros((2*len(r1),2*len(r1)),dtype=np.complex)) # diag
+  pout = bmat(pout) # convert to block matrix
+#  mout = [[diag,pout],[np.conjugate(pout),diag]] # output matrix
+  mout = [[diag,pout],[None,diag]] # output matrix
+#  mout = [[diag,pout],[pout,diag]] # output matrix
+  mout = bmat(mout) # return full matrix
+  mout = reorder(mout) # reorder the entries
+  return mout
 
 
 
@@ -261,8 +274,13 @@ def add_pairing(deltas=[0.,0.,0.],is_sparse=True,r1=[],r2=[]):
 
 
 def reorder(m):
-  '''Reorder a matrix that has electrons and holes, so that they are
-  ordered in an analogous way as the initial matrix'''
+  '''Reorder a matrix that has electrons and holes, so that
+  the order resembles the Nambu spinor in each site.
+  The initial matrix is
+  H D
+  D H
+  The output is a set of block matrices for each site in the 
+  Nambu form'''
   R = np.matrix(np.zeros(m.shape)) # zero matrix
   nr = m.shape[0]//4 # number of positions
   for i in range(nr): # electrons
@@ -272,5 +290,165 @@ def reorder(m):
     R[2*i+1+2*nr,4*i+3] = 1.0 # up holes
   R = csc_matrix(R) # to sparse
   return R.H*m*R
+
+
+
+def extract_pairing(m):
+  """Extract the pairing from a matrix, assuming it has the Nambu form"""
+  nr = m.shape[0]//4 # number of positions
+  uu = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  dd = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  ud = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  for i in range(nr): # loop over positions
+    for j in range(nr): # loop over positions
+        ud[i,j] = m[4*i,4*j+2]
+        dd[i,j] = m[4*i+1,4*j+2]
+        uu[i,j] = m[4*i,4*j+3]
+  return (uu,dd,ud) # return the three matrices
+
+
+
+
+def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
+    """ Add a general pairing matrix to a Hamiltonian"""
+#    self.get_eh_sector = get_eh_sector_odd_even # assign function
+#    if mode is None: df = delta # assume function is given
+    if mode=="swave":
+        from geometry import same_site
+        df = lambda r1,r2: delta*same_site(r1,r2)*np.identity(2)
+    elif mode=="px":
+        df = lambda r1,r2: delta*px(r1,r2)
+    elif mode=="swaveA":
+        df = lambda r1,r2: delta*swaveA(self.geometry,r1,r2)
+    elif mode=="dx2y2":
+        df = lambda r1,r2: delta*dx2y2(r1,r2)
+    elif mode=="snn":
+        df = lambda r1,r2: delta*swavenn(r1,r2)
+    elif mode=="C3nn":
+        df = lambda r1,r2: delta*C3nn(r1,r2)
+    elif mode=="SnnAB":
+        df = lambda r1,r2: delta*SnnAB(self.geometry,r1,r2)
+    else: raise
+    self.turn_nambu() # add electron hole terms
+    r = self.geometry.r # positions 
+    m = add_pairing(df,r1=r,r2=r) # intra cell
+    self.intra = self.intra + m + m.H
+    if self.dimensionality>0:
+      if self.is_multicell: # for multicell hamiltonians
+        from multicell import Hopping
+        for d in self.geometry.neighbor_directions(): # loop over directions
+          # this is a workaround to be able to do triplets
+          # do it for +k and -k
+          if d.dot(d)<0.0001: continue # skip onsite
+          r2 = self.geometry.replicas(d) # positions
+          m = add_pairing(df,r1=r,r2=r2) # new matrix
+#          m2 = add_pairing(df,r1=r,r2=r2) # new matrix, the other way
+          m2 = m
+          if np.max(np.abs(m))>0.0001: # non zero
+              self.hopping.append(Hopping(d=d,m=m)) # add pairing
+          if np.max(np.abs(m2))>0.0001: # non zero
+              self.hopping.append(Hopping(d=-np.array(d),m=m2.H)) # add pairing
+        from multicell import collect_hopping
+        self.hopping = collect_hopping(self)
+      else: # conventional way
+        raise # error
+
+
+iden = np.matrix([[1.,0.],[0.,1.]],dtype=np.complex)
+taux = np.matrix([[0.,1.],[1.,0.]],dtype=np.complex)
+tauz = np.matrix([[1.,0.],[0.,-1.]],dtype=np.complex)
+
+def px(r1,r2):
+    """Function with first neighbor px profile"""
+    dr = r1-r2 ; dr2 = dr.dot(dr)
+    if 0.99<dr2<1.001: return dr[0]*tauz
+    return 0.0*tauz
+
+
+
+def dx2y2(r1,r2):
+    """Function with first neighbor dx2y2 profile"""
+    dr = r1-r2
+    dr2 = dr.dot(dr)
+    if 0.99<dr2<1.001: # first neighbor
+        return (dr[0]**2 - dr[1]**2)*iden
+    return 0.0*iden
+
+
+
+def swavenn(r1,r2):
+    """Function with first neighbor dx2y2 profile"""
+    dr = r1-r2
+    dr2 = dr.dot(dr)
+    if 0.99<dr2<1.001: # first neighbor
+        return 1.0*iden
+    return 0.0*iden
+
+
+def C3nn(r1,r2):
+    """Function with first neighbor C3 profile"""
+    dr = r1-r2
+    dr2 = dr.dot(dr)
+    if 0.99<dr2<1.001: # first neighbor
+#        return dr[0]
+        phi = np.arctan2(dr[1],dr[0]) # angle
+        return 1.0*np.exp(1j*phi)*tauz
+    return 0.0*tauz
+
+
+def SnnAB(g,r1,r2):
+    """Swave between AB"""
+    dr = r1-r2
+    dr2 = dr.dot(dr)
+    if 0.99<dr2<1.001: # first neighbor
+        i = g.get_index(r1,replicas=True)
+        j = g.get_index(r2,replicas=True)
+        if g.sublattice[i]==1 and g.sublattice[j]==-1:
+          return 1.0*tauz
+        else: return -1.0*tauz
+#          return 1.0*np.matrix([[1.,0.],[0.,0.]])
+    return 0.0*iden
+
+def swaveA(g,r1,r2):
+    """Swave only in A"""
+    dr = r1-r2
+    dr2 = dr.dot(dr)
+    if dr2<0.001: # first neighbor
+        i = g.get_index(r1,replicas=False)
+        if i is None: return 0.0
+        if g.sublattice[i]==1:
+          return 1.0*iden
+    return 0.0*iden
+
+
+
+
+
+def extract_euphdn(m):
+    """Extract electron up hole down sector"""
+    n = m.shape[0]//2 # half the dimension
+    out = np.matrix(np.zeros((n,n),dtype=np.complex))
+    for i in range(n):
+      for j in range(n):
+        out[i,j] = m[2*i,2*j]
+    return out
+
+
+
+def superconductivity_type(h):
+    """Check the sype of superconductivity"""
+    h.check() # check that everything is ok
+    hk = h.get_hk_gen() # get geenrator
+    k = np.random.random(3) # random kpoint
+    h1 = hk(k) # Hamiltonian at +k
+    h2 = hk(-k) # Hamiltonian at -k
+    (t,t,m1) = extract_pairing(h1)
+    (t,t,m2) = extract_pairing(h2)
+#    m3 = time_reversal(m1) # time reversal in spin space
+    if np.max(np.abs(m1-m2))<1e-5:
+        print("Even pairing")
+    elif np.max(np.abs(m1+m2))<1e-5:
+        print("Odd pairing")
+
 
 

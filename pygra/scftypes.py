@@ -649,7 +649,8 @@ def write_magnetization(mag):
 def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,fermi_shift=0.0,
-                  mode="Hubbard",energy_cutoff=None,maxite=1000):
+                  mode="Hubbard",energy_cutoff=None,maxite=1000,
+                  broyden=False):
   """ Solve a selfcnsistent Hubbard mean field"""
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
@@ -689,11 +690,11 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   scf.mixing = mix
   scf.maxerror = maxerror
 #  print("BEGINNING OF BROYDEN")
-#  scf = meanfield.broyden_solver(scf)
 #  print("END OF BROYDEN")
   while True: # infinite loop
     scf.iterate() # do an iteration
-    scf.hamiltonian.write_magnetization() # write the magnetization
+    if scf.hamiltonian.has_spin: 
+        scf.hamiltonian.write_magnetization() # write the magnetization
     eout = scf.get_total_energy() # total energy
     print("Total energy",eout)
 #    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
@@ -714,6 +715,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
       scf.mixing = 1.0 # last iteration with mixing one
       scf.smearing = None # last iteration without smearing
     if stop_scf: break # stop the calculation
+  if broyden: scf = meanfield.broyden_solver(scf)
   file_etot.close() # close file
   file_error.close() # close file
   file_gap.close() # close file

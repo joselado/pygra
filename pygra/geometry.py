@@ -37,8 +37,8 @@ class geometry:
     self.atoms_names = [] # no name for the atoms
     self.atoms_have_names = False # atoms do not have names
     self.ncells = 2 # number of neighboring cells returned
-  def get_index(self,r):
-    return get_index(self,r)
+  def get_index(self,r,**kwargs):
+    return get_index(self,r,**kwargs)
   def plot_geometry(self):
     """Plots the system"""
     return plot_geometry(self)
@@ -1409,6 +1409,7 @@ def neighbor_directions(g,cutoff=3):
       for i2 in range(-cutoff,cutoff+1):
         for i3 in range(-cutoff,cutoff+1):
           dirs.append([i1,i2,i3])
+  dirs = [np.array(d) for d in dirs]
   return dirs # return directions
 
 
@@ -1453,14 +1454,26 @@ def write_profile(g,d,name="PROFILE.OUT",nrep=1):
 
 
 
-def get_index(g,r):
+def get_index(g,r,replicas=False):
     """Given a certain position, return the index of it in the geometry"""
-    for i in range(len(g.r)):
-        ri = g.r[i] # get this position
+    if replicas: # check the replicas
+      ds = g.neighbor_directions()
+      rset = [g.replicas(d) for d in ds]  # all sets of replicas
+    else:
+      rset = [g.r] # list of positions
+    for rs in rset: # loop over set of sites
+      for i in range(len(rs)):
+        ri = rs[i] # get this position
         if np.sum(np.abs(ri-r))<0.0001: return i # return index
     return None # not found
 
 
+def same_site(r1,r2):
+    """Check if it is the same site"""
+    dr = r1-r2
+    dr = dr.dot(dr)
+    if dr<0.0001: return 1.0
+    else: return 0.0
 
 
 

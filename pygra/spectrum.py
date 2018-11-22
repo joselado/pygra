@@ -5,6 +5,7 @@ import scipy.sparse.linalg as slg
 import kpm
 import os
 from operators import operator2list
+import timing
 
 arpack_tol = 1e-5
 arpack_maxiter = 10000
@@ -41,13 +42,15 @@ def fermi_surface(h,write=True,output_file="FERMI_MAP.OUT",
       return tdos.trace()[0,0].real # return traze
   elif mode=='lowest': # use full inversion
     def get_weight(hk):
-      es,waves = slg.eigsh(hk,k=num_waves,sigma=0.0,tol=arpack_tol,which="LM",
+      es,waves = slg.eigsh(hk,k=num_waves,sigma=e,tol=arpack_tol,which="LM",
                             maxiter = arpack_maxiter)
-      return np.sum(delta/(es*es+delta*delta)) # return weight
+      return np.sum(delta/((e-es)**2+delta**2)) # return weight
+  else: raise
 
 ##############################################
 
 
+  ts = timing.Testimator()
   # setup the operator
   for x in kxs:
     for y in kxs:
@@ -295,6 +298,56 @@ def eigenvalues(h,nk):
       est.iterate()
       es += lg.eigvalsh(hkgen(k)).tolist() # add
     return es # return all the eigenvalues
+
+
+
+
+
+
+
+def reciprocal_map(h,f,nk=40,reciprocal=True,nsuper=1,filename="MAP.OUT"):
+  """ Calculates the reciprocal map of something"""
+  if reciprocal: R = h.geometry.get_k2K()
+  else: R = np.matrix(np.identity(3))
+  fo = open(filename,"w") # open file
+  nt = nk*nk # total number of points
+  ik = 0
+  ks = [] # list with kpoints
+  import parallel
+  for x in np.linspace(-nsuper,nsuper,nk,endpoint=False):
+    for y in np.linspace(-nsuper,nsuper,nk,endpoint=False):
+        ks.append([x,y,0.])
+  tr = timing.Testimator(filename.replace(".OUT",""),maxite=len(ks))
+  def fp(ki): # function to compute the quantity
+      if parallel.cores == 1: tr.iterate()
+      else: print("Doing",ki)
+      r = np.matrix(ki).T # real space vectors
+      k = np.array((R*r).T)[0] # change of basis
+      return f(k) # call function
+  bs = parallel.pcall(fp,ks) # compute all the Berry curvatures
+  for (b,k) in zip(bs,ks): # write everything
+      fo.write(str(k[0])+"   "+str(k[1])+"     "+str(b.real))
+      fo.write("     "+str(b.imag)+"\n")
+      fo.flush()
+  fo.close() # close file
+
+
+
+def singlet_map(h,nk=40,nsuper=3,mode="abs"):
+    """Compute a map with the superconducting singlet pairing"""
+    hk = h.get_hk_gen() # get function
+    from superconductivity import extract_pairing
+    def f(k): # define function
+      m = hk(k) # call Hamiltonian
+      (uu,dd,ud) = extract_pairing(m) # extract the pairing
+#      return np.abs(ud) # trace
+#      return np.sum(np.abs(ud)) # trace
+      if mode=="trace": return ud.trace()[0,0] # trace
+      elif mode=="det": return np.linalg.det(ud) # trace
+      elif mode=="abs": return np.sum(np.abs(ud)) # trace
+    reciprocal_map(h,f,nk=nk,nsuper=nsuper,filename="PAIRING_MAP.OUT")
+
+
 
 
 

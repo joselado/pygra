@@ -5,9 +5,9 @@ from scipy.sparse import csc_matrix
 def equal(m1,m2):
   """Check if two matrices are the same"""
   if np.max(np.abs(m1-m2))>0.000001:
-    print(csc_matrix(m1))
-    print("\n")
-    print(csc_matrix(m2))
+    print(csc_matrix(m1-m2))
+#    print("\n")
+#    print(csc_matrix(m2))
     return False
   else: return True
 
@@ -21,7 +21,7 @@ def check_hamiltonian(h):
   if h.has_eh: # if it has electron hole degree of freedom
     v = np.random.random(3) # random kpoint
     m1 = hk(v) # Hamiltonian
-    m2 = hk(-v) # Hamiltonian in time reversal
+    m2 = hk(-v) # Hamiltonian in time reversal point
     from superconductivity import eh_operator
     eh = eh_operator(m1) # get the function
     if not equal(m1,-eh(m2)): 

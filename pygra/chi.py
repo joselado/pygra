@@ -6,9 +6,8 @@ except:
     print("Error, chif90 not found")
 
 
-def chargechi(h,i=0,j=0,es=np.linspace(-3.0,3.0,100),delta=0.01,temp=None):
+def chargechi(h,i=0,j=0,es=np.linspace(-3.0,3.0,100),delta=0.01,temp=1e-7):
     """Compute charge response function"""
-    if temp is None: temp = delta
     if h.dimensionality!=0: raise
     hk = h.get_hk_gen() # get generator
     m = hk(0) # get Hamiltonian

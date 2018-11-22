@@ -2,9 +2,26 @@ import numpy as np
 from scipy.sparse import csc_matrix,bmat,coo_matrix
 
 
+def collect_hopping(h):
+    """Collect the hoppings in a new list"""
+    td = dict() # dictionary
+    zero = h.intra*0.0 # initialize
+    for t in h.hopping: td[tuple(t.dir)] = zero.copy() # initialize
+    for t in h.hopping: 
+        td[tuple(t.dir)] += t.m # add
+    ts = [] # empty list
+    for key in td:
+        if np.max(np.abs(td[key]))>1e-6:
+          ts.append(Hopping(d=np.array(key),m=td[key]))
+
+    return ts
+
+
+
+
 class Hopping(): 
   def __init__(self,d=None,m=None):
-    self.dir = d
+    self.dir = np.array(d)
     self.m = m
 
 

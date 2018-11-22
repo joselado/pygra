@@ -14,9 +14,7 @@ import magnetism
 import checkclass
 import extract
 
-from bandstructure import get_bands_0d
-from bandstructure import get_bands_1d
-from bandstructure import get_bands_2d
+from bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
 from rotate_spin import sx,sy,sz
@@ -105,25 +103,12 @@ class hamiltonian():
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
-  def get_dos(self,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=100,
-          use_kpm=False):
+  def get_dos(self,**kwargs):
       import dos
-      dos.dos(self,energies=energies,delta=delta,nk=nk,use_kpm=use_kpm)
-  def get_bands(self,nkpoints=100,use_lines=False,kpath=None,operator=None,
-                 num_bands=None,callback=None,central_energy = 0.0):
+      dos.dos(self,**kwargs)
+  def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
-    # workaround
-    if type(operator)==str: operator = self.get_operator(operator)
-    if self.dimensionality==0: # for 0d and 1d system
-      return get_bands_0d(self,operator=operator)
-    elif self.dimensionality==1: # for 0d and 1d system
-      return get_bands_1d(self,nkpoints=nkpoints,operator=operator,
-                         num_bands=num_bands,callback=callback)
-    elif self.dimensionality>1:  # for 2d system
-      return get_bands_2d(self,kpath=kpath,operator=operator,
-                           num_bands=num_bands,callback=callback,
-                           central_energy=central_energy)
-    else: raise
+    return get_bands_nd(self,**kwargs)
   def plot_bands(self,nkpoints=100,use_lines=False):
     """Dummy function"""
     self.get_bands()
@@ -148,21 +133,19 @@ class hamiltonian():
     self.turn_nambu() # add electron hole
     if phi is not None: delta = delta*np.exp(1j*phi*np.pi)
     self.intra = self.intra + add_swave(delta=delta,rs=self.geometry.r,is_sparse=self.is_sparse)
-  def add_pwave(self,delta=0.0):
+  def add_pairing(self,delta=0.0,**kwargs):
     """ Add a general pairing matrix, uu,dd,ud"""
-#    self.get_eh_sector = get_eh_sector_odd_even # assign function
-    self.turn_nambu() # add electron hole terms
-    add_pwave = superconductivity.add_pwave # add pwave pairing
-    r = self.geometry.r # positions 
-    self.intra += add_pwave(delta,r1=r,r2=r) # intra cell
-    if self.dimensionality>0:
-      if self.is_multicell: # for multicell hamiltonians
-        for i in range(len(self.hopping)): # loop over hoppings
-          d = self.hopping[i].dir # direction
-          r2 = self.geometry.replicas(d) # positions
-          self.hopping[i].m += add_pwave(delta,r1=r,r2=r2)
-      else: # conventional way
-        raise # error
+    superconductivity.add_pairing_to_hamiltonian(self,delta=delta,**kwargs)
+  def same_hamiltonian(self,h,ntries=10):
+      """Check if two hamiltonians are the same"""
+      hk1 = self.get_hk_gen()
+      hk2 = h.get_hk_gen()
+      for i in range(ntries):
+        k = np.random.random(3)
+        m = hk1(k) - hk2(k)
+        if np.max(np.abs(m))>0.000001: return False
+      return True
+      
   def supercell(self,nsuper):
     """ Creates a supercell of a one dimensional system"""
     if self.dimensionality==0: return self
@@ -405,12 +388,8 @@ class hamiltonian():
         self.txy = tmprot(self.txy,[1.,1.,0.])
         self.txmy = tmprot(self.txmy,[1.,-1.,0.])
       else: raise
-  def add_transverse_efield(self,efield=0.0):
-    """Adds a transverse electric field"""
-    def f(x,y):  # define function which shifts fermi energy
-      return y*efield
-    self.shift_fermi(f) # shift fermi energy locally
   def get_magnetization(self,nkp=10):
+    from magnetism import get_magnetization
     get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
     """Return a 1d Hamiltonian"""
@@ -505,7 +484,7 @@ class hamiltonian():
         np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
         np.savetxt("MAGNETISM.OUT",np.matrix([g.x,g.y,g.z,mx,my,mz]).T)
         return np.array([mx,my,mz])
-    return 0.0
+    return np.array([mx,my,mz]).transpose()
 
 
 
@@ -931,11 +910,7 @@ def first_neighbors2d(h):
 def first_neighbors1d(h):
   """ Gets a first neighbor hamiltonian"""
   r = h.geometry.r    # x coordinate 
-#  try:
   a1 = h.geometry.a1 # get a1
-#  except:
-#    a1 = np.array([h.geometry.celldis,0.,0.])
-#    print("Vector taken from celldis")
 # first neighbors hopping, all the matrices
   h.intra = create_fn_hopping(r,r)
   h.inter = create_fn_hopping(r,r+a1)
@@ -970,7 +945,6 @@ def first_neighbors0d(h):
 
 from superconductivity import add_swave
 from superconductivity import build_eh
-nambu = build_eh # redefine
 nambu_nonh = build_eh_nonh
 
 
@@ -1011,67 +985,9 @@ def hk_gen(h):
 
 
 
-
-
-
-
-
-def generate_parametric_hopping(h,f=None,mgenerator=None,
-             spinful_generator=False):
-  """ Adds a parametric hopping to the hamiltonian based on an input function"""
-  rs = h.geometry.r # positions
-  g = h.geometry # geometry
-  has_spin = h.has_spin # check if it has spin
-  is_sparse = h.is_sparse
-  if mgenerator is None: # no matrix generator given on input
-    if f is None: raise # no function given on input
-    if spinful_generator: 
-      raise
-      print("WARNING, I am not sure why I programmed this")
-      h.has_spin = True
-      generator = parametric_hopping_spinful
-    else: 
-      h.has_spin = False
-      generator = parametric_hopping
-    def mgenerator(r1,r2):
-      return generator(r1,r2,f,is_sparse=is_sparse)
-  else:
-    if h.dimensionality==3: raise
-#    print("Generator matrix given on input")
-  h.intra = mgenerator(rs,rs)
-  if h.dimensionality == 0: pass
-  elif h.dimensionality == 1:
-    dr = np.array([g.celldis,0.,0.])
-    h.inter = mgenerator(rs,rs+dr)
-  elif h.dimensionality == 2:
-    h.tx = mgenerator(rs,rs+g.a1)
-    h.ty = mgenerator(rs,rs+g.a2)
-    h.txy = mgenerator(rs,rs+g.a1+g.a2)
-    h.txmy = mgenerator(rs,rs+g.a1-g.a2)
-  elif h.dimensionality == 3:
-    if spinful_generator: raise # not implemented
-    h.is_multicell = True # multicell Hamiltonian
-    import multicell
-    multicell.parametric_hopping_hamiltonian(h,fc=f)
-  else: raise
-  # check that the sparse mde is set ok
-  if is_sparse and type(h.intra)==type(np.matrix([[]])):
-    print("Matrices should be sparse, fixing")
-    h.is_sparse = False
-    h.turn_sparse() # turn the matrix sparse 
-  if not is_sparse and type(h.intra)!=type(np.matrix([[]])):
-    print("Matrices should be dense, fixing",type(h.intra),type(np.matrix))
-    h.is_sparse = True
-    h.turn_dense() # turn the matrix sparse 
-  if has_spin: # Hamiltonian should be spinful
-    print("Adding spin degree of freedom")
-    h.has_spin = False
-    h.turn_spinful()
-  return h
-
-
 from neighbor import parametric_hopping
 from neighbor import parametric_hopping_spinful
+from neighbor import generate_parametric_hopping
 
 
 
@@ -1097,33 +1013,6 @@ def kchain(h,k):
 
 
 
-
-
-def get_magnetization(h,nkp=20):
-  """Return the magnetization of the system"""
-  totkp = nkp**(h.dimensionality)
-  nat = h.intra.shape[0]//2 # number of atoms
-  eigvals,eigvecs = h.eigenvectors(nkp)
-  voccs = [] # accupied vectors
-  eoccs = [] # accupied eigenvalues
-  occs = [] # accupied eigenvalues
-  for (e,v) in zip(eigvals,eigvecs): # loop over eigenvals,eigenvecs
-    if e<0.0000001:  # if level is filled, add contribution
-      voccs.append(v) # store
-      eoccs.append(e) # store
-  pdup = np.array([[2*i,2*i] for i in range(nat)]) # up density
-  pddn = pdup + 1 # down density
-  pxc = np.array([[2*i,2*i+1] for i in range(nat)]) # exchange
-  import correlatorsf90
-  vdup = correlatorsf90.correlators(voccs,pdup)/totkp
-  vddn = correlatorsf90.correlators(voccs,pddn)/totkp
-  vxc = correlatorsf90.correlators(voccs,pxc)/totkp
-  magnetization = np.array([vxc.real,vxc.imag,vdup-vddn]).transpose().real
-  from scftypes import write_magnetization
-  write_magnetization(magnetization)
-
-
-
 # import the function written in the library
 from kanemele import generalized_kane_mele
 
@@ -1132,6 +1021,7 @@ from kanemele import generalized_kane_mele
 
 def turn_nambu(self):
   """Turn a Hamiltonian an Nambu Hamiltonian"""
+  from superconductivity import build_eh as nambu # redefine
   if self.has_eh: return # do nothing if already has eh
 #  self.get_eh_sector = get_eh_sector_odd_even # assign function
 #  if not self.has_eh: # if has not been assigned yet
@@ -1159,5 +1049,21 @@ import inout
 
 
 def load(input_file="hamiltonian.pkl"):  return inout.load(input_file)
+
+
+def print_hopping(h):
+    """Print all the hoppings in a user friendly way"""
+    from pandas import DataFrame
+    def pprint(m): 
+        if np.max(np.abs(m.real))>0.00001: print(DataFrame(m.real))
+        if np.max(np.abs(m.imag))>0.00001: print(DataFrame(m.imag*1j))
+        print("\n")
+    print("Onsite")
+    pprint(h.intra)
+    if h.dimensionality==0: return
+    h = h.get_multicell()
+    for t in h.hopping:
+        print("Hopping",t.dir)
+        pprint(t.m)
 
 

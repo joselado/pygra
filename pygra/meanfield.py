@@ -260,7 +260,7 @@ def broyden_solver(scf):
         return scf.cij - x # difference with respect to input
     from scipy.optimize import broyden1,broyden2,anderson
 #    x = anderson(fun,x0)
-    x = broyden1(fun,x0) # broyden solver
+    x = broyden1(fun,x0,f_tol=1e-7) # broyden solver
     scf.cij = x # impose those expectation values
     scf.cij2v() # update mean field
     scf.iterate() # perform an iteration

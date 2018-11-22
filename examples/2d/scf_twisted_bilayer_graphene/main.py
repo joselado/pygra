@@ -21,6 +21,8 @@ from specialhopping import twisted_matrix
 h = g.get_hamiltonian(is_sparse=True,has_spin=False,is_multicell=False,
      mgenerator=twisted_matrix(ti=0.6,lambi=7.0))
 
+h.get_dos(use_kpm=True)
+exit()
 import density
 
 h.turn_dense()
