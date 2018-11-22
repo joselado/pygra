@@ -143,7 +143,7 @@ def ket_Aw(A,w):
 
 
 def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
-                    callback=None,central_energy=0.0):
+                    callback=None,central_energy=0.0,nk=400):
   """Get a 2d bandstructure"""
   if type(operator)==str: operator = self.get_operator(operator)
   if num_bands is None: # all the bands
@@ -172,7 +172,7 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
   hkgen = h.get_hk_gen() # generator hamiltonian
   if kpath is None:
     import klist
-    kpath = klist.default(h.geometry) # generate default klist
+    kpath = klist.default(h.geometry,nk=nk) # generate default klist
   tr = timing.Testimator("BANDSTRUCTURE") # generate object
   for k in range(len(kpath)): # loop over kpoints
 #    print("Bands in kpoint",k,"of",len(kpath),end="\r")

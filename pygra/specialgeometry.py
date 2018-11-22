@@ -153,4 +153,26 @@ def multilayer_graphene(l=[0]):
 
 
 
+def mismatched_lattice(n1=5,n2=4,g=None):
+    if g is None: g = geometry.honeycomb_lattice()
+    g1 = g.supercell(n1) # graphene
+    g2 = g.supercell(n2) # BN
+    g1.z += 1.5 # shift
+    g2.z -= 1.5 # shift
+    g1.xyz2r() # update
+    g2.xyz2r() # update
+    
+    gn = g1.copy() # new geometry
+    if g.has_sublattice: 
+        gn.sublattice = np.concatenate([g1.sublattice,g2.sublattice])
+    scale = n1/n2 # scale
+    g2.x *= scale # scale
+    g2.y *= scale # scale
+    g2.xyz2r() # update
+    gn.r = np.concatenate([g1.r,g2.r]) # concatenate
+    gn.r2xyz() # update
+    gn.get_fractional() # update fractional coordinates
+    return gn # get geometry
+
+
 

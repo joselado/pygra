@@ -148,6 +148,7 @@ class hamiltonian():
       
   def supercell(self,nsuper):
     """ Creates a supercell of a one dimensional system"""
+    if nsuper==1: return self
     if self.dimensionality==0: return self
     elif self.dimensionality==1: ns = [nsuper,1,1]
     elif self.dimensionality==2: ns = [nsuper,nsuper,1]

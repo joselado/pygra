@@ -316,6 +316,9 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     if mode=="swave":
         from geometry import same_site
         df = lambda r1,r2: delta*same_site(r1,r2)*np.identity(2)
+    elif mode=="swavez":
+        from geometry import same_site
+        df = lambda r1,r2: delta*same_site(r1,r2)*tauz
     elif mode=="px":
         df = lambda r1,r2: delta*px(r1,r2)
     elif mode=="swaveA":
