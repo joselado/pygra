@@ -7,7 +7,7 @@ import specialgeometry
 
 # the following input numbers are the number of replicas required
 # by each lattice to be commensurate
-g = specialgeometry.mismatched_lattice(10,11)
+g = specialgeometry.mismatched_lattice(11,10)
 
 g.write()
 
