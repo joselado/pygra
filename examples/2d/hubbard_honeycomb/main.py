@@ -3,7 +3,7 @@ import sys
 import os
 
 
-sys.path.append("../../../pygra")  # add pygra library
+sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
 import numpy as np
 import geometry

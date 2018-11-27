@@ -145,7 +145,7 @@ def ket_Aw(A,w):
 def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
                     callback=None,central_energy=0.0,nk=400):
   """Get a 2d bandstructure"""
-  if type(operator)==str: operator = self.get_operator(operator)
+  if type(operator)==str: operator = h.get_operator(operator)
   if num_bands is None: # all the bands
     if operator is not None: 
       def diagf(m): # diagonalization routine

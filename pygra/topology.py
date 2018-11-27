@@ -186,7 +186,7 @@ def hall_conductivity(h,dk=-1,n=1000):
 
 
 
-def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
+def mesh_chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
   """ Calculates the chern number of a 2d system """
   c = 0.0
   ks = [] # array for kpoints
@@ -226,7 +226,6 @@ def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
   open("CHERN.OUT","w").write(str(c)+"\n")
   return c
 
-hall_conductivity = chern
 
 
 def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
@@ -646,3 +645,4 @@ def chern_density(h,nk=10,operator=None,delta=0.02,dk=0.02,
 
 
 
+hall_conductivity = chern
