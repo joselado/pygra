@@ -1,12 +1,12 @@
 
 import sys
-sys.path.append("../../../pygra")  # add pygra library
+import os
+sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
-import geometry
-import topology
-import klist
+from pygra import geometry
+from pygra import topology
 
 g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=True)
-import kdos
+from pygra import kdos
 kdos.surface(h)

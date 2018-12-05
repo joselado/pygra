@@ -1,11 +1,11 @@
 import os
 import sys
-sys.path.append("../../../pygra")
-import geometry
-import hamiltonians
 import numpy as np
-import ribbon
-import multilayers
+sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
+from pygra import geometry
+from pygra import hamiltonians
+from pygra import ribbon
+from pygra import multilayers
 
 g = multilayers.get_geometry("AB",armchair=False) # bilayer AB geometry
 g = ribbon.bulk2ribbon(g,n=20,clean=False) # get the geometry of a ribbon

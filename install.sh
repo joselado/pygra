@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
-cd pygra
+cd src/pygra
 python compile_fortran.py
 cd -

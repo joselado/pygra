@@ -7,8 +7,8 @@ import topology
 import klist
 
 g = geometry.honeycomb_lattice()
-h = g.get_hamiltonian(has_spin=True)
-h.add_haldane(0.1)
+h = g.get_hamiltonian(has_spin=False)
+h.add_haldane(0.05)
 import dos
 import topology
 c = topology.chern(h)

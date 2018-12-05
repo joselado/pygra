@@ -1,11 +1,12 @@
 # zigzag ribbon
 import sys
-sys.path.append("../../../pygra")  # add pygra library
+import os
+sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
 import numpy as np
-import geometry
-import scftypes
-import operators
+from pygra import geometry
+from pygra import scftypes
+from pygra import operators
 from scipy.sparse import csc_matrix
 g = geometry.chain()
 g = geometry.honeycomb_lattice()
@@ -27,8 +28,7 @@ h = scf.hamiltonian # get the Hamiltonian
 h.get_bands() # calculate band structure
 
 
-import groundstate
+from pygra import groundstate
 
 groundstate.hopping(h,nrep=3) # write three replicas
-import spectrum
 #spectrum.fermi_surface(h)

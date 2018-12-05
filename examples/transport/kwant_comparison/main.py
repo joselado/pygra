@@ -1,14 +1,15 @@
 
 import sys
-sys.path.append("../../../pygra")  # add pygra library
+import os
+sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
-import disorder
-import geometry
-import heterostructures
+from pygra import disorder
+from pygra import geometry
+from pygra import heterostructures
 import numpy as np
 import matplotlib.pyplot as plt
 
-g = geometry.square_ribbon(20)
+g = geometry.square_ribbon(3)
 h = g.get_hamiltonian()
 #h.add_peierls(.2)
 h.remove_spin()
@@ -19,7 +20,7 @@ hr.shift_fermi(.4)
 hl.shift_fermi(.7)
 
 
-hcs = [h] + [disorder.phase(h,w=0.5) for i in range(100)] +[h]
+hcs = [h] + [disorder.phase(h,w=0.5) for i in range(10)] +[h]
 ht1 = heterostructures.create_leads_and_central_list(hr,hl,hcs)
 ht2 = ht1.copy()
 #ht2 = ht2.block2full()

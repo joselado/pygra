@@ -6,9 +6,9 @@ import os
 sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
 import numpy as np
-import geometry
-import scftypes
-import operators
+from pygra import geometry
+from pygra import scftypes
+from pygra import operators
 from scipy.sparse import csc_matrix
 g = geometry.honeycomb_lattice()
 g.write()

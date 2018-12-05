@@ -1,9 +1,10 @@
 
 import sys
-sys.path.append("../../../pygra")  # add pygra library
+import os
+sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
-import geometry
-import heterostructures
+from pygra import geometry
+from pygra import heterostructures
 import numpy as np
 import matplotlib.pyplot as plt
 
