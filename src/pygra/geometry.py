@@ -5,6 +5,7 @@ from scipy.sparse import bmat
 from scipy.sparse import csc_matrix as csc
 from . import sculpt
 from .supercell import non_orthogonal_supercell
+from . import checkclass
 
 try:
   from . import supercellf90
@@ -25,9 +26,9 @@ class geometry:
     self.z = [] # positions in z
     self.r = [] # full positions 
     self.celldis = 1.0 # distance to the nearest cell (for 1d)
-    self.a1 = np.array([1.0,0.0,0.])  # first vector to the nearest cell
-    self.a2 = np.array([0.0,1.0,0.])  # first vector to the nearest cell
-    self.a3 = np.array([0.0,0.0,1.])  # first vector to the nearest cell
+    self.a1 = np.array([100.0,0.0,0.])  # first vector to the nearest cell
+    self.a2 = np.array([0.0,100.0,0.])  # first vector to the nearest cell
+    self.a3 = np.array([0.0,0.0,100.])  # first vector to the nearest cell
     self.b1 = np.array([1.0,0.0,0.])  # first vector to the nearest cell
     self.b2 = np.array([0.0,1.0,0.])  # first vector to the nearest cell
     self.b3 = np.array([0.0,0.0,1.])  # first vector to the nearest cell
@@ -58,6 +59,7 @@ class geometry:
       return non_orthogonal_supercell(self,nsuper)
 #    except: pass # continue with normal way
     if self.dimensionality==1:
+      if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
       s = supercell1d(self,nsuper)
     elif self.dimensionality==2:
       try: # two number given

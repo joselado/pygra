@@ -13,6 +13,7 @@ g = specialgeometry.twisted_bilayer(5)
 #g = g.supercell(3)
 #g = geometry.honeycomb_lattice()
 g.write()
+exit()
 from pygra.specialhopping import twisted_matrix
 
 h = g.get_hamiltonian(is_sparse=True,has_spin=False,is_multicell=False,

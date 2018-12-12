@@ -1,11 +1,7 @@
-# zigzag ribbon
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
 import numpy as np
-import geometry
-import scftypes
-import operators
+from pygra import geometry
+from pygra import scftypes
+from pygra import operators
 from scipy.sparse import csc_matrix
 g = geometry.chain()
 g = g.supercell(4)
@@ -25,6 +21,6 @@ h = scf.hamiltonian # get the Hamiltonian
 h.get_bands() # calculate band structure
 
 
-import groundstate
+from pygra import groundstate
 
 groundstate.hopping(h)

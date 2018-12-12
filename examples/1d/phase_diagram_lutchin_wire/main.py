@@ -1,11 +1,7 @@
-# zigzag ribbon
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
-import topology
+from pygra import geometry
+from pygra import topology
 import numpy as np
-import phasediagram
+from pygra import phasediagram
 
 g = geometry.bichain() # create geometry of a chain
 
