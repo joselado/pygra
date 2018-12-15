@@ -13,6 +13,7 @@ from . import magnetism
 from . import checkclass
 from . import extract
 from . import multicell
+from . import spectrum
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -45,9 +46,14 @@ class hamiltonian():
   def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
                                  sparse=sparse,numw=numw)
+  def get_filling(self,energy=0.5,nk=10):
+    """Get the filling of a Hamiltonian at this energy"""
+    es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
+    es = np.array(es)
+    esf = es[es<energy]
+    return len(esf)/len(es) # return filling
   def set_filling(self,filling=0.5,nk=10,extrae=0.):
     """Set the filling of the Hamiltonian"""
-    from . import spectrum
     es = spectrum.eigenvalues(self,nk=nk)
     from .scftypes import get_fermi_energy
     fill = filling + extrae/self.intra.shape[0] # filling

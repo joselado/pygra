@@ -51,6 +51,7 @@ class scfclass():
     self.silent = False
     self.gap = 0.0 # gap of the system
     self.smearing = None
+    self.write_vabv = False # write EV in each iteration
     if use_multicorrelator: # fortran library is present
       self.correlator_mode = "multicorrelator" # multicorrelator mode 
     else:
@@ -275,8 +276,9 @@ class scfclass():
     for key in self.mf: mfnew[key] = self.hamiltonian.intra*0.  # initialize 
     if self.correlator_mode == "multicorrelator":
       np.savetxt("VS_SCF.OUT",np.matrix([range(len(self.cij)),np.abs(self.cij)]).T)
-    fvs = open("VAV_VBV.OUT","w") # open file
-    fvs.write("# dx dy dz i j abs(v)\n")
+    if self.write_vabv: 
+        fvs = open("VAV_VBV.OUT","w") # open file
+        fvs.write("# dx dy dz i j abs(v)\n")
     for v in self.interactions: # loop over interactions
       if v.contribution=="AB":
         tmp = v.a*v.vbv*v.g + v.b*v.vav*v.g # add contribution
@@ -285,14 +287,15 @@ class scfclass():
         tmp = v.a*v.vbv*v.g 
         accu += np.abs(v.vbv) 
       else: raise
-      fvs.write(str(v.dir[0])+"   ")
-      fvs.write(str(v.dir[1])+"   ")
-      fvs.write(str(v.dir[2])+"   ")
-      fvs.write(str(v.i)+"   ")
-      fvs.write(str(v.j)+"   ")
-      fvs.write(str(np.abs(v.vav)+np.abs(v.vbv))+"\n")
+      if self.write_vabv: # write in a file
+        fvs.write(str(v.dir[0])+"   ")
+        fvs.write(str(v.dir[1])+"   ")
+        fvs.write(str(v.dir[2])+"   ")
+        fvs.write(str(v.i)+"   ")
+        fvs.write(str(v.j)+"   ")
+        fvs.write(str(np.abs(v.vav)+np.abs(v.vbv))+"\n")
       mfnew[tuple(v.dir)] = mfnew[tuple(v.dir)] + tmp  # store
-    fvs.close() # close file
+    if self.write_vabv: fvs.close() # close file
     accu /= len(self.interactions)*2
     if not self.silent: print("Average value of expectation values",accu)
     self.error = error_meanfield(self.mf,mfnew)/self.sites # get the error
