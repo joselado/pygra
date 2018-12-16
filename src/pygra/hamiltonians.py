@@ -231,9 +231,10 @@ class hamiltonian():
           self.txmy = des_spin(self.txmy,component=0)
         else: raise
       self.has_spin = False  # flag for nonspin calculation
-  def shift_fermi(self,fermi):
+  def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)
+  def shift_fermi(self,fermi): self.add_onsite(fermi)  
   def first_neighbors(self):
     """ Create first neighbor hopping"""
     if self.dimensionality == 0:

@@ -1,10 +1,6 @@
-
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import disorder
-import geometry
-import heterostructures
+from pygra import disorder
+from pygra import geometry
+from pygra import heterostructures
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -14,7 +10,7 @@ h = g.get_hamiltonian()
 #h.add_peierls(.2)
 h.remove_spin()
 h = disorder.anderson(h,w=0.5)
-h.get_bands(nkpoints=2000)
+h.get_bands(nk=2000)
 hr = h.copy()
 hl = h.copy()
 

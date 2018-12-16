@@ -1,7 +1,6 @@
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-import geometry
+from pygra import geometry
+from pygra import potentials
 import numpy as np
 
 g = geometry.chain(400) # chain
@@ -19,7 +18,6 @@ def discard(w):
 fo = open("LAMBDA_VS_V.OUT","w")
 for beta in betas:
   h = g.get_hamiltonian(has_spin=False)
-  import potentials
   fun = potentials.aahf1d(v=2.5,beta=beta)
   h.shift_fermi(fun)
   (es,ls) = h.get_tails(discard=discard) # return the localization length

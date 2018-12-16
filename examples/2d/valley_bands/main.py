@@ -1,7 +1,6 @@
 
 import sys
 import os
-sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
 
 from pygra import geometry
 

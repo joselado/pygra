@@ -1,8 +1,5 @@
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
-import dos
+from pygra import geometry
+from pygra import dos
 
 g = geometry.diamond_lattice_minimal()
 

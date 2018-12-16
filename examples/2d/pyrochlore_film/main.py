@@ -1,8 +1,4 @@
-import sys
 import numpy as np
-import os
-sys.path.append(os.environ["PYGRAROOT"])
-
 from pygra import geometry
 
 g = geometry.pyrochlore_lattice()

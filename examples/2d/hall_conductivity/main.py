@@ -1,9 +1,6 @@
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
-import topology
+from pygra import geometry
+from pygra import topology
 import numpy as np
 
 mus = np.linspace(-0.7,0.7,40)

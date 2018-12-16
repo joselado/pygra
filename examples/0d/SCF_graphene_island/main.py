@@ -1,8 +1,7 @@
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-import islands
-import interactions
+from pygra import islands
+from pygra import interactions
+from pygra import scftypes
 import numpy as np
 
 g = islands.get_geometry(name="honeycomb",n=4,nedges=3,rot=0.0) # get an island
@@ -32,7 +31,6 @@ h = g.get_hamiltonian(fun=fhop,has_spin=True) # get the Hamiltonian
 h.add_zeeman([0.,.4,0.])
 g.write()
 
-import scftypes
 mf = scftypes.guess(h,mode="antiferro")
 scf = scftypes.selfconsistency(h,filling=0.5,g=1.0,
                 mix=0.9,mf=mf,mode="U")

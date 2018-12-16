@@ -1,13 +1,15 @@
-import sys
-sys.path.append("../../../pygra")  # add pygra library
+from pygra import geometry  # library to create crystal geometries
+from pygra import hamiltonians  # library to work with hamiltonians
+from pygra import sculpt  # to modify the geometry
+from pygra import correlator
+from pygra import kpm
+from pygra import densitymatrix
 
-import geometry  # library to create crystal geometries
-import hamiltonians  # library to work with hamiltonians
-import sculpt  # to modify the geometry
-import correlator
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
-import kpm
 import time
 
 g = geometry.chain()
@@ -24,7 +26,6 @@ h.intra += np.diag(np.random.random(h.intra.shape[0]))
 
 i = 0
 j = 9
-import densitymatrix
 t1 = time.clock()
 rand = lambda : np.random.randint(0,40)
 pairs = [(i,i+np.random.randint(1,8)) for i in range(10,20)]

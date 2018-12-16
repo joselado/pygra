@@ -1,11 +1,8 @@
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
-import topology
-import klist
-import specialgeometry
+from pygra import geometry
+from pygra import topology
+from pygra import klist
+from pygra import specialgeometry
 
 # get the geometry of ABC trilayer graphene
 # distance between first neighbors is 1
@@ -29,7 +26,7 @@ g = g.supercell(13) # create a big supercell
 # get the Hamiltonian
 h = g.get_hamiltonian(fun=fhop,has_spin=False)
 import numpy as np
-import potentials
+from pygra import potentials
 f = potentials.commensurate_potential(g)
 
 def fm(ri): # function for the mass
