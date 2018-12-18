@@ -438,149 +438,7 @@ def get_gap(es,fermi):
 
 
 
-def magnetic_mean_field(wf,U,collinear=False,totkp=1):
-  """Return the mean field matrix"""
-  (vdup,vddn,vxc,ndn,nup,xc) = get_udxc(wf,totkp=totkp) # density and XC
-  if collinear: mf = ndn + nup 
-  else: mf = ndn + nup - xc - xc.H
-  mf = selective_U_matrix(U,mf.todense()) # new intramatrix mean field
-  edc = -np.sum(selective_U_vector(U,vdup*vddn)).real 
-  edc += np.sum(selective_U_vector(U,vxc*np.conjugate(vxc))).real 
-  charge = (vdup+vddn).real # total charge
-  mag = np.array([vxc.real,vxc.imag,(vdup-vddn)/2.]).transpose().real
-  return mf,edc,charge,mag # return mean field and double counting energy
-
-
-
-
-
-
-def hubbardscf(h,U=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
-                  maxerror=1e-05,silent=False,mf=None,
-                  smearing=None,collinear=False,fermi_shift=0.0):
-  """ Solve a selfconsistent Hubbard mean field"""
-  if not h.has_spin: raise
-  os.system("rm -f STOP") # remove stop file
-  from scipy.linalg import eigh
-  from . import correlatorsf90
-  nat = h.intra.shape[0]//2 # number of atoms
-  htmp = h.copy()  # copy hamiltonian
-  # generalate the necessary list of correlators
-  if mf is None: # generate initial mean field
-    if mag is None: mag = np.random.random((nat,3)) 
-# get mean field matrix
-    old_mf = selective_U_matrix(U,directional_mean_field(mag)) 
-  else: old_mf = mf # use guess
-  # get the pairs for the correlators
-  ndim = h.intra.shape[0] # dimension
-  totkp = nkp**(h.dimensionality) # total number of kpoints
-  file_etot = open("SCF_ENERGY.OUT","w")
-  file_error = open("SCF_ERROR.OUT","w")
-  ite = 0 # iteration counter
-  scf = scfclass(h) # create scf class
-  while True: # infinite loop
-    ite += 1 # increase counter
-    htmp.intra = h.intra + old_mf # add mean field 
-    t1 = time.clock()
-# get eigenvectors
-    eigvals,eigvecs,kvectors = htmp.eigenvectors(nkp,kpoints=True) 
-    eigvecs = np.conjugate(eigvecs)
-# fermi energy
-    t2 = time.clock()
-    fermi = get_fermi_energy(eigvals,filling,fermi_shift=fermi_shift) 
-# occupied states
-    eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi) 
-# mean field
-    mf,edc,charge,mag = magnetic_mean_field(voccs,U,collinear=collinear,
-                                totkp=totkp) 
-    t3 = time.clock()
-    print("Times",t2-t1,t3-t2)
-    error = np.max(np.abs(old_mf-mf)) # absolute difference
-    # total energy
-    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
-    file_etot.write(str(ite)+"    "+str(etot)+"\n") # write energy in file
-    file_error.write(str(ite)+"    "+str(error)+"\n") # write energy in file
-    totcharge = np.sum(charge).real # total charge
-    avcharge = totcharge/nat # average charge
-    ######
-    if not silent:
-      print("\n")
-      print("Iteration number =",ite)
-      print("Error in SCF =",error)
-      print("Fermi energy =",fermi)
-      print("Total energy =",etot)
-      print("Total charge =",totcharge)
-      print("Average charge =",avcharge)
-    old_mf = old_mf*mix + mf*(1.-mix) # mixing
-    if error<maxerror or os.path.exists("STOP"): # if converged break
-      break
-  file_etot.close() # close file
-  file_error.close() # close file
-  # output result
-  class scftmp(): pass # create an empty class
-  scf = scftmp() # empty class
-  scf.hamiltonian = htmp.copy() # copy Hamiltonian
-  scf.hamiltonian.intra -= fermi*np.identity(ndim) # shift Fermi energy
-  scf.energy = etot # store total energy
-  scf.mean_field = mf # store mean field matrix
-  scf.magnetization = mag
-  write_magnetization(scf.magnetization) # write in file
-  return scf # return mean field
-
-
-
-
-def selective_U_matrix(Us,m):
-  """Return a mean field matrix, using a different U for each atom"""
-  try: Us[0] # try to get an index
-  except: return Us*m # return
-  if len(Us)!=len(m)//2: raise
-  mout = m.copy()
-  fac = np.matrix(np.identity(len(Us)*2),dtype=np.complex)
-  for i in range(len(Us)):
-    fac[2*i,2*i] = Us[i]
-    fac[2*i+1,2*i+1] = Us[i]
-  return m*fac # return matrix 
-
-
-
-def selective_U_vector(Us,m):
-  """Return a mean field matrix, using a different U for each atom"""
-  try: 
-    Us[0] # try to get an index
-    return np.array(Us)*m
-  except: return Us*m # return
-
-
-
-
-
-
-
-def get_udxc(voccs,weight=None,totkp=1):
-  """Get up/down densities and corresponding mean field matrices"""
-  from . import correlatorsf90
-  ndim = voccs.shape[1] # dimension of the matrix
-  if weight is not None:
-    if len(weight)!=voccs.shape[0]: raise # inconsistent dimensions
-  nat = ndim//2 # one half
-  pdup = np.array([[2*i,2*i] for i in range(nat)]) # up density
-  pddn = pdup + 1 # down density
-  pxc = np.array([[2*i,2*i+1] for i in range(nat)]) # exchange
-  if weight is None: # no weight
-    vdup = correlatorsf90.correlators(voccs,pdup)/totkp
-    vddn = correlatorsf90.correlators(voccs,pddn)/totkp
-    vxc = correlatorsf90.correlators(voccs,pxc)/totkp
-  else: # with weight
-    vdup = correlatorsf90.correlators_weighted(voccs,weight,pdup)/totkp
-    vddn = correlatorsf90.correlators_weighted(voccs,weight,pddn)/totkp
-    vxc = correlatorsf90.correlators_weighted(voccs,pxc)/totkp
-  ndn = csc_matrix((vdup,pddn.transpose()),dtype=np.complex,shape=(ndim,ndim))
-  nup = csc_matrix((vddn,pdup.transpose()),dtype=np.complex,shape=(ndim,ndim))
-  xc = csc_matrix((np.conjugate(vxc),pxc.transpose()),
-                           dtype=np.complex,shape=(ndim,ndim))
-  return (vdup,vddn,vxc,ndn,nup,xc) # return everything
-
+from .selfconsistency.hubbard import hubbardscf
 
 
 def get_super_correlator(voccs,weight=None,totkp=1):
@@ -655,7 +513,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
                   smearing=None,fermi_shift=0.0,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
                   broyden=False):
-  """ Solve a selfcnsistent Hubbard mean field"""
+  """ Solve a generalized selfcnsistent problem"""
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
   htmp = h.copy()  # copy hamiltonian
@@ -675,6 +533,9 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   scf = scfclass(h) # create scf class
   scf.nkgrid = nkp
   scf.silent = silent
+  scf.mixing = mix
+  scf.mode = mode # store the mode
+  scf.g = g # coupling
   scf.smearing = smearing
   scf.energy_cutoff = energy_cutoff # energy_cutoff
   scf.filling = filling # filling of the system
@@ -691,7 +552,6 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
     scf.mf[(0,0,0)] = old_mf # initial mean field
 #  scf.solve()
   stop_scf = False # do not stop
-  scf.mixing = mix
   scf.maxerror = maxerror
 #  print("BEGINNING OF BROYDEN")
 #  print("END OF BROYDEN")

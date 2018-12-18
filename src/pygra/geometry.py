@@ -192,6 +192,9 @@ class geometry:
   def neighbor_directions(self):
     """Return directions linking to neighbors"""
     return neighbor_directions(self,self.ncells)
+  def write_profile(self,d,**kwargs):
+      """Write a profile in a file"""
+      write_profile(self,d,**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
@@ -1442,13 +1445,16 @@ def neighbor_cells(num,dim=3):
 
 
 
-def write_profile(g,d,name="PROFILE.OUT",nrep=1):
+def write_profile(g,d,name="PROFILE.OUT",nrep=1,normal_order=False):
   """Write a certain profile in a file"""
   if g.dimensionality == 0: nrep =1
   x,y = g.x,g.y # get the coordinates
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
-  m = np.matrix([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
+  if normal_order:
+      m = np.matrix([go.x,go.y,go.z,d.tolist()*(nrep**g.dimensionality)]).T
+  else:
+      m = np.matrix([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
   np.savetxt(name,m) # save in file
 
 

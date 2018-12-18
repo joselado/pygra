@@ -9,22 +9,40 @@ from pygra import specialgeometry
 from pygra import scftypes
 
 
-g = specialgeometry.twisted_bilayer(11)
+g = specialgeometry.twisted_bilayer(5)
+#g = geometry.honeycomb_lattice()
 g.write()
 from pygra import specialhopping
 h = g.get_hamiltonian(is_sparse=True,has_spin=False,is_multicell=False,
-     mgenerator=specialhopping.twisted_matrix(ti=0.3,lambi=7.0))
+     mgenerator=specialhopping.twisted_matrix(ti=0.5,lambi=7.0))
 h.turn_dense()
-def ff(r):
-    return 0.2*r[2]
+#def ff(r):
+#    return 0.2*r[2]
     
-h.shift_fermi(ff)
+#h.shift_fermi(ff)
 
-mf = h.intra*0.0 +0.0j #scftypes.guess(h,mode="antiferro")
-scf = scftypes.selfconsistency(h,nkp=1,filling=0.5+6./h.intra.shape[0],g=2.0,
-                mix=0.9,mf=mf,mode="U")
+h.turn_spinful()
+h.turn_dense()
+h.add_sublattice_imbalance(0.5)
+h.add_kane_mele(0.03)
+#h.get_bands(num_bands=40)
+#exit()
+from pygra import meanfield
+mf = meanfield.guess(h,"antiferro",0.1)
 
-scf.hamiltonian.get_bands()
+g = 2.0
 
+filling = 0.5 + 1./h.intra.shape[0] # plus two electrons
+
+nk = 1
+scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=g,
+                mix=0.9,mf=mf)
+
+#scf1 = scftypes.selfconsistency(h,nkp=nk,filling=0.5,g=g,
+#                mix=0.9,mf=mf)
+
+scf.hamiltonian.get_bands(num_bands=40,operator="sz")
+
+#print(scf.total_energy-scf1.total_energy)
 
 
