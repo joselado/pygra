@@ -22,21 +22,16 @@ for U in Us: # loop over Us
 #  import scftypes
   
   h = g.get_hamiltonian() # create hamiltonian of the system
-#  h = h.get_multicell()
-  
-#  h.shift_fermi(0.0)
-  
-  
-  mf = scftypes.guess(h,mode="antiferro")
-  scf = scftypes.selfconsistency(h,nkp=20,filling=0.5,g=U,
-                mix=0.9,mf=mf,mode="U",broyden=True)
+  mf = scftypes.guess(h,mode="antiferro") # antiferro initialization
+  # perform SCF with specialized routine for Hubbard
+  scf = scftypes.hubbardscf(h,nkp=20,filling=0.5,g=U,
+                mix=0.9,mf=mf)
+  # alternatively use
+#  scf = scftypes.selfconsistency(h,nkp=20,filling=0.5,g=U,
+#                mix=0.9,mf=mf)
   h = scf.hamiltonian # get the Hamiltonian
-#  h.get_bands() # calculate band structure
-#  import groundstate
-  gap = h.get_gap()
+  gap = h.get_gap() # compute the gap
   f.write(str(U)+"   "+str(gap)+"\n")
-#  groundstate.swave(h)
-  #groundstate.hopping(h)
   
 f.close()
 
