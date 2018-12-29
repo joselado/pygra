@@ -1,11 +1,8 @@
-import sys
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+
 import numpy as np
-import os
-sys.path.append(os.environ["PYGRAROOT"])
-
 from pygra import geometry
-from pygra import sculpt
-
 g = geometry.pyrochlore_lattice()
 h = g.get_hamiltonian()
 h.turn_dense()

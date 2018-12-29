@@ -512,7 +512,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,fermi_shift=0.0,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
-                  broyden=False):
+                  broyden=False,callback=None):
   """ Solve a generalized selfcnsistent problem"""
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
@@ -569,6 +569,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
 #    totcharge = np.sum(charge).real # total charge
 #    avcharge = totcharge/nat # average charge
 #    ######
+    if callback is not None: callback(scf.hamiltonian) # callback
     if not silent:
       print("\n")
       print("Error in SCF =",scf.error)

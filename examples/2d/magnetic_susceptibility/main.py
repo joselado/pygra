@@ -1,11 +1,9 @@
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
+from pygra importgeometry
 import topology
 import klist
-
 g = geometry.triangular_lattice()
 #g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=True)

@@ -1,12 +1,10 @@
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
+from pygra importgeometry
 import numpy as np
 import topology
 import klist
-
 def geth(mu,delta=0.0):
   g = geometry.honeycomb_zigzag_ribbon(10)
   h = g.get_hamiltonian(has_spin=True)
@@ -23,7 +21,6 @@ def geth(mu,delta=0.0):
 #  def ff(r):
 #      if r[1]>0.0: return mu
 #      return 0.0
-
   
   
   h.add_zeeman(fm)
@@ -31,24 +28,18 @@ def geth(mu,delta=0.0):
   h.shift_fermi(mu)
   h.add_swave(delta)
   return h
-
 h = geth(0.0)
 #h.get_bands(operator="sx")
 #exit()
 import green
-
 es = np.linspace(-0.2,0.2,50)
-
 #(xs,ys) = green.dos_semiinfinite(h.intra,h.inter,energies=es)
-
 #np.savetxt("DOS.OUT",np.matrix([xs,ys]).T)
 #exit()
-
 mus = np.linspace(0.,0.5,40)
 gs = []
 nus = []
 import topology
-
 for mu in mus:
   h = geth(mu,delta=0.1)
   g = h.get_gap()
@@ -56,13 +47,7 @@ for mu in mus:
   nus.append(abs(nu))
   gs.append(g)
   print(mu,g,nu)
-
-
-
-
-
 import matplotlib.pyplot as plt
-
 plt.subplot(121)
 plt.plot(mus,gs,marker="o")
 plt.subplot(122)

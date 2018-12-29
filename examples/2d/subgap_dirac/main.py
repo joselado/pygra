@@ -1,13 +1,10 @@
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import sys
-import os
-sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
-
-import geometry
-import topology
-import klist
+from pygra import geometry
+from pygra import topology
+from pygra import klist
 import numpy as np
-
 #g = geometry.single_square_lattice()
 g = geometry.honeycomb_lattice()
 #g = geometry.bichain()
@@ -28,22 +25,21 @@ h.check()
 #h.add_pairing(0.4,mode="snn")
 #h.add_pairing(0.4,mode="swaveA")
 #h.add_swave(0.4)
-import klist
-
+from pygra import klist
 kpath = klist.default(g,nk=4000)
 h.get_bands(kpath=kpath)
 exit()
 #h.turn_sparse()
-import hamiltonians
+from pygra import hamiltonians
 #hamiltonians.print_hopping(h)
 #h.check()
-import superconductivity
+from pygra import superconductivity
 superconductivity.superconductivity_type(h)
 exit()
 #exit()
 #h1.add_swave(0.3)
 #print(h.same_hamiltonian(h1))
-import spectrum
+from pygra import spectrum
 spectrum.singlet_map(h,nsuper=1,mode="abs")
 #h.get_bands()
 #dos.dos(h,nk=100,use_kpm=True)

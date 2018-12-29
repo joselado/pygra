@@ -8,6 +8,7 @@ dimensionalities and based on a variety of different lattices
 - Include magnetism, spin-orbit coupling and superconductivity
 - Selfconsistent mean field calculations
 - Topological characterization of electronic structures
+- Spectral functions
 - Quantum Transport
 
 # EXAMPLES #

@@ -1,12 +1,10 @@
-import os
-import sys
-sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 import numpy as np
-import geometry
+from pygra importgeometry
 import topology
 import klist
-
 g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=False)
 #h = g.get_hamiltonian()
@@ -20,6 +18,5 @@ import parallel
 #parallel.cores = 7
 #topology.chern_density(h,es=np.linspace(-5.0,5.0,200),nk=10)
 #topology.write_berry(h,mode="Green")
-
 h.get_bands()
 #dos.dos(h,nk=100,use_kpm=True)

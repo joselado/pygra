@@ -1,12 +1,11 @@
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 from pygra import geometry
 from pygra import topology
 import numpy as np
-
 mus = np.linspace(-0.7,0.7,40)
-
 fo = open("HALL.OUT","w")
-
 for mu in mus:
   g = geometry.honeycomb_lattice()
   h = g.get_hamiltonian(has_spin=True)
@@ -16,6 +15,4 @@ for mu in mus:
   sigmaxy = topology.hall_conductivity(h,nk=20) # get
   print(mu,sigmaxy)
   fo.write(str(mu)+"  "+str(sigmaxy)+"\n")
-
 fo.close()
-

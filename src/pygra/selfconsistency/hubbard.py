@@ -6,6 +6,7 @@ from ..scftypes import get_fermi_energy
 from ..scftypes import get_occupied_states
 from scipy.sparse import csc_matrix
 import time
+from ..scftypes import directional_mean_field
 
 
 def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,

@@ -1,19 +1,14 @@
-import sys
-import os
-sys.path.append("../../../pygra")  # add the pygra library
-import geometry
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+
+from pygra importgeometry
 import numpy as np
 import hybrid
 import films
 import operators
-
 g = geometry.diamond_lattice_minimal() # get the three dimensional diamond lattice
-
 g = films.geometry_film(g,nz=20) # create a film
 h = g.get_hamiltonian(is_multicell=True) # create hamiltonian
-
-
-
 def get_hamiltonian():
   """Hamiltonian for parameter p"""
   h = g.get_hamiltonian(is_multicell=True,is_sparse=False) # create hamiltonian
@@ -27,10 +22,7 @@ def get_hamiltonian():
   h.add_swave(lambda r: 0.4*(-step(r[2])+1.0))
   h.add_kane_mele(0.05)
   return h
-
 h = get_hamiltonian()
-
 h.get_bands(operator=operators.get_sz(h))
-
-import kdos
+from pygra importkdos
 #kdos.kdos_bands(h,delta=0.01)

@@ -1,16 +1,13 @@
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
+from pygra importgeometry
 import topology
 import klist
 import classicalspin
-
 import films
 import ribbon
 import islands
-
 g = geometry.honeycomb_lattice() # generate the geometry
 g = geometry.triangular_lattice() # generate the geometry
 g = geometry.pyrochlore_lattice() # generate the geometry
@@ -43,4 +40,3 @@ h.turn_dense()
 h.get_bands(operator="yposition")
 #h.get_bands()
 sm.write()
-

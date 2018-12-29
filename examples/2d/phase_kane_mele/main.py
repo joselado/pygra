@@ -1,14 +1,12 @@
-# zigzag ribbon
-import sys
-sys.path.append("../../../pygra")  # add pygra library
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import geometry
+# zigzag ribbon
+from pygra importgeometry
 import topology
 import numpy as np
 import phasediagram
-
 g = geometry.honeycomb_lattice() # create geometry of a chain
-
 def getz2(x1,x2): 
   # calculate the Z2 invariant for certain Zeeman and Rashba
   h = g.get_hamiltonian(has_spin=True) # get the Hamiltonian, spinfull
@@ -17,7 +15,5 @@ def getz2(x1,x2):
   z2 = topology.z2_invariant(h,nk=10,nt=10) # get the Z2
   print(x1,x2,z2)
   return z2
-
-
 # now write the Phase diagram in a file
 phasediagram.diagram2d(getz2,x=np.linspace(-.05,0.05,10,endpoint=True),y=np.linspace(-.1,.1,10,endpoint=True),nite=3)

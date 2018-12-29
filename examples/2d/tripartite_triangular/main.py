@@ -1,11 +1,7 @@
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import sys
-sys.path.append("../../../pygra")  # add pygra library
-
-import geometry
-import topology
-import klist
-
+from pygra import geometry
 g = geometry.triangular_lattice_tripartite()
 g = g.supercell(3)
 g.write()

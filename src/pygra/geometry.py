@@ -60,7 +60,7 @@ class geometry:
 #    except: pass # continue with normal way
     if self.dimensionality==1:
       if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
-      s = supercell1d(self,nsuper)
+      s = supercell3d(self,n1=nsuper)
     elif self.dimensionality==2:
       try: # two number given
         nsuper1 = nsuper[0]
@@ -546,7 +546,7 @@ def supercell1d(g,nsuper):
   celldis = g.a1[0]
   if np.abs(g.a1.dot(g.a1) - g.a1[0]**2)>0.001:
     print("Something weird in supercell 1d")
-    return supercell1d(sculpt.rotate_a2b(g,g.a1,np.sqrt([1.,0.,0.]))) 
+    return supercell1d(sculpt.rotate_a2b(g,g.a1,np.sqrt([1.,0.,0.])),nsuper) 
   # position of the supercell
   yout = []
   xout = []
@@ -732,7 +732,7 @@ def cubic_lattice():
     for j in range(2):
       for k in range(2):
         ss.append((-1)**(i+j+k)) # sublattice
-        rs.append(i*g.a1 + j*g.a2 + k*g.a3) # position
+        rs.append(i*a1 + j*a2 + k*a3) # position
   g.a1 = a1*2      
   g.a2 = a2*2      
   g.a3 = a3*2      

@@ -1,5 +1,6 @@
-import os
-import sys
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+
 import numpy as np
 from pygra import geometry
 from pygra import hamiltonians
@@ -7,8 +8,6 @@ from pygra import klist
 from pygra import sculpt
 from pygra import specialgeometry
 from pygra import scftypes
-
-
 g = specialgeometry.twisted_bilayer(5)
 #g = geometry.honeycomb_lattice()
 g.write()
@@ -20,7 +19,6 @@ h.turn_dense()
 #    return 0.2*r[2]
     
 #h.shift_fermi(ff)
-
 h.turn_spinful()
 h.turn_dense()
 h.add_sublattice_imbalance(0.5)
@@ -29,20 +27,12 @@ h.add_kane_mele(0.03)
 #exit()
 from pygra import meanfield
 mf = meanfield.guess(h,"antiferro",0.1)
-
 g = 2.0
-
 filling = 0.5 + 1./h.intra.shape[0] # plus two electrons
-
 nk = 1
 scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=g,
                 mix=0.9,mf=mf)
-
 #scf1 = scftypes.selfconsistency(h,nkp=nk,filling=0.5,g=g,
 #                mix=0.9,mf=mf)
-
 scf.hamiltonian.get_bands(num_bands=40,operator="sz")
-
 #print(scf.total_energy-scf1.total_energy)
-
-

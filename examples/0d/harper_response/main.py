@@ -1,13 +1,12 @@
-import os
-import sys
-sys.path.append(os.environ["PYGRAROOT"])  # add pygra library
-import geometry
-import numpy as np
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
+from pygra import geometry
+from pygra import chi
+import numpy as np
 n = 100
 g = geometry.chain(n) # chain
 g.dimensionality = 0
-
 Bs = np.linspace(0.0,3.0,300)
 fo = open("SWEEP.OUT","w")
 for B in Bs:
@@ -19,7 +18,6 @@ for B in Bs:
   h = g.get_hamiltonian(fun=ft,has_spin=False)
   
   es = np.linspace(0.0,7.0,200)
-  import chi
   cout = []
   for i in range(10,n-10):
     es,cs = chi.chargechi(h,es=es,i=i,j=i)
@@ -32,5 +30,4 @@ for B in Bs:
       fo.write(str(ie)+"   ")
       fo.write(str(abs(ic.imag))+"\n")
   fo.flush()
-
 fo.close()

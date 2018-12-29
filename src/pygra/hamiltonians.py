@@ -494,7 +494,7 @@ class hamiltonian():
 #        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
         np.savetxt("MAGNETISM.OUT",np.matrix([g.x,g.y,g.z,mx,my,mz]).T)
         return np.array([mx,my,mz])
-    return np.array([mx,my,mz]).transpose()
+#    return np.array([mx,my,mz]).transpose()
   def get_ipr(self,**kwargs):
       """Return the IPR"""
       from . import ipr

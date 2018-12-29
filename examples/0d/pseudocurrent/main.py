@@ -1,12 +1,12 @@
-import sys
-sys.path.append("../../../pygra")  # add pygra library
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+
 import neighbor
 import multiterminal
 import numpy as np
-import geometry
+from pygra importgeometry
 import sculpt
 import pseudocontact
-
 g = geometry.honeycomb_lattice()
 imfile = "color_island.png"
 imfile = "contact.png"
@@ -21,4 +21,3 @@ h = g.get_hamiltonian(has_spin=False,is_sparse=True)
 h.add_peierls(0.02)
 indexes = sculpt.common(g,gc)
 pseudocontact.write_correlator(h,index=indexes,e=0.4)
-

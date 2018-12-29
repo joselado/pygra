@@ -1,10 +1,10 @@
-# zigzag ribbon
-import sys
-sys.path.append("../../../pygra")  # add pygra library
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
+# zigzag ribbon
 import numpy as np
-import geometry
-import scftypes
+from pygra importgeometry
+from pygra importscftypes
 import operators
 from scipy.sparse import csc_matrix
 g = geometry.honeycomb_zigzag_ribbon(4) # create geometry of a zigzag ribbon
@@ -15,20 +15,14 @@ g = geometry.chain()
 g = g.supercell(10)
 g.write()
 #exit()
-
 h = g.get_hamiltonian() # create hamiltonian of the system
 h = h.get_multicell()
-
 #h.shift_fermi(0.5)
-
-
 def delta(r1,r2):
   dr = r1-r2
   if 0.1<dr[0]<1.1: return [-0.5,-0.5,0.]
   elif -1.1<dr[0]<-0.1: return [0.5,0.5,0.]
   else: return [0.,0.,0.]
-
-
 #h.add_pwave(delta)
 #print(h.hopping[1].m)
 #h.get_bands()
@@ -37,9 +31,7 @@ def delta(r1,r2):
 #h.add_zeeman(0.5)
 #h.shift_fermi(-1.0)
 h.add_swave(0.0)
-
 mf = scftypes.guess(h,mode="swave",fun=lambda r: 0.02)
-
 #h.remove_spin()
 mode = {"U":-2}
 mode = {"V":-1.}
@@ -56,11 +48,6 @@ h = scf.hamiltonian # get the Hamiltonian
 h.get_bands() # calculate band structure
 #print(scf.magnetization)
 #h.write()
-
 import groundstate
-
 #groundstate.swave(h)
 #groundstate.hopping(h)
-
-
-

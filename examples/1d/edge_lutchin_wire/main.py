@@ -1,8 +1,8 @@
-# zigzag ribbon
-import sys
-sys.path.append("../../../pygra")  # add pygra library
+# Add the root path of the pygra library
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import geometry
+# zigzag ribbon
+from pygra importgeometry
 import topology
 import operators
 g = geometry.chain() # create geometry of a chain
@@ -11,13 +11,11 @@ h.add_rashba(0.5) # add Rashba SOC
 h.add_zeeman(0.3) # add Zeeman field
 h.shift_fermi(2.) # add Zeeman field
 h.add_swave(0.2) # add swave pairing
-
 #h.get_bands(operator=operators.get_sy(h))
 #exit()
 #print(h.intra)
-
 phi = topology.berry_phase(h) # get the berry phase
-import kdos
+from pygra importkdos
 kdos.write_surface(h)
 #print(phi)
 #hf = h.supercell(100) # do a supercell
