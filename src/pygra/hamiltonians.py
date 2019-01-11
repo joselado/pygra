@@ -465,6 +465,7 @@ class hamiltonian():
       ht = self.copy()
       ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
       return operators.get_valley(ht)
+    elif name=="ipr": return operators.ipr 
     else: raise
   def extract(self,name="mz"): 
     """Extract somethign from the Hamiltonian"""

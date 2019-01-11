@@ -225,13 +225,16 @@ class geometry:
   def update_reciprocal(self):
     """Update reciprocal lattice vectors"""
     self.b1,self.b2,self.b3 = get_reciprocal(self.a1,self.a2,self.a3)
-  def get_k2K_generator(self):
+  def get_k2K_generator(self,toreal=False):
     """Function to turn a reciprocal lattice vector to natural units"""
     R = self.get_k2K() # get matrix
-    def fun(k):
-      if len(k)!=3: raise
+    if toreal: R = R.H # transform to real coordinates
+    def fun(k0):
+      if len(k0)==3: k = k0 # do nothing
+      elif len(k0)==2: k = np.array([k0[0],k0[1],0.]) # convert to three comp
       r = np.matrix(k).T # real space vectors
       out = np.array((R*r).T)[0] # change of basis
+      if len(k0)==2: return np.array([out[0],out[1]]) # return two
       return out
     return fun
   def fractional2real(self):
@@ -1484,3 +1487,33 @@ def same_site(r1,r2):
 
 
 
+def hyperhoneycomb_lattice():
+  """Return a hyperhoneycomb lattice"""
+  g = geometry() # create geometry
+  g.a1 = np.array([np.sqrt(3.),0.,0.]) # lattice vector
+  g.a2 = np.array([0.,np.sqrt(3.),0.]) # lattice vector
+  g.a3 = np.array([-np.sqrt(3.)/2.,np.sqrt(3.)/2.,3.]) # lattice vector
+  rs = [] # vectors in the unit cell
+  rs.append(np.array([0.,0.,-0.5])+g.a1/2.) # site
+  rs.append(np.array([0.,0.,0.])) # site
+  rs.append(np.array([0.,0.,1.])) # site
+  rs.append(np.array([0.,0.,1.5])+g.a2/2.) # site
+  g.dimensionality = 3 # three dimensional system
+  g.has_sublattice = True
+  g.sublattice = np.array([1,-1,1,-1])
+  g.r = np.array(rs) # store
+  g.r2xyz() # create r coordinates
+  g.get_fractional()
+  return g
+
+
+
+
+def pyrochlore_lattice():
+  """Return a pyrochlore lattice"""
+  rs = [np.array([0.,0.,0.])]
+  rs += [np.array([-.25,.25,0.])]
+  rs += [np.array([0.,.25,.25])]
+  rs += [np.array([-.25,0.,.25])]
+  fac = np.sqrt(rs[1].dot(rs[1])) # distance to FN
+  rs = [np.array(r)/fac for r in rs] # positions

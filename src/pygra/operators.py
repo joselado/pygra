@@ -361,6 +361,9 @@ def tofunction(A):
     else: return lambda x,k=0.0: braket_wAw(x,A).real # if it is a matrix
 
 
+def ipr(w,k=None):
+    """IPR operator"""
+    return np.sum(np.abs(w)**4)
 
 
 
