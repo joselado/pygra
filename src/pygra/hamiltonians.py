@@ -479,7 +479,7 @@ class hamiltonian():
     elif name=="mz" and self.has_spin:
       return extract.mz(self.intra)
     else: raise
-  def write_magnetization(self,nrep=3):
+  def write_magnetization(self,nrep=5):
     """Extract the magnetization and write it in a file"""
     if not self.has_eh: # without electron hole
       if self.has_spin: # for spinful
@@ -487,9 +487,9 @@ class hamiltonian():
         my = extract.my(self.intra)
         mz = extract.mz(self.intra)
         g = self.geometry
-        g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=3)
-        g.write_profile(my,name="MY.OUT",normal_order=True,nrep=3)
-        g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=3)
+        g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=nrep)
+        g.write_profile(my,name="MY.OUT",normal_order=True,nrep=nrep)
+        g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=nrep)
 #        np.savetxt("MX.OUT",np.matrix([g.x,g.y,g.z,mx]).T)
 #        np.savetxt("MY.OUT",np.matrix([g.x,g.y,g.z,my]).T)
 #        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
