@@ -14,6 +14,7 @@ from . import checkclass
 from . import extract
 from . import multicell
 from . import spectrum
+from . import kekule
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -247,16 +248,51 @@ class hamiltonian():
       from .multicell import first_neighbors as fnm
       fnm(self)
     else: raise
+  def add_hopping_matrix(self,fm):
+      """
+      Add a certain hopping matrix to the Hamiltonian
+      """
+      if not self.is_multicell: raise # this may not work for multicell
+      h = self.geometry.get_hamiltonian(has_spin=self.has_spin,
+              is_multicell=self.is_multicell,
+              mgenerator=fm) # generate a new Hamiltonian
+      self.add_hamiltonian(h) # add this contribution
+  def add_hamiltonian(self,h):
+      """
+      Add the hoppings of another Hamiltonian
+      """
+      if not self.is_multicell: raise # not implemented
+      hd = h.get_dict() # get the dictionary
+      self.intra = self.intra + hd[(0,0,0)] # add the matrix
+      for i in range(len(self.hopping)):
+          d = tuple(self.hopping[i].dir)
+          if d in hd:
+            self.hopping[i].m = self.hopping[i].m + hd[d]
+  def get_dict(self):
+      """
+      Return the dictionary that yields the hoppings
+      """
+      if not self.is_multicell: raise # not implemented
+      hop = dict()
+      hop[(0,0,0)] = self.intra
+      for t in self.hopping: hop[tuple(t.dir)] = t.m
+      return hop # return dictionary
   def copy(self):
-    """ Returns a copy of the hamiltonian"""
+    """
+    Return a copy of the hamiltonian
+    """
     from copy import deepcopy
     return deepcopy(self)
   def check(self):
-    """Checks if the Hamiltonian is hermitic"""
+    """
+    Check if the Hamiltonian is OK
+    """
     from . import check
     check.check_hamiltonian(self) # check the Hamiltonian
   def turn_sparse(self):
-    """ Transforms the hamiltonian into a sparse hamiltonian"""
+    """
+    Transforms the hamiltonian into a sparse hamiltonian
+    """
     from scipy.sparse import csc_matrix
 #    if self.is_sparse: return # if it is sparse return
     self.is_sparse = True # sparse flag to true
@@ -335,6 +371,18 @@ class hamiltonian():
   def add_haldane(self,t):
     """ Adds a Haldane term"""  
     kanemele.add_haldane(self,t) # return Haldane SOC
+  def add_kekule(self,t):
+      """
+      Add Kekule coupling
+      """
+      if self.dimensionality==0: # zero dimensional
+        m = kekule.kekule_matrix(self.geometry.r)
+        self.intra = self.intra + self.spinless2full(m)
+      else: # workaround for higher dimensionality
+        r = self.geometry.multireplicas(2) # get many replicas
+        fm = kekule.kekule_function(r,t=t)
+        self.add_hopping_matrix(fm) # add the Kekule hopping
+
   def add_modified_haldane(self,t):
     """ Adds a Haldane term"""  
     kanemele.add_modified_haldane(self,t) # return Haldane SOC
@@ -1082,5 +1130,10 @@ def print_hopping(h):
     for t in h.hopping:
         print("Hopping",t.dir)
         pprint(t.m)
+
+
+
+
+
 
 

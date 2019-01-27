@@ -189,15 +189,21 @@ class geometry:
       f.write("\n")
       ir += 1
     f.close() # close file
-  def neighbor_directions(self):
+  def neighbor_directions(self,n=None):
     """Return directions linking to neighbors"""
-    return neighbor_directions(self,self.ncells)
+    if n is None: n = self.ncells
+    return neighbor_directions(self,n)
   def write_profile(self,d,**kwargs):
       """Write a profile in a file"""
       write_profile(self,d,**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
+  def multireplicas(self,n):
+      """
+      Return several replicas of the unit cell
+      """
+      return multireplicas(self,n)
   def bloch_phase(self,d,k):
     """Return the Bloch phase for this d vector"""
     if self.dimensionality == 0: return 1.0
@@ -1086,9 +1092,16 @@ def remove_duplicated(g):
   """ Remove duplicated atoms"""
   if not g.atoms_have_names: raise
   go = g.copy() # copy geometry
+  rs = remove_duplicated_positions(g.r)
+  go.r = np.array(rs)
+  go.r2xyz() # update the other coordinates
+  go.atoms_names = names
+  return go
+
+
+def remove_duplicated_positions(r):
   rs = []
-  names = []
-  for (n,ir) in zip(g.atoms_names,g.r): # loop over atoms
+  for ir in r: # loop over atoms
      store = True # store this atom
      for jr in rs: # loop over stored
        dr = ir-jr
@@ -1096,11 +1109,8 @@ def remove_duplicated(g):
        if dr<0.01: store = False
      if store: # store this atom
        rs.append(ir.copy())
-       names.append(n)
-  go.r = np.array(rs)
-  go.r2xyz() # update the other coordinates
-  go.atoms_names = names
-  return go
+  return rs # return unrepeated atoms
+
 
 
 
@@ -1517,3 +1527,23 @@ def pyrochlore_lattice():
   rs += [np.array([-.25,0.,.25])]
   fac = np.sqrt(rs[1].dot(rs[1])) # distance to FN
   rs = [np.array(r)/fac for r in rs] # positions
+
+
+
+
+
+
+
+def multireplicas(self,n):
+    """
+    Return several replicas of the unit cell, it is similar
+    to supercell but without the shift of the center and going to positive
+    and negative positions
+    """
+    out = [] # empty list with positions
+    dl = self.neighbor_directions(n) # list with neighboring cells to take
+    if self.dimensionality==0: return self.r
+    else: # bigger dimensionality
+        for d in dl:  out += self.replicas(d) # add this direction
+    return out
+

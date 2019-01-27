@@ -8,11 +8,8 @@ import scipy.linalg as lg
 #from bandstructure import braket_wAw
 from . import current
 from . import superconductivity
+from .algebra import braket_wAw
 
-
-def braket_wAw(w,A):
-  w = np.matrix(w) # convert to matrix
-  return ((w.T).H*A*w.T)[0,0] # expectation value
 
 
 
