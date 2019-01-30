@@ -8,7 +8,7 @@ from pygra import klist
 from pygra import sculpt
 from pygra import specialgeometry
 from pygra import scftypes
-g = specialgeometry.twisted_bilayer(5)
+g = specialgeometry.twisted_bilayer(8)
 #g = geometry.honeycomb_lattice()
 g.write()
 from pygra import specialhopping

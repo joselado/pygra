@@ -2,10 +2,10 @@
 import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 # zigzag ribbon
-from pygra importgeometry
-import topology
+from pygra import geometry
+from pygra import topology
 import numpy as np
-import phasediagram
+from pygra import phasediagram
 g = geometry.honeycomb_lattice() # create geometry of a chain
 def getz2(x1,x2): 
   # calculate the Z2 invariant for certain Zeeman and Rashba

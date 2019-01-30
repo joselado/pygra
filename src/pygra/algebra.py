@@ -53,4 +53,55 @@ def get_representation(wfs,A):
 
 
 
+## routines for diagonalization ##
+
+error = 1e-7
+
+from . import algebraf90
+
+
+accelerate = False
+
+def eigh(m):
+    """Wrapper for linalg"""
+    if not accelerate: return dlg.eigh(m)
+    # check if doing slices helps
+    n = m.shape[0] # size of the matrix
+    mo = m[0:n:2,1:n:2] # off diagonal is zero
+#    if False: # assume block diagonal
+    if np.max(np.abs(mo))<error: # assume block diagonal
+        # detected block diagonal
+        (es0,vs0) = eigh(m[0:n:2,0:n:2]) # recall
+        (es1,vs1) = eigh(m[1:n:2,1:n:2]) # recall
+        es = np.concatenate([es0,es1]) # concatenate array
+        vs0 = algebraf90.todouble(vs0.T,0)
+        vs1 = algebraf90.todouble(vs1.T,1)
+        vs = np.concatenate([vs0,vs1])
+        return (es,vs.T) # return the eigenvaleus and eigenvectors
+
+    else:
+      if np.max(np.abs(m.imag))<error: # assume real
+          return dlg.eigh(m.real) # diagonalize real matrix
+      else: return dlg.eigh(m) # diagonalize complex matrix
+
+
+def eigvalsh(m):
+    """Wrapper for linalg"""
+    if not accelerate: return dlg.eigvalsh(m)
+    # check if doing slices helps
+    n = m.shape[0] # size of the matrix
+    mo = m[0:n:2,1:n:2] # off diagonal is zero
+#    if False: # assume block diagonal
+    if np.max(np.abs(mo))<error: # assume block diagonal
+        # detected block diagonal
+        es0 = eigvalsh(m[0:n:2,0:n:2]) # recall
+        es1 = eigvalsh(m[1:n:2,1:n:2]) # recall
+        es = np.concatenate([es0,es1]) # concatenate array
+        return es
+
+    else:
+      if np.max(np.abs(m.imag))<error: # assume real
+          return dlg.eigvalsh(m.real) # diagonalize real matrix
+      else: return dlg.eigvalsh(m) # diagonalize complex matrix
+
 

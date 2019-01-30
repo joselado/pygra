@@ -317,10 +317,10 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     else: deltaf = lambda x: delta
     if mode=="swave":
         from .geometry import same_site
-        df = lambda r1,r2: same_site(r1,r2)*np.identity(2)
+        weightf = lambda r1,r2: same_site(r1,r2)*np.identity(2)
     elif mode=="swavez":
         from .geometry import same_site
-        df = lambda r1,r2: same_site(r1,r2)*tauz
+        weightf = lambda r1,r2: same_site(r1,r2)*tauz
     elif mode=="px":
         weightf = lambda r1,r2: px(r1,r2)
     elif mode=="swaveA":

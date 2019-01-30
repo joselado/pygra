@@ -15,6 +15,7 @@ from . import extract
 from . import multicell
 from . import spectrum
 from . import kekule
+from . import algebra
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -724,7 +725,7 @@ def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
   from scipy.sparse import csc_matrix as csc
   shape = h.intra.shape
   if h.dimensionality==0:
-    vv = lg.eigh(h.intra)
+    vv = algebra.eigh(h.intra)
     vecs = [v for v in vv[1].transpose()]
     if kpoints: return vv[0],vecs,[[0.,0.,0.] for e in vv[0]]
     else: return vv[0],vecs
@@ -743,8 +744,8 @@ def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
       from . import parallel
       if parallel.cores>1: # in parallel
 #        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
-        vvs = parallel.pcall(lambda k: lg.eigh(f(k)),kp)
-      else: vvs = [lg.eigh(f(k)) for k in kp] # 
+        vvs = parallel.pcall(lambda k: algebra.eigh(f(k)),kp)
+      else: vvs = [algebra.eigh(f(k)) for k in kp] # 
     nume = sum([len(v[0]) for v in vvs]) # number of eigenvalues calculated
     eigvecs = np.zeros((nume,h.intra.shape[0]),dtype=np.complex) # eigenvectors
     eigvals = np.zeros(nume) # eigenvalues

@@ -5,7 +5,7 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 from pygra import geometry
 from pygra import scftypes
 from pygra import operators
-g = geometry.honeycomb_zigzag_ribbon(4) # create geometry of a zigzag ribbon
+g = geometry.honeycomb_zigzag_ribbon(10) # create geometry of a zigzag ribbon
 h = g.get_hamiltonian() # create hamiltonian of the system
 mf = scftypes.guess(h,"ferro",fun=lambda r: [0.,0.,1.])
 scf = scftypes.selfconsistency(h,nkp=30,filling=0.5,mf=mf,
