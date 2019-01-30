@@ -12,14 +12,11 @@ h = g.get_hamiltonian(has_spin=False)
 h.add_sublattice_imbalance(0.6)
 from pygra import dos
 from pygra import topology
-#op = h.get_operator("valley",projector=True) # valley operator
-op = None
-#topology.write_berry(h,mode="Green",operator=op,delta=0.00001)
-op = None
-(x1,y1) = topology.write_berry(h,mode="Wilson",operator=op)
-(x,y) = topology.write_berry(h,mode="Green",operator=op)
+op = h.get_operator("valley",projector=True) # valley operator
+(x1,y1) = topology.write_berry(h)
+(x,y) = topology.write_berry(h,operator=op)
 import matplotlib.pyplot as plt
-plt.plot(x,y,c="blue",label="Wilson")
+plt.plot(x,y,c="blue",label="Valley Berry")
 plt.scatter(x1,y1,c="red",label="Berry")
 plt.legend()
 plt.show()

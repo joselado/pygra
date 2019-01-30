@@ -376,22 +376,34 @@ class hamiltonian():
       Add Kekule coupling
       """
       if self.dimensionality==0: # zero dimensional
-        m = kekule.kekule_matrix(self.geometry.r)
+        m = kekule.kekule_matrix(self.geometry.r,t=t)
         self.intra = self.intra + self.spinless2full(m)
       else: # workaround for higher dimensionality
         r = self.geometry.multireplicas(2) # get many replicas
         fm = kekule.kekule_function(r,t=t)
         self.add_hopping_matrix(fm) # add the Kekule hopping
+  def add_chiral_kekule(self,**kwargs):
+      """
+      Add a chiral kekule hopping
+      """
+      fun = kekule.chiral_kekule(self.geometry,**kwargs)
+      self.add_kekule(fun)
 
   def add_modified_haldane(self,t):
-    """ Adds a Haldane term"""  
+    """
+    Adds a Haldane term
+    """  
     kanemele.add_modified_haldane(self,t) # return Haldane SOC
   def add_anti_kane_mele(self,t):
-    """ Adds a Haldane term"""  
+    """
+    Adds an anti Kane-Mele term
+    """  
     kanemele.add_anti_kane_mele(self,t) # return anti kane mele SOC
   def add_antihaldane(self,t): self.add_modified_haldane(t) # second name
   def add_peierls(self,mag_field,new=False):
-    """Add magnetic field"""
+    """
+    Add magnetic field
+    """
     from .peierls import add_peierls
     add_peierls(self,mag_field=mag_field,new=new)
   def align_magnetism(self,vectors):

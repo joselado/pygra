@@ -72,6 +72,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     old_mf = old_mf*mix + mf*(1.-mix) # mixing
     if error<maxerror or os.path.exists("STOP"): # if converged break
       break
+    if ite>=maxite: break # if too many iterations
   file_etot.close() # close file
   file_error.close() # close file
   # output result

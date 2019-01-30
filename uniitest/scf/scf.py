@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import sys
-sys.path.append("../src/") # add the library
+sys.path.append("../../src/") # add the library
 from pygra import geometry
 from pygra import scftypes
 

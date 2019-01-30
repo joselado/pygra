@@ -201,14 +201,21 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
     else:
       es,ws = diagf(hk)
       ws = ws.transpose() # transpose eigenvectors
-      for (e,w) in zip(es,ws):  # loop over waves
-        if callable(operator):  
-          try: waw = operator(w,k=kpath[k]) # call the operator
+      def evaluate(w,k,A): # evaluate the operator
+        if callable(A):  
+          try: waw = A(w,k=kpath[k]) # call the operator
           except: 
             print("Check out the k optional argument in operator")
-            waw = operator(w) # call the operator
-        else: waw = braket_wAw(w,operator).real # calculate expectation value
-        f.write(str(k)+"   "+str(e)+"  "+str(waw)+"\n") # write in file
+            waw = A(w) # call the operator
+        else: waw = braket_wAw(w,A).real # calculate expectation value
+        return waw # return the result
+      for (e,w) in zip(es,ws):  # loop over waves
+        if isinstance(operator, (list,)): # input is a list
+            waws = [evaluate(w,k,A) for A in operator]
+        else: waws = [evaluate(w,k,operator)]
+        f.write(str(k)+"   "+str(e)+"  ") # write in file
+        for waw in waws:  f.write(str(waw)+"  ") # write in file
+        f.write("\n") # next line
       # callback function in each iteration
       if callback is not None: callback(k,es,ws) # call the function
     f.flush()

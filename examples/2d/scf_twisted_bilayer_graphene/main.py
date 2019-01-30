@@ -31,7 +31,7 @@ g = 2.0
 filling = 0.5 + 1./h.intra.shape[0] # plus two electrons
 nk = 1
 scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=g,
-                mix=0.9,mf=mf)
+                mix=0.9,mf=mf,maxite=1)
 #scf1 = scftypes.selfconsistency(h,nkp=nk,filling=0.5,g=g,
 #                mix=0.9,mf=mf)
 scf.hamiltonian.get_bands(num_bands=40,operator="sz")
