@@ -123,11 +123,11 @@ class hamiltonian():
     """ Adds a sublattice imbalance """
     if self.geometry.has_sublattice and self.geometry.sublattice_number==2:
       add_sublattice_imbalance(self,mass)
-  def add_antiferromagnetism(self,mass,axis=[0.,0.,1.]):
+  def add_antiferromagnetism(self,mass):
     """ Adds antiferromagnetic imbalanc """
     if self.geometry.has_sublattice:
       if self.geometry.sublattice_number==2:
-        magnetism.add_antiferromagnetism(self,mass,axis=axis)
+        magnetism.add_antiferromagnetism(self,mass)
       elif self.geometry.sublattice_number>2:
         magnetism.add_frustrated_antiferromagnetism(self,mass)
       else: raise

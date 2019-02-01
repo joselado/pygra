@@ -48,7 +48,7 @@ matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
 fig = plt.figure()
 fig.subplots_adjust(0.2,0.2)
 plt.plot(ps*180,es,marker="o",c="blue")
-plt.xlabel("Angle of the magnetization [degress]")
+plt.xlabel("Angle of the magnetization [degrees]")
 plt.ylabel("Total energy")
 plt.show()
 
