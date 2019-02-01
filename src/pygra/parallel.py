@@ -1,6 +1,7 @@
 # routines to call a function in parallel
 from __future__ import print_function
 import scipy.linalg as lg
+from . import algebra
 try:
   from multiprocess import Pool
 #  raise
@@ -35,7 +36,7 @@ def multieigh(ms):
   """Diagonalize a bunch of Hamiltonians at once"""
 #  mainpool = initialize()
   if mainpool is not None: mainpool.map(lg.eigh,ms)
-  else: return [lg.eigh(m) for m in ms]
+  else: return [algebra.eigh(m) for m in ms]
 
 
 
