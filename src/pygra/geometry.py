@@ -270,7 +270,8 @@ class Geometry:
     Return the connections of each site
     """
     from . import neighbor
-    if self.dimensionality==0:
+#    if self.dimensionality==0:
+    if True:
       self.connections = neighbor.connections(self.r,self.r)
       return self.connections # return list
     else: raise

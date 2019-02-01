@@ -192,7 +192,7 @@ class hamiltonian():
     """Turn the hamiltonian spinful""" 
     if self.is_sparse: # sparse Hamiltonian
       self.turn_dense() # dense Hamiltonian
-      self.turn_spinful() # spinful
+      self.turn_spinful(enforce_tr=enforce_tr) # spinful
       self.turn_sparse()
     else: # dense Hamiltonian
       if self.has_spin: return # already spinful
@@ -203,7 +203,8 @@ class hamiltonian():
         from .increase_hilbert import spinful
         from .superconductivity import time_reversal
         def fun(m):
-          return spinful(m)
+            if enforce_tr: return spinful(m,np.conjugate(m))
+            else: return spinful(m)
         if not self.has_spin:
           self.has_spin = True
           self.intra = fun(self.intra) 
