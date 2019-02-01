@@ -7,6 +7,7 @@ from ..scftypes import get_occupied_states
 from scipy.sparse import csc_matrix
 import time
 from ..scftypes import directional_mean_field
+from .. import limits
 
 
 def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
@@ -21,6 +22,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   from scipy.linalg import eigh
   nat = h.intra.shape[0]//2 # number of atoms
   htmp = h.copy()  # copy hamiltonian
+  htmp.turn_dense() # turn into a dense Hamiltonian
   # generalate the necessary list of correlators
   if mf is None: # generate initial mean field
     if mag is None: mag = np.random.random((nat,3))

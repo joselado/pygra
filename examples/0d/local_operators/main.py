@@ -11,15 +11,15 @@ i = g.get_central()[0]
 g = g.remove(i)
 
 h = g.get_hamiltonian(has_spin = False)
-#h.add_peierls(0.1)
+h.add_peierls(0.1)
 x = np.zeros(h.intra.shape[0])
 #x[i] = 0.3 # set onsite
 h.shift_fermi(x) # shift the Fermi eenrgy
 ops = operators.get_envelop(h,sites=range(h.intra.shape[0]),d=0.3)
 
 #fv = operators.get_valley(h,projector=True) # valley function
-fv = operators.get_valley_taux(h,projector=True) # valley function
-ops = [fv(1)@o for o in ops] # local times valley
+fv = operators.get_valley(h,projector=True) # valley function
+ops = [fv()@o for o in ops] # local times valley
 print(type(ops[0]))
 print(ops[0].shape)
 
