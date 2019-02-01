@@ -1,13 +1,14 @@
 # Add the root path of the pygra library
 import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-from pygra importgeometry
+from pygra import geometry
 import numpy as np
-import hybrid
-import films
-import operators
+from pygra import films
+from pygra import algebra
+algebra.accelerate = True
+
 g = geometry.diamond_lattice_minimal() # get the three dimensional diamond lattice
-g = films.geometry_film(g,nz=20) # create a film
+g = films.geometry_film(g,nz=40) # create a film
 h = g.get_hamiltonian(is_multicell=True) # create hamiltonian
 def get_hamiltonian():
   """Hamiltonian for parameter p"""
@@ -23,6 +24,5 @@ def get_hamiltonian():
   h.add_kane_mele(0.05)
   return h
 h = get_hamiltonian()
-h.get_bands(operator=operators.get_sz(h))
-from pygra importkdos
+h.get_bands(operator="sz",nk=100)
 #kdos.kdos_bands(h,delta=0.01)
