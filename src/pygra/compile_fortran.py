@@ -17,7 +17,7 @@ names += [("kanemele","kanemelef90.f90","kanemelef90")]
 names += [("green","greenf90.f90","greenf90")] 
 names += [("specialhopping","specialhoppingf90.f90","specialhoppingf90")] 
 names += [("chi","chif90.f90","chif90")] 
-names += [("algebraf90","algebraf90.f90","algebraf90")] 
+names += [("algebra","algebraf90.f90","algebraf90")] 
 
 
 
