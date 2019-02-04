@@ -31,7 +31,7 @@ for p in ps: # loop over angles
   # antiferro initialization
   mf = scftypes.guess(h,mode="antiferro",fun = lambda x: 1.0) 
   # perform SCF with specialized routine for collinear Hubbard
-  scf = scftypes.hubbardscf(h,nkp=5,filling=0.5,g=U,
+  scf = scftypes.hubbardscf(h,nkp=5,filling=0.1,g=U,
                 mix=0.5,mf=mf,collinear=True)
   e = scf.total_energy # get the energy of the system
   es.append(e) # store energy
