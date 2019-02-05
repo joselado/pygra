@@ -112,7 +112,7 @@ class hamiltonian():
     return diagonalize(self,nkpoints=nkpoints)
   def get_dos(self,**kwargs):
       from . import dos
-      dos.dos(self,**kwargs)
+      return dos.dos(self,**kwargs)
   def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
     return get_bands_nd(self,**kwargs)
@@ -458,8 +458,12 @@ class hamiltonian():
         self.txmy = tmprot(self.txmy,[1.,-1.,0.])
       else: raise
   def get_magnetization(self,nkp=10):
-    from .magnetism import get_magnetization
-    get_magnetization(self,nkp=nkp)
+    mx = self.extract(name="mx")
+    my = self.extract(name="my")
+    mz = self.extract(name="mz")
+    return np.array([mx,my,mz]).T # return array
+#    from .magnetism import get_magnetization
+#    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
     """Return a 1d Hamiltonian"""
     if self.is_multicell: raise # not implemented
@@ -552,10 +556,12 @@ class hamiltonian():
         g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=nrep)
         g.write_profile(my,name="MY.OUT",normal_order=True,nrep=nrep)
         g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=nrep)
-#        np.savetxt("MX.OUT",np.matrix([g.x,g.y,g.z,mx]).T)
-#        np.savetxt("MY.OUT",np.matrix([g.x,g.y,g.z,my]).T)
-#        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
-        np.savetxt("MAGNETISM.OUT",np.array([g.x,g.y,g.z,mx,my,mz]).T)
+        # this is just a workaround
+        m = np.genfromtxt("MX.OUT").transpose()
+        (x,y,z,mx) = m[0],m[1],m[2],m[3]
+        my = np.genfromtxt("MY.OUT").transpose()[3]
+        mz = np.genfromtxt("MZ.OUT").transpose()[3]
+        np.savetxt("MAGNETISM.OUT",np.array([x,y,z,mx,my,mz]).T)
         return np.array([mx,my,mz])
 #    return np.array([mx,my,mz]).transpose()
   def get_ipr(self,**kwargs):

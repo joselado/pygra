@@ -127,14 +127,17 @@ def write_dos(es,ds,output_file="DOS.OUT"):
 
 
 def dos1d(h,use_kpm=False,scale=10.,nk=100,npol=100,ntries=2,
-          ndos=1000,delta=0.01,ewindow=None,frand=None):
+          ndos=1000,delta=0.01,ewindow=None,frand=None,
+          energies=None):
   """ Calculate density of states of a 1d system"""
   if h.dimensionality!=1: raise # only for 1d
   ks = np.linspace(0.,1.,nk,endpoint=False) # number of kpoints
   if not use_kpm: # conventional method
     hkgen = h.get_hk_gen() # get generator
 #    delta = 16./(nk*h.intra.shape[0]) # smoothing
-    calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta) # conventiona algorithm
+    calculate_dos_hkgen(hkgen,ks,
+            delta=delta,energies=energies) # conventiona algorithm
+    return np.genfromtxt("DOS.OUT").transpose()
   else:
     h.turn_sparse() # turn the hamiltonian sparse
     hkgen = h.get_hk_gen() # get generator
@@ -149,7 +152,6 @@ def dos1d(h,use_kpm=False,scale=10.,nk=100,npol=100,ntries=2,
       ts.remaining(i,nk)
     yt /= nk # normalize
     write_dos(xs,yt) # write in file
-    print()
     return xs,yt
 
 
@@ -412,7 +414,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
       if h.dimensionality==0:
         return dos0d(h,es=energies,delta=delta)
       elif h.dimensionality==1:
-        return dos1d(h,ndos=len(energies),delta=delta,nk=nk)
+        return dos1d(h,energies=energies,delta=delta,nk=nk)
       elif h.dimensionality==2:
         return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
             ndos=len(energies),random=random,window=np.max(np.abs(energies)))
