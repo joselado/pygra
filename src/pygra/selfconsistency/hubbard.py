@@ -70,6 +70,11 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
       print("Fermi energy =",fermi)
       print("Total energy =",etot)
       print("Total charge =",totcharge)
+      mx = htmp.extract(name="mx")
+      my = htmp.extract(name="my")
+      mz = htmp.extract(name="mz")
+      print("Mag =",np.sum(mx),np.sum(my),np.sum(mz))
+      print("Abs mag =",np.sum(np.abs(mx)),np.sum(np.abs(my)),np.sum(np.abs(mz)))
       print("Average charge =",avcharge)
     old_mf = old_mf*mix + mf*(1.-mix) # mixing
     if error<maxerror or os.path.exists("STOP"): # if converged break
