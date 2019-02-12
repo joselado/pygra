@@ -94,7 +94,7 @@ def twisted_supercell(g,m0=3,r=1):
 
 def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
   sublattice=True,r=1,rot=[1,1,0,0],g=None,dz=3.0):
-  """Return the geometry for twisted bilayer graphene"""
+  """Return the geometry for twisted multilayer graphene"""
   if g is None: g = geometry.honeycomb_lattice() # default is honeycomb
   g.has_sublattice = False # no sublattice
   g = geometry.non_orthogonal_supercell(g,m=[[-1,0,0],[0,1,0],[0,0,1]])

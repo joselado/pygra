@@ -313,13 +313,14 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     """ Add a general pairing matrix to a Hamiltonian"""
 #    self.get_eh_sector = get_eh_sector_odd_even # assign function
 #    if mode is None: df = delta # assume function is given
+    from .geometry import same_site
     if callable(delta): deltaf = delta # input is a function
     else: deltaf = lambda x: delta
-    if mode=="swave":
-        from .geometry import same_site
+    if callable(mode):
+        weightf = mode # mode is a function
+    elif mode=="swave":
         weightf = lambda r1,r2: same_site(r1,r2)*np.identity(2)
     elif mode=="swavez":
-        from .geometry import same_site
         weightf = lambda r1,r2: same_site(r1,r2)*tauz
     elif mode=="px":
         weightf = lambda r1,r2: px(r1,r2)

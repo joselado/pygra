@@ -15,6 +15,19 @@ def braket_wAw(w,A,wi=None):
     return (np.conjugate(wi)@A@w)[0,0] # modern way
 
 
+
+
+def braket_ww(w,wi):
+  """
+  Compute the braket of two wavefunctions
+  """
+  w = matrix2vector(w) # convert to vector
+  wi = matrix2vector(wi) # convert to vector
+  return (np.conjugate(w)@wi) # modern way
+
+
+
+
 def disentangle_manifold(wfs,A):
   """
   Disentangles the wavefunctions of a degenerate manifold
@@ -103,5 +116,15 @@ def eigvalsh(m):
       if np.max(np.abs(m.imag))<error: # assume real
           return dlg.eigvalsh(m.real) # diagonalize real matrix
       else: return dlg.eigvalsh(m) # diagonalize complex matrix
+
+
+
+def matrix2vector(v):
+    """Transform a matrix into a vector"""
+    if issparse(v): # sparse matrix
+      v = v.todense() # convert to conventional matrix
+    v = np.array(v) # convert to array
+    if len(v.shape)==1: return v
+    else: return v.reshape(v.shape[0]*v.shape[1])
 
 

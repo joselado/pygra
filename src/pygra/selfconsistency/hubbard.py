@@ -59,6 +59,8 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
     file_etot.write(str(ite)+"    "+str(etot)+"\n") # write energy in file
     file_error.write(str(ite)+"    "+str(error)+"\n") # write energy in file
+    file_etot.flush()
+    file_error.flush()
     totcharge = np.sum(charge).real # total charge
     avcharge = totcharge/nat # average charge
     htmp.write_magnetization() # write in a file
