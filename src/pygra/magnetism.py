@@ -56,7 +56,7 @@ def add_antiferromagnetism(h,m):
     out = [[None for j in range(natoms)] for i in range(natoms)] # output matrix
     # create the array
     if checkclass.is_iterable(m): # iterable, input is an array
-      if len(mass)!=len(h.geometry.r): raise
+      if len(m)!=len(h.geometry.r): raise
       mass = m # use the input array
     elif callable(m): # input is a function
       mass = [m(h.geometry.r[i]) for i in range(natoms)] # call the function

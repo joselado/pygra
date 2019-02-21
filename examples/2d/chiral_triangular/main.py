@@ -5,7 +5,7 @@ from pygra import geometry
 from pygra import specialhopping
 import numpy as np
 g = geometry.triangular_lattice()
-fun = specialhopping.phase_C3(g,phi=0.3)
+fun = specialhopping.phase_C3(g,phi=1.0)
 h = g.get_hamiltonian(has_spin=False,fun=fun)
 h.turn_spinful(enforce_tr=True)
 h.turn_dense()

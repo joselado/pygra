@@ -151,14 +151,17 @@ def get_moments_vivj_python(m0,vi,vj,n=100):
   mus = np.zeros(n,dtype=np.complex) # empty arrray for the moments
   v = vi.copy()
   am = v.copy()
-  a = m*v  # vector number 1
-  bk = (vj.H*v).todense().trace()[0,0] # calculate bk
-  bk1 = (vj.H*a).todense().trace()[0,0] # calculate bk
+  a = m@v  # vector number 1
+  bk = algebra.braket_ww(vj,v)
+#  bk = (vj.H*v).todense().trace()[0,0] # calculate bk
+  bk1 = algebra.braket_ww(vj,a)
+#  bk1 = (vj.H*a).todense().trace()[0,0] # calculate bk
   mus[0] = bk  # mu0
   mus[1] = bk1 # mu1
   for ii in range(2,n): 
-    ap = 2.*m*a - am # recursion relation
-    bk = (vj.H*ap).todense().trace()[0,0]
+    ap = 2.*m@a - am # recursion relation
+    bk = algebra.braket_ww(vj,ap)
+#    bk = (vj.H*ap).todense().trace()[0,0]
     mus[ii] = bk
     am = a.copy() # new variables
     a = ap.copy() # new variables

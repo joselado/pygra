@@ -70,13 +70,13 @@ def get_representation(wfs,A):
 
 error = 1e-7
 
-from . import algebraf90
 
 
 accelerate = False
 
 def eigh(m):
     """Wrapper for linalg"""
+    from . import algebraf90
     if not accelerate: return dlg.eigh(m)
     # check if doing slices helps
     n = m.shape[0] # size of the matrix
