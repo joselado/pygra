@@ -23,7 +23,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   nat = h.intra.shape[0]//2 # number of atoms
   htmp = h.copy()  # copy hamiltonian
   htmp.turn_dense() # turn into a dense Hamiltonian
-  # generalate the necessary list of correlators
+  # generate the necessary list of correlators
   if mf is None: # generate initial mean field
     if mag is None: mag = np.random.random((nat,3))
 # get mean field matrix

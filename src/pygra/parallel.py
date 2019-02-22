@@ -56,6 +56,7 @@ def pcall_mp(fun,args,cores=cores):
     mainpool = Pool(cores) # create pool
 #    print("Using",cores,"cores")
     out = mainpool.map(fun,args) # return list
+    mainpool.terminate()
     del mainpool # delete pool
     return out
 #except:
