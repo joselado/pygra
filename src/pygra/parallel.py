@@ -4,13 +4,13 @@ import scipy.linalg as lg
 from . import algebra
 try:
   from multiprocess import Pool
-#  raise
 except:
     print("Multiprocess not working")
     def Pool(n=1): # workaround
             class mpool():
                 def map(self,f,xs):
                   return [f(x) for x in xs]
+                def terminate(self): return None # dummy function
             return mpool()
 
 cores = 1 # call in a single by default
