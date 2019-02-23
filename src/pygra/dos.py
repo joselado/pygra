@@ -223,7 +223,8 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 
 
 def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
-          ndos=500,numw=20,random=True,kpm_window=1.0,window=None):
+          ndos=500,numw=20,random=True,kpm_window=1.0,
+          window=None,energies=None):
   """ Calculate density of states of a 2d system"""
   if h.dimensionality!=2: raise # only for 2d
   ks = []
@@ -237,9 +238,11 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
     if delta is None: delta = 6./nk
 # conventiona algorithm
     return calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
-                          is_sparse=h.is_sparse,numw=numw,window=window) 
+                          is_sparse=h.is_sparse,numw=numw,window=window,
+                          energies=energies) 
   else: # use the kpm
-    npol = ndos//10
+    if delta is not None: npol = int(20*scale/delta)
+    else: npol = ndos//10
     h.turn_sparse() # turn the hamiltonian sparse
     hkgen = h.get_hk_gen() # get generator
     mus = np.array([0.0j for i in range(2*npol)]) # initialize polynomials
@@ -256,8 +259,11 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
       else: hk = hkgen(k) # hamiltonian
       mus += kpm.random_trace(hk/scale,ntries=ntries,n=npol)
     mus /= len(ks) # normalize by the number of kpoints
-    xs = np.linspace(-0.9,0.9,ndos)*kpm_window # x points
+    if energies is None:
+      xs = np.linspace(-0.9,0.9,ndos)*kpm_window # x points
+    else:  xs = energies/scale
     ys = kpm.generate_profile(mus,xs) # generate the profile
+    ys /= scale # rescale
     write_dos(xs*scale,ys) # write in file
     return (xs,ys)
 
@@ -423,7 +429,8 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
           return dos1d(h,energies=energies,delta=delta,nk=nk)
         elif h.dimensionality==2:
           return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
-              ndos=len(energies),random=random,window=np.max(np.abs(energies)))
+              ndos=len(energies),random=random,window=np.max(np.abs(energies)),
+              energies=energies)
         elif h.dimensionality==3:
           return dos3d(h,nk=nk,delta=delta,energies=energies)
         else: raise
