@@ -230,6 +230,7 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
   ks = []
   from .klist import kmesh
   ks = kmesh(h.dimensionality,nk=nk)
+  exit()
   if random:
     ks = [np.random.random(2) for ik in ks]
     print("Random k-mesh")
@@ -248,16 +249,21 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
     mus = np.array([0.0j for i in range(2*npol)]) # initialize polynomials
     tr = timing.Testimator("DOS")
     ik = 0
-    for k in ks: # loop over kpoints
-#      print("KPM DOS at k-point",k)
-      ik += 1
-      tr.remaining(ik,len(ks))      
-      if random: 
-        kr = np.random.random(2)
-        print("Random sampling in DOS")
-        hk = hkgen(kr) # hamiltonian
-      else: hk = hkgen(k) # hamiltonian
-      mus += kpm.random_trace(hk/scale,ntries=ntries,n=npol)
+    from . import parallel
+    if parallel.cores==1: # serial run
+      for k in ks: # loop over kpoints
+        ik += 1
+        tr.remaining(ik,len(ks))      
+        if random: 
+          kr = np.random.random(2)
+          print("Random sampling in DOS")
+          hk = hkgen(kr) # hamiltonian
+        else: hk = hkgen(k) # hamiltonian
+        mus += kpm.random_trace(hk/scale,ntries=ntries,n=npol)
+    else:
+        ff = lambda k: kpm.random_trace(hkgen(k)/scale,ntries=ntries,n=npol)
+        mus = parallel.pcall(kk,ks) # parallel call
+        mus = np.array(mus).sum(axis=0) # sum all the contributions
     mus /= len(ks) # normalize by the number of kpoints
     if energies is None:
       xs = np.linspace(-0.9,0.9,ndos)*kpm_window # x points
@@ -396,13 +402,13 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,
   numk = nk**h.dimensionality
   tr = timing.Testimator("DOS",maxite=numk) # generate object
   ytot = np.zeros(ne) # initialize
+  npol = 5*int(scale/delta) # number of polynomials
   for ik in range(numk): # loop over kpoints
     tr.iterate()
     k = np.random.random(3)
     hk = hkgen(k) # get Hamiltonian
     if callable(operator): op = operator(k) # call the function if necessary
     else: op = operator # take the same operator
-    npol = 2*int(scale/delta) # number of polynomials
     (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,operator=op,
                    ewindow=ewindow,ntries=ntries) # compute
     ytot += y # add contribution
@@ -428,7 +434,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
         elif h.dimensionality==1:
           return dos1d(h,energies=energies,delta=delta,nk=nk)
         elif h.dimensionality==2:
-          return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
+          return dos2d(h,use_kpm=False,nk=nk,ntries=ntries,delta=delta,
               ndos=len(energies),random=random,window=np.max(np.abs(energies)),
               energies=energies)
         elif h.dimensionality==3:
