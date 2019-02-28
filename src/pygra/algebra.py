@@ -1,6 +1,7 @@
 from scipy.sparse import issparse
 from scipy.sparse import csc_matrix as csc
 import scipy.linalg as dlg
+import scipy.sparse.linalg as slg
 import numpy as np
 
 
@@ -127,4 +128,15 @@ def matrix2vector(v):
     if len(v.shape)==1: return v
     else: return v.reshape(v.shape[0]*v.shape[1])
 
+
+
+
+def smalleig(m,numw=10,evecs=False,tol=1e-7):
+  """
+  Return the smallest eigenvalues using arpack
+  """
+  eig,eigvec = slg.eigsh(m,k=numw,which="LM",sigma=0.0,
+                                  tol=tol)
+  if evecs:  return eig,eigvec.transpose()  # return eigenvectors
+  else:  return eig  # return eigenvalues
 

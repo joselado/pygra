@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import scipy.linalg as lg
-from .bandstructure import smalleig # arpack diagonalization
+from .algebra import smalleig # arpack diagonalization
 import time
 from . import timing
 from . import kpm
@@ -181,14 +181,14 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
   """Calculate density of states using the ks given on input"""
   es = np.zeros((len(ks),hkgen(ks[0]).shape[0])) # empty list
   tr = timing.Testimator("DOS",maxite=len(ks))
+  if delta is None: delta = 5./len(ks) # automatic delta
   from . import parallel
   def fun(k): # function to execute
     if parallel.cores==1: tr.iterate() # print the info
     hk = hkgen(k) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
-      print("Sparse")
-      return smalleig(hk,numw=numw).tolist() # eigenvalues
+      return smalleig(hk,numw=numw,tol=delta/1e3).tolist() # eigenvalues
     else: # dense Hamiltonian
       return lg.eigvalsh(hk).tolist() # get eigenvalues
 #  for ik in range(len(ks)):  
@@ -199,7 +199,6 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 #  es = es.reshape(len(es)*len(es[0])) # 1d array
   es = np.array(es) # convert to array
   nk = len(ks) # number of kpoints
-  if delta is None: delta = 5./nk # automatic delta
   if energies is not None: # energies given on input
     xs = energies
   else:
@@ -208,7 +207,7 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
     else:
       xs = np.linspace(-window,window,ndos) # create x
   ys = calculate_dos(es,xs,delta) # use the Fortran routine
-  ys /= nk # normalize 
+  ys /= nk # normalize by the number of k-points
   write_dos(xs,ys) # write in file
   print("\nDOS finished")
   return (xs,ys) # return result
