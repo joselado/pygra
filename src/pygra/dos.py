@@ -187,6 +187,7 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
     hk = hkgen(k) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
+      print("Sparse")
       return smalleig(hk,numw=numw).tolist() # eigenvalues
     else: # dense Hamiltonian
       return lg.eigvalsh(hk).tolist() # get eigenvalues
@@ -230,7 +231,6 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
   ks = []
   from .klist import kmesh
   ks = kmesh(h.dimensionality,nk=nk)
-  exit()
   if random:
     ks = [np.random.random(2) for ik in ks]
     print("Random k-mesh")
@@ -420,7 +420,7 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,
 
 def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
             use_kpm=False,scale=10.,ntries=10,mode="ED",
-            random=True,operator=None):
+            random=True,operator=None,**kwargs):
   """Calculate the density of states"""
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
@@ -436,7 +436,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
         elif h.dimensionality==2:
           return dos2d(h,use_kpm=False,nk=nk,ntries=ntries,delta=delta,
               ndos=len(energies),random=random,window=np.max(np.abs(energies)),
-              energies=energies)
+              energies=energies,**kwargs)
         elif h.dimensionality==3:
           return dos3d(h,nk=nk,delta=delta,energies=energies)
         else: raise
@@ -455,6 +455,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
             out.append(-g.trace()[0,0].imag) # store dos
           np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
           return energies,np.array(out) # return
+      else: raise
     else: # operator given on input
         ds = [green.green_operator(h,operator,e=e,delta=delta,nk=nk) 
                 for e in energies]
