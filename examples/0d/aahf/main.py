@@ -4,25 +4,40 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 from pygra import geometry
 from pygra import potentials
 import numpy as np
+
+
 g = geometry.chain(400) # chain
 g.dimensionality = 0
-betas = np.linspace(0.0,4.0,30)
+vs = np.linspace(0.0,4.0,30) # potentials
 # loop over v's
+
+
 def discard(w):
+  """Discard edge wavefunctions"""
   w2 = np.abs(w)*np.abs(w) # absolute value
   n = len(w)
   if np.sum(w2[0:n//10])>0.5 or np.sum(w2[9*n//10:n])>0.5: return False
   else: return True
+
+
 fo = open("LAMBDA_VS_V.OUT","w")
-for beta in betas:
-  h = g.get_hamiltonian(has_spin=False)
-  fun = potentials.aahf1d(v=2.5,beta=beta)
-  h.shift_fermi(fun)
+lm = [] # empty array
+for v in vs: # loop over strengths of the potential
+  h = g.get_hamiltonian(has_spin=False) # get the Hamiltonian
+  fun = potentials.aahf1d(v=v,beta=0.0) # function with the AAH potential
+  h.add_onsite(fun) # add onsite energies
   (es,ls) = h.get_tails(discard=discard) # return the localization length
-  for (e,l) in zip(es,ls):
-    fo.write(str(beta)+"    ")
-    fo.write(str(e)+"    ")
-    fo.write(str(l)+"\n")
+  lm.append(np.mean(ls)) # store
+  # write in file
+  fo.write(str(v)+"    ")
+  fo.write(str(np.mean(ls))+"\n")
   fo.flush()
 fo.close()
-h.get_bands()
+
+
+import matplotlib.pyplot as plt
+
+plt.plot(vs,lm,marker="o")
+plt.xlabel("AAH Onsite")
+plt.ylabel("1/(Localization length)")
+plt.show()
