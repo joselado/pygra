@@ -1,6 +1,5 @@
 import os
 import numpy as np
-from .. import correlatorsf90
 from ..scftypes import scfclass
 from ..scftypes import get_fermi_energy
 from ..scftypes import get_occupied_states
@@ -9,6 +8,13 @@ import time
 from ..scftypes import directional_mean_field
 from .. import limits
 from .. import inout
+
+
+try:
+  from .. import correlatorsf90
+except: pass
+
+
 
 mf_file = "MF.pkl" # mean field file
 
