@@ -63,8 +63,8 @@ def global_spin_rotation(m,vector = np.array([0.,0.,1.]),angle = 0.0,
   R = [[None for i in range(n)] for j in range(n)] # rotation matrix
   from scipy.linalg import expm  # exponenciate matrix
   for i in range(n): # loop over sites
-    u = np.array(vector)
-    u = u/np.sqrt(u.dot(u)) # unit vector
+    u = np.array(vector) # rotation direction
+    u = u/np.sqrt(u.dot(u)) # normalize rotation direction
     rot = u[0]*sx + u[1]*sy + u[2]*sz 
     # a factor 2 is taken out due to 1/2 of S
     rot = expm(np.pi*1j*rot*angle/2.0)
@@ -74,9 +74,9 @@ def global_spin_rotation(m,vector = np.array([0.,0.,1.]),angle = 0.0,
 #      R[i][i] = iden  # save term
   R = bmat(R)  # convert to full sparse matrix
   if spiral:  # for spin spiral
-    mout = R * csc_matrix(m)  # rotate matrix
+    mout = R @ m  # rotate matrix
   else:  # normal global roration
-    mout = R * csc_matrix(m) * R.H  # rotate matrix
+    mout = R @ m @ R.H  # rotate matrix
   return mout # return dense matrix
 
 

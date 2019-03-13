@@ -177,9 +177,10 @@ class hamiltonian():
     """ Read the Hamiltonian"""
     return load(output_file) # read Hamiltonian
   def load(self,**kwargs): self.read(**kwargs)
-  def total_energy(self,nkpoints=30,nbands=None,random=False,kp=None):
+  def total_energy(self,**kwargs):
     """ Get total energy of the system"""
-    return total_energy(self,nk=nkpoints,nbands=nbands,random=random,kp=kp)
+    from .spectrum import total_energy
+    return total_energy(self,**kwargs)
   def add_zeeman(self,zeeman):
     """Adds zeeman to the matrix """
     if self.has_spin:  # if it has spin degree of freedom
@@ -410,15 +411,15 @@ class hamiltonian():
         self.txy = gsr(self.txy,vector=vector,angle=angle)
         self.txmy = gsr(self.txmy,vector=vector,angle=angle)
       else: raise
-  def generate_spin_spiral(self,vector=np.array([1.,0.,0.]),
-                            angle=0.,atoms=None,
+  def generate_spin_spiral(self,vector=np.array([0.,0.,1.]),
+                            atoms=None,
                             qspiral=[1.,0.,0.]):
     from .rotate_spin import global_spin_rotation as gsr
     qspiral = np.array(qspiral) # to array
     if qspiral.dot(qspiral)<1e-7: qspiral = np.array([0.,0.,0.])
-    else: qspiral = qspiral/np.sqrt(qspiral.dot(qspiral)) # normalize
     def tmprot(m,vec): # function used to rotate
-      angleq = angle*qspiral.dot(np.array(vec)) # angle
+      """Function to rotate one matrix"""
+      angleq = qspiral.dot(np.array(vec)) # angle of the rotation
       return gsr(m,vector=vector,angle=angleq,spiral=True,atoms=None)
     if self.is_multicell: # multicell Hamiltonian
       a1,a2,a3 = self.geometry.a1, self.geometry.a2,self.geometry.a3
@@ -427,8 +428,9 @@ class hamiltonian():
 #        direc = a1*ar[0] + a2*ar[1] + a3*ar[2]
         self.hopping[i].m = tmprot(self.hopping[i].m,ar) # rotate matrix
     else:
-      if self.dimensionality==1:
-        self.inter = tmprot(self.inter,self.geometry.a1)
+      if self.dimensionality==0: pass
+      elif self.dimensionality==1:
+        self.inter = tmprot(self.inter,[1.,0.,0.])
       elif self.dimensionality==2:
         a1,a2 = self.geometry.a1,self.geometry.a2
         self.tx = tmprot(self.tx,[1.,0.,0.])
@@ -844,7 +846,6 @@ def set_finite_system(hin,periodic=True):
   return h
   
 
-from .spectrum import total_energy
 
 
 def des_spin(m,component=0):

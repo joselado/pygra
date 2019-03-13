@@ -152,6 +152,11 @@ class Geometry:
       r = np.matrix(k).T # real space vectors
       return np.array((R*r).T)[0]
     return f # return function
+  def natural2reciprocal(self,v):
+      """
+      Return a natural vector in real reciprocal coordinates
+      """
+      return self.get_k2K_generator()(v)
   def get_fractional(self,center=False):
     """Fractional coordinates"""
     get_fractional(self,center=center) # get fractional coordinates
