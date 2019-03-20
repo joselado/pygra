@@ -293,6 +293,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
         etot = integrate.dblquad(lambda x,y: enek([x,y]),-1.,1.,-1.,1.,
                 epsabs=tol,epsrel=tol)[0]
     else: raise
+  else: raise
   return etot
 
 

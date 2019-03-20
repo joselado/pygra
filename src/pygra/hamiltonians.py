@@ -16,6 +16,7 @@ from . import multicell
 from . import spectrum
 from . import kekule
 from . import algebra
+from . import rotate_spin
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -177,10 +178,11 @@ class hamiltonian():
     """ Read the Hamiltonian"""
     return load(output_file) # read Hamiltonian
   def load(self,**kwargs): self.read(**kwargs)
-  def total_energy(self,**kwargs):
+  def get_total_energy(self,**kwargs):
     """ Get total energy of the system"""
     from .spectrum import total_energy
     return total_energy(self,**kwargs)
+  def total_energy(self,**kwargs): return self.get_total_energy(**kwargs)
   def add_zeeman(self,zeeman):
     """Adds zeeman to the matrix """
     if self.has_spin:  # if it has spin degree of freedom
@@ -394,68 +396,31 @@ class hamiltonian():
     from .rotate_spin import align_magnetism as align
     self.intra = align(self.intra,vectors)
     self.inter = align(self.inter,vectors)
-  def global_spin_rotation(self,vector=np.array([0.,0.,1.]),angle=0.):
-    from .rotate_spin import global_spin_rotation as gsr
-    if self.has_eh: raise
-    self.intra = gsr(self.intra,vector=vector,angle=angle)
-    if self.is_multicell: # multicell hamiltonian
-      for i in range(len(self.hopping)): # loop 
-        self.hopping[i].m = gsr(self.hopping[i].m,vector=vector,angle=angle)
-    else:
-      if self.dimensionality==0: pass
-      elif self.dimensionality==1:
-        self.inter = gsr(self.inter,vector=vector,angle=angle)
-      elif self.dimensionality==2:
-        self.tx = gsr(self.tx,vector=vector,angle=angle)
-        self.ty = gsr(self.ty,vector=vector,angle=angle)
-        self.txy = gsr(self.txy,vector=vector,angle=angle)
-        self.txmy = gsr(self.txmy,vector=vector,angle=angle)
-      else: raise
-  def generate_spin_spiral(self,vector=np.array([0.,0.,1.]),
-                            atoms=None,
-                            qspiral=[1.,0.,0.]):
-    from .rotate_spin import global_spin_rotation as gsr
-    qspiral = np.array(qspiral) # to array
-    if qspiral.dot(qspiral)<1e-7: qspiral = np.array([0.,0.,0.])
-    def tmprot(m,vec): # function used to rotate
-      """Function to rotate one matrix"""
-      angleq = qspiral.dot(np.array(vec)) # angle of the rotation
-      return gsr(m,vector=vector,angle=angleq,spiral=True,atoms=None)
-    if self.is_multicell: # multicell Hamiltonian
-      a1,a2,a3 = self.geometry.a1, self.geometry.a2,self.geometry.a3
-      for i in range(len(self.hopping)): # loop 
-        ar = self.hopping[i].dir # direction
-#        direc = a1*ar[0] + a2*ar[1] + a3*ar[2]
-        self.hopping[i].m = tmprot(self.hopping[i].m,ar) # rotate matrix
-    else:
-      if self.dimensionality==0: pass
-      elif self.dimensionality==1:
-        self.inter = tmprot(self.inter,[1.,0.,0.])
-      elif self.dimensionality==2:
-        a1,a2 = self.geometry.a1,self.geometry.a2
-        self.tx = tmprot(self.tx,[1.,0.,0.])
-        self.ty = tmprot(self.ty,[0.,1.,0.])
-        self.txy = tmprot(self.txy,[1.,1.,0.])
-        self.txmy = tmprot(self.txmy,[1.,-1.,0.])
-      else: raise
+  def global_spin_rotation(self,**kwargs):
+      """ Perform a global spin rotation """
+      return rotate_spin.hamiltonian_spin_rotation(self,**kwargs)
+  def generate_spin_spiral(self,**kwargs):
+      """ Generate a spin spiral antsaz in the Hamiltonian """
+      return rotate_spin.generate_spin_spiral(self,**kwargs)
   def get_magnetization(self,nkp=10):
-    mx = self.extract(name="mx")
-    my = self.extract(name="my")
-    mz = self.extract(name="mz")
-    return np.array([mx,my,mz]).T # return array
+      """ Return the magnetization """
+      mx = self.extract(name="mx")
+      my = self.extract(name="my")
+      mz = self.extract(name="mz")
+      return np.array([mx,my,mz]).T # return array
 #    from .magnetism import get_magnetization
 #    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
-    """Return a 1d Hamiltonian"""
-    if self.is_multicell: raise # not implemented
-    if not self.dimensionality==2: raise # not implemented
-    intra,inter = kchain(self,k) # generate intra and inter
-    hout = self.copy() # copy the Hamiltonian
-    hout.intra = intra # store
-    hout.inter = inter # store
-    hout.dimensionality = 1 # one dimensional
-    hout.geometry.dimensionality = 1 # one dimensional
-    return hout
+      """Return a 1d Hamiltonian"""
+      if self.is_multicell: raise # not implemented
+      if not self.dimensionality==2: raise # not implemented
+      intra,inter = kchain(self,k) # generate intra and inter
+      hout = self.copy() # copy the Hamiltonian
+      hout.intra = intra # store
+      hout.inter = inter # store
+      hout.dimensionality = 1 # one dimensional
+      hout.geometry.dimensionality = 1 # one dimensional
+      return hout
   def get_multicell(self):
     """Return a multicell Hamiltonian"""
     return multicell.turn_multicell(self)
