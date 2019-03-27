@@ -96,10 +96,10 @@ class hamiltonian():
         U = np.diag([self.geometry.bloch_phase(k,r) for r in frac_r])
         U = np.matrix(U) # this is without .H
         U = self.spinless2full(U) # increase the space if necessary
-        hk = U.H*hk*U
+        hk = U.H@hk@U
 #        print(csc_matrix(np.angle(hk)))
 #        exit()
-      if operator is not None: hk = operator.H*hk*operator # project
+      if operator is not None: hk = operator.H@hk@operator # project
       out = (np.identity(hk.shape[0])*(e+1j*delta) - hk).I 
 #      print(self.geometry.frac_r) 
 #      exit()

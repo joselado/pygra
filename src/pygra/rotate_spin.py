@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.linalg as lg
 
 
 
@@ -61,14 +62,13 @@ def global_spin_rotation(m,vector = np.array([0.,0.,1.]),angle = 0.0,
   else: 
     raise
   R = [[None for i in range(n)] for j in range(n)] # rotation matrix
-  from scipy.linalg import expm  # exponenciate matrix
   for i in range(n): # loop over sites
     u = np.array(vector) # rotation direction
     u = u/np.sqrt(u.dot(u)) # normalize rotation direction
     rot = u[0]*sx + u[1]*sy + u[2]*sz 
     # a factor 2 is taken out due to 1/2 of S
     # a factor 2 is added to have BZ in the interval 0,1
-    rot = expm(2.*np.pi*1j*rot*angle/2.0)
+    rot = lg.expm(2.*np.pi*1j*rot*angle/2.0)
 #    if i in atoms:
     R[i][i] = rot  # save term
 #    else:
@@ -93,12 +93,10 @@ def spiralhopping(m,ri,rj,svector = np.array([0.,0.,1.]),
   """
   from scipy.sparse import csc_matrix,bmat
   iden = csc_matrix([[1.,0.],[0.,1.]]) # identity matrix
-  n = len(ri) # number of sites
-  R = [[None for i in range(n)] for j in range(n)] # rotation matrix
-  from scipy.linalg import expm  # exponenciate matrix
   def getR(r):
       """Return a rotation matrix"""
       n = len(r) # number of sites 
+      R = [[None for i in range(n)] for j in range(n)] # rotation matrix
       u = np.array(svector) # rotation direction
       u = u/np.sqrt(u.dot(u)) # normalize rotation direction
       for i in range(n): # loop over sites
@@ -106,12 +104,11 @@ def spiralhopping(m,ri,rj,svector = np.array([0.,0.,1.]),
          angle = np.array(qvector).dot(np.array(r[i])) # angle of rotation
          # a factor 2 is taken out due to 1/2 of S
          # a factor 2 is added to have BZ in the interval 0,1
-         rot = expm(2.*np.pi*1j*rot*angle/2.0)
-         R[i][i] = rot  # save term
-         return bmat(R)  # convert to full sparse matrix
-  Ri = getR(ri) # get the first rotation matrix
-  Rj = getR(rj) # get the second rotation matrix
-  return Rj @ m @ Ri # return the rotated matrix
+         R[i][i] = lg.expm(2.*np.pi*1j*rot*angle/2.0)
+      return bmat(R)  # convert to full sparse matrix
+  Roti = getR(ri) # get the first rotation matrix
+  Rotj = getR(rj) # get the second rotation matrix
+  return Rotj @ m @ Roti.H # return the rotated matrix
 
 
 def hamiltonian_spin_rotation(self,vector=np.array([0.,0.,1.]),angle=0.):
@@ -137,18 +134,28 @@ def hamiltonian_spin_rotation(self,vector=np.array([0.,0.,1.]),angle=0.):
 
 
 def generate_spin_spiral(self,vector=np.array([0.,0.,1.]),
-                            qspiral=[1.,0.,0.]):
+                            qspiral=[1.,0.,0.],fractional=False):
     """
     Generate a spin spiral antsaz in the Hamiltonian
     """
     if not self.has_spin: raise # no spin
     qspiral = np.array(qspiral) # to array
     if qspiral.dot(qspiral)<1e-7: qspiral = np.array([0.,0.,0.])
+    self.geometry.get_fractional()
     def tmprot(m,vec): # function used to rotate
       """Function to rotate one matrix"""
-      angleq = qspiral.dot(np.array(vec)) # angle of the rotation
-      return global_spin_rotation(m,vector=vector,
+      if fractional: # fractional coordinates provided
+        # rotate fractional coordinates
+        ri = self.geometry.frac_r # positions of the first cell
+        rj = self.geometry.frac_r + np.array(vec) # positions of the next cell
+        return spiralhopping(m,ri,rj,svector=vector,
+                qvector = qspiral)
+      else:
+        # only rotate between supercells
+        angleq = qspiral.dot(np.array(vec)) # angle of the rotation
+        return global_spin_rotation(m,vector=vector,
               angle=angleq,spiral=True,atoms=None)
+    # now rotate every matrix
     if self.is_multicell: # multicell Hamiltonian
       a1,a2,a3 = self.geometry.a1, self.geometry.a2,self.geometry.a3
       for i in range(len(self.hopping)): # loop
