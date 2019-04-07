@@ -108,6 +108,8 @@ def spiralhopping(m,ri,rj,svector = np.array([0.,0.,1.]),
       return bmat(R)  # convert to full sparse matrix
   Roti = getR(ri) # get the first rotation matrix
   Rotj = getR(rj) # get the second rotation matrix
+#  print(Roti@Rotj.H)
+#  print(ri,rj)
   return Rotj @ m @ Roti.H # return the rotated matrix
 
 
@@ -155,6 +157,7 @@ def generate_spin_spiral(self,vector=np.array([0.,0.,1.]),
         angleq = qspiral.dot(np.array(vec)) # angle of the rotation
         return global_spin_rotation(m,vector=vector,
               angle=angleq,spiral=True,atoms=None)
+    self.intra = tmprot(self.intra,[0.,0.,0.]) # rotate intra matrix
     # now rotate every matrix
     if self.is_multicell: # multicell Hamiltonian
       a1,a2,a3 = self.geometry.a1, self.geometry.a2,self.geometry.a3
