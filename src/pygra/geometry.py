@@ -182,8 +182,9 @@ class Geometry:
     self.y[:] -= r0[1]
     self.z[:] -= r0[2]
     self.xyz2r() # update
-    self.get_fractional(center=True)
-    self.fractional2real()
+    if self.dimensionality>0:
+      self.get_fractional(center=True)
+      self.fractional2real()
   def write_function(self,fun,name="FUNCTION.OUT"):
     """Write a certain function"""
     f = open(name,"w")

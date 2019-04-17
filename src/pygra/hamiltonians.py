@@ -408,6 +408,20 @@ class hamiltonian():
       my = self.extract(name="my")
       mz = self.extract(name="mz")
       return np.array([mx,my,mz]).T # return array
+  def compute_vev(self,name="sz",**kwargs):
+      """
+      Compute a VEV of a spatially resolved operator
+      """
+      n = len(self.geometry.r) # number of sites
+      ops = [operators.index(self,n=[i]) for i in range(n)]
+      if name=="sx": op = operators.get_sx(self)
+      elif name=="sy": op = operators.get_sy(self)
+      elif name=="sz": op = operators.get_sz(self)
+      elif name=="density": op = operators.index(self,n=range(n))
+      else: raise
+      ops = [o@op for o in ops] # define operators
+      return spectrum.ev(self,operator=ops,**kwargs).real
+      
 #    from .magnetism import get_magnetization
 #    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
