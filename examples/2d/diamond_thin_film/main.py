@@ -3,10 +3,9 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 import numpy as np
 from pygra import geometry
-g = geometry.pyrochlore_lattice()
-g.write()
+g = geometry.diamond_lattice_minimal()
 from pygra import films
-g = films.geometry_film(g,nz=1)
+g = films.geometry_film(g,nz=5)
+g.write()
 h = g.get_hamiltonian()
-h.shift_fermi(1.5)
 h.get_bands()
