@@ -321,17 +321,13 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     elif mode=="swave":
         weightf = lambda r1,r2: same_site(r1,r2)*np.identity(2)
     elif mode=="antihaldane":
-        rm = self.geometry.multireplicas(3)
-        from .kanemele import haldane
-        def weightf(r1,r2):
-          m = haldane([r1],[r2],rm,fun=1.0).todense()[0,0]
-          i = self.geometry.get_index(r1,replicas=True)
-          j = self.geometry.get_index(r2,replicas=True)
-          i = self.geometry.sublattice[i]
-          j = self.geometry.sublattice[j]
-          m = m*(i+j)/2
-#          print(m,type(m),m.shape) ; exit()
-          return m*np.identity(2)
+        from .kanemele import get_haldane_function
+        f = get_haldane_function(self.geometry,stagger=True)
+        weightf = lambda r1,r2: f(r1,r2)*np.identity(2)
+    elif mode=="haldane":
+        from .kanemele import get_haldane_function
+        f = get_haldane_function(self.geometry,stagger=False)
+        weightf = lambda r1,r2: f(r1,r2)*np.identity(2)
     elif mode=="swavez":
         weightf = lambda r1,r2: same_site(r1,r2)*tauz
     elif mode=="px":
@@ -341,7 +337,7 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     elif mode=="swaveB":
         weightf = lambda r1,r2: swaveB(self.geometry,r1,r2)
     elif mode=="swavesublattice":
-        def weightf(r1,r2)
+        def weightf(r1,r2):
           return swaveB(self.geometry,r1,r2) - swaveA(self.geometry,r1,r2)
     elif mode=="dx2y2":
         weightf = lambda r1,r2: dx2y2(r1,r2)
