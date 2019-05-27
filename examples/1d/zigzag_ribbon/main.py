@@ -3,7 +3,7 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 # zigzag ribbon
 from pygra import geometry
-g = geometry.honeycomb_zigzag_ribbon(5) # create geometry of a zigzag ribbon
-g = g.supercell(1)
-h = g.get_hamiltonian() # create hamiltonian of the system
+g = geometry.honeycomb_zigzag_ribbon(20) # create geometry of a zigzag ribbon
+h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
+#exit()
 h.get_bands()
