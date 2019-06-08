@@ -129,3 +129,36 @@ def is_number(s):
     except:
         return False
 
+
+def add_inplane_bfield(h,b=0.0,phi=0.0):
+    """Add an in-plane magnetic field"""
+    if h.dimensionality>2: raise # not implemented
+    if h.has_spin: raise # not implemented
+    if not h.is_multicell: raise # not implemented
+    cphi = np.cos(phi*np.pi)
+    sphi = np.sin(phi*np.pi)
+    g = h.geometry # get geometry
+    r = g.r # get positions
+    def add_phase(m,r1,r2): # add the phase
+        mo = coo_matrix(m) # convert to coo matrix
+        data = mo.data +0.0j
+        k = 0
+        for (i,j,d) in zip(mo.row,mo.col,mo.data): # loop
+            z = r1[i][2] + r2[j][2]
+            dx = r1[i][0] - r2[j][0]
+            dy = r1[i][1] - r2[j][1]
+            p = z*(dx*sphi - dy*cphi)
+            data[k] *= np.exp(1j*b*p)
+            k += 1
+        out = csc_matrix((data,(mo.row,mo.col)),shape=mo.shape) 
+        return out.todense() # return matrix
+    # now add the phase to the Hamiltonian
+    h.intra = add_phase(h.intra,r,r) # add the phase
+    for i in range(len(h.hopping)):
+        t = h.hopping[i]
+        h.hopping[i].m = add_phase(t.m,r,g.replicas(t.dir))
+    return h
+
+
+
+

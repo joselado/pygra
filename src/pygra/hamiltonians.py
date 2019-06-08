@@ -16,6 +16,7 @@ from . import multicell
 from . import spectrum
 from . import kekule
 from . import algebra
+from . import groundstate
 from . import rotate_spin
 from .bandstructure import get_bands_nd
 
@@ -387,6 +388,10 @@ class hamiltonian():
     """
     from .peierls import add_peierls
     add_peierls(self,mag_field=mag_field,new=new)
+  def add_inplane_bfield(self,**kwargs):
+      """Add in-plane magnetic field"""
+      from .peierls import add_inplane_bfield
+      add_inplane_bfield(self,**kwargs)
   def align_magnetism(self,vectors):
     """ Rotate the Hamiltonian to have magnetism in the z direction"""
     if self.has_eh: raise
@@ -521,6 +526,15 @@ class hamiltonian():
         np.savetxt("MAGNETISM.OUT",np.array([x,y,z,mx,my,mz]).T)
         return np.array([mx,my,mz])
 #    return np.array([mx,my,mz]).transpose()
+  def write_onsite(self,nrep=5,normal_order=False):
+      """Extract onsite energy"""
+      if self.has_eh: raise
+      d = extract.onsite(self.intra,has_spin=self.has_spin)
+      d = d - np.mean(d)
+      self.geometry.write_profile(d,name="ONSITE.OUT",
+              normal_order=normal_order,nrep=nrep)
+  def write_hopping(self,**kwargs):
+      groundstate.hopping(self,**kwargs)
   def get_ipr(self,**kwargs):
       """Return the IPR"""
       from . import ipr
