@@ -8,6 +8,7 @@ import os
 import scipy.optimize as optimize
 from . import klist
 from . import inout
+from . import algebra
 from . import meanfield
 from . import groundstate
 
@@ -232,9 +233,14 @@ class scfclass():
         lamb.append(d) # store data
         dv.append(-np.array(v.dir)) # store direction, be aware of the sign!!!
       k += 1 # increase counter
-    self.ijk = np.array(ijk,dtype=np.int) # first array
-    self.lamb = np.array(lamb,dtype=np.complex) # data array
+    ijk = np.array(ijk,dtype=np.int)
+    lamb = np.array(lamb,dtype=np.complex) # data array
+    self.ijk = ijk # first array
+    self.lamb = lamb # data array
     self.dir = np.array(dv,dtype=np.int) # data array
+    self.tensormf = algebra.sparsetensor.Tensor3(ijk[:,0],
+            ijk[:,1],ijk[:,2],lamb,
+            shape=(v.a.shape[0],v.a.shape[0],k))
   def update_expectation_values(self):
     """Calculate the expectation values of the different operators"""
     # this conjugate comes from being inconsistent

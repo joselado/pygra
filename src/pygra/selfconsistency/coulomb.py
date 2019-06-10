@@ -112,26 +112,13 @@ def charge_mean_field(voccs,vc):
 
 
 
-def coulomb_density_matrix(g,rcut=6.0,vc=1.0):
+def coulomb_density_matrix(g,**kwargs):
     """Return a list with the Coulomb interaction terms"""
-    g = g.copy() # copy geometry
-    interactions = [] # empty list
+    from ..crystalfield import hartree_onsite
+    m = hartree_onsite(g,**kwargs) # get array
+    m = m - np.mean(m) # remove average
     nat = len(g.r) # number of atoms
-    mout = np.zeros((nat,nat)) # initialize matrix
-    lat = np.sqrt(g.a1.dot(g.a1)) # size of the unit cell
-    g.ncells = int(2*rcut/lat)+1 # number of unit cells to consider
-    for d in g.neighbor_directions(): # loop
-        ri = g.r # positions
-        rj = g.replicas(d) # positions
-        for i in range(nat):
-          for j in range(nat):
-              dr = (ri[i]-rj[j]).dot(ri[i]-rj[j]) # loop
-              dr = np.sqrt(dr) # square root
-              if dr<1e-4: continue # next iteration
-              if dr>rcut: continue
-              v = vc/dr # Coulomb interaction
-              v = v*np.exp(-dr/rcut) # quench interaction
-              if v<1e-6: continue
-              mout[i,j] += v # store contribution
-    return mout # return
+    ind = range(nat) # indexes
+    mat = csc_matrix((m,(ind,ind)),shape=(nat,nat),dtype=np.complex)
+    return mat # return
 

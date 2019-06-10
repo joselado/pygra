@@ -133,8 +133,10 @@ def is_number(s):
 def add_inplane_bfield(h,b=0.0,phi=0.0):
     """Add an in-plane magnetic field"""
     if h.dimensionality>2: raise # not implemented
-    if h.has_spin: raise # not implemented
-    if not h.is_multicell: raise # not implemented
+    if h.has_spin: gi = lambda i: i//2
+    else: gi = lambda i: i
+    if not h.is_multicell: 
+        h.turn_multicell() # turn to multicell form
     cphi = np.cos(phi*np.pi)
     sphi = np.sin(phi*np.pi)
     g = h.geometry # get geometry
@@ -144,9 +146,9 @@ def add_inplane_bfield(h,b=0.0,phi=0.0):
         data = mo.data +0.0j
         k = 0
         for (i,j,d) in zip(mo.row,mo.col,mo.data): # loop
-            z = r1[i][2] + r2[j][2]
-            dx = r1[i][0] - r2[j][0]
-            dy = r1[i][1] - r2[j][1]
+            z = r1[gi(i)][2] + r2[gi(j)][2]
+            dx = r1[gi(i)][0] - r2[gi(j)][0]
+            dy = r1[gi(i)][1] - r2[gi(j)][1]
             p = z*(dx*sphi - dy*cphi)
             data[k] *= np.exp(1j*b*p)
             k += 1
