@@ -31,7 +31,7 @@ h = g.get_hamiltonian() # get the Hamiltonian object
 h.get_bands() # compute the band structure
 ```
 
-## Mean field Hubabrd model of a zigzag graphene ribbon
+## Mean field Hubbard model of a zigzag graphene ribbon
 ```python
 from pygra import geometry
 from pygra import scftypes
@@ -98,6 +98,16 @@ def fsc(r): # spatially dependent superconductivity
 h.add_antiferromagnetism(faf) # add antiferromagnetism
 h.add_swave(fsc) # add superconductivity
 h.get_bands() # calculate band structure
+```
+
+## Fermi surface of a Kagome lattice
+```python
+from pygra import geometry
+from pygra import spectrum
+g = geometry.kagome_lattice()
+h = g.get_hamiltonian(has_spin=True)
+spectrum.multi_fermi_surface(h,nk=60,energies=np.linspace(-4,4,100),
+        delta=0.1,nsuper=1)
 ```
 
 
