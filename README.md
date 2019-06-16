@@ -89,14 +89,8 @@ kdos.surface(h)
 from pygra import geometry
 g = geometry.honeycomb_zigzag_ribbon(10) # create geometry of a zigzag ribbon
 h = g.get_hamiltonian(has_spin=True) # create hamiltonian of the system
-def faf(r): # spatially dependent antiferromagnetism
-    if r[1]>0.0: return 0.5
-    else: return 0.0
-def fsc(r): # spatially dependent superconductivity
-    if r[1]<0.0:  return 0.3
-    else: return 0.0
-h.add_antiferromagnetism(faf) # add antiferromagnetism
-h.add_swave(fsc) # add superconductivity
+h.add_antiferromagnetism(lambda r: (r[1]>0)*0.5) # add antiferromagnetism
+h.add_swave(lambda r: (r[1]<0)*0.3) # add superconductivity
 h.get_bands() # calculate band structure
 ```
 
