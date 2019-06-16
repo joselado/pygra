@@ -477,6 +477,7 @@ class hamiltonian():
       elif name=="electron": return operators.get_electron(self)
       elif name=="hole": return operators.get_hole(self)
       elif name=="zposition": return operators.get_zposition(self)
+      elif name=="surface": return operators.get_surface(self)
       elif name=="yposition": return operators.get_yposition(self)
       elif name=="xposition": return operators.get_xposition(self)
       elif name=="velocity": return operators.get_velocity(self)
