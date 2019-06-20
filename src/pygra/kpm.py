@@ -273,6 +273,7 @@ def random_trace(m_in,ntries=20,n=200,fun=None,operator=None):
     return mus
 #  from . import parallel
   out = [pfun(i) for i in range(ntries)] # perform all the computations
+#  from . import parallel
 #  out = parallel.pcall(pfun,range(ntries))
   mus = np.zeros(out[0].shape,dtype=np.complex)
   for o in out: mus = mus + o # add contribution
