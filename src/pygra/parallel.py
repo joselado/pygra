@@ -84,7 +84,7 @@ def pcall(fun,args): # define the function
     is_child = True # child from now on
     if cores==1: out = pcall_serial(fun,args) # one core, simply iterate
     else: out = pcall_mp(fun,args,cores=cores) # call in parallel
-    is_child = False
+    is_child = False # main from now on
     return out
   # child process
   else: return pcall_serial(fun,args) # one core, simply iterate
