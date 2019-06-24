@@ -10,7 +10,7 @@ def evolve_local_state(h,i=0,ts=np.linspace(0.,20.,300),
     """Evolve a state that is originally localized in a point"""
     if h.dimensionality!=0: raise # only for 0d
     # create the vector
-    if h.has_spin: raise
+#    if h.has_spin: raise
     # get the function that does time evolution
     if mode=="green": evol = evolve_green(h,i=i)
     elif mode=="chi": evol = evolve_chi(h,i=i,ts=ts)
