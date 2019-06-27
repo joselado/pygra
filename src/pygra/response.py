@@ -10,7 +10,6 @@ def magnetic_response_map(h,nk=20,nq=20,j=[0.1,0.,0.],r=[0,0,1],
 # function with the energy
   energy_qvector = energy_qvector_generator(h,j=j,r=r,kp=kp,nk=nk) 
   f = open("SUSCEPTIBILITY.OUT","w")
-
   k2K = h.geometry.get_k2K_generator() # get the function
   # loop over qvectors
   if qs is None: # not provided
@@ -29,7 +28,6 @@ def magnetic_response_map(h,nk=20,nq=20,j=[0.1,0.,0.],r=[0,0,1],
     e = energy_qvector(angle=q2,q=q)  # energy
     f.write(str(q0[0])+"  "+str(q0[1])+"  "+str(e)+"\n")
     f.flush()
-  
   f.close()
   print("writen SUSCEPTIBILITY.OUT")
 
