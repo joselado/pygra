@@ -255,8 +255,8 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
       # write everything
       outstr += str(ik)+"   "+str(energy)+"   "
       for g in out: # loop
-        if g.shape[0]==op.shape[0]: d = -(g*op).trace()[0,0].imag # bulk
-        else: d = -(g*ops).trace()[0,0].imag # interface
+        if g.shape[0]==op.shape[0]: d = -(g@op).trace()[0,0].imag # bulk
+        else: d = -(g@ops).trace()[0,0].imag # interface
         outstr += str(d)+"   "
       outstr += "\n"
     return outstr
