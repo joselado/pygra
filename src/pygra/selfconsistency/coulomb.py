@@ -17,7 +17,7 @@ def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
                   smearing=None,fermi_shift=0.0,
                   maxite=1000,save=False,**kwargs):
   """ Solve a selfconsistent Hubbard mean field"""
-  vc = coulomb_density_matrix(h.geometry,vc=2*g) # get the matrix
+  vc = coulomb_density_matrix(h.geometry,vc=2*g,**kwargs) # get the matrix
   mix = 1. - mix
   U = g # redefine
   if h.has_spin: raise # not implemented
@@ -61,7 +61,7 @@ def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
     t3 = time.time()
     error = np.max(np.abs(old_mf-mf)) # absolute difference
     # total energy
-    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
+    etot = (np.sum(eoccs)/totkp + edc).real  # eigenvalues and double counting
     file_etot.write(str(ite)+"    "+str(etot)+"\n") # write energy in file
     file_error.write(str(ite)+"    "+str(error)+"\n") # write energy in file
     file_etot.flush()
@@ -113,13 +113,32 @@ def charge_mean_field(voccs,vc):
 
 
 
-def coulomb_density_matrix(g,**kwargs):
-    """Return a list with the Coulomb interaction terms"""
-    from ..crystalfield import hartree_onsite
-    m = hartree_onsite(g,**kwargs) # get array
-    m = m - np.mean(m) # remove average
+
+def coulomb_density_matrix(g,rcut=6.0,vc=0.0):
+    """Return an array with the Hartree terms"""
+    g = g.copy() # copy geometry
+    interactions = [] # empty list
     nat = len(g.r) # number of atoms
-    ind = range(nat) # indexes
-    mat = csc_matrix((m,(ind,ind)),shape=(nat,nat),dtype=np.complex)
-    return np.array(mat.todense()) # return
+    mout = np.zeros((nat,nat)) # initialize matrix
+    lat = np.sqrt(g.a1.dot(g.a1)) # size of the unit cell
+    g.ncells = int(2*rcut/lat)+1 # number of unit cells to consider
+    ri = g.r # positions
+    for d in g.neighbor_directions(): # loop
+        rj = np.array(g.replicas(d)) # positions
+        for i in range(nat):
+          for j in range(nat):
+            dx = rj[j,0] - ri[i,0]
+            dy = rj[j,1] - ri[i,1]
+            dz = rj[j,2] - ri[i,2]
+            dr = dx*dx + dy*dy + dz*dz
+            dr = np.sqrt(dr) # square root
+            if dr<1e-4: v = 0.0
+            elif dr>rcut: v = 0.0
+            else: v = 1./dr*np.exp(-dr/rcut) # quench interaction
+            mout[i,j] += v # store contribution
+    mout /= 2*np.max(mout) # normalize
+    return vc*mout # return
+
+
+
 
