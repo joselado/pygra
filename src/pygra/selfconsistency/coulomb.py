@@ -6,6 +6,7 @@ from ..scftypes import get_occupied_states
 import time
 from .. import limits
 from .. import inout
+from scipy.sparse import csc_matrix
 
 
 
@@ -120,5 +121,5 @@ def coulomb_density_matrix(g,**kwargs):
     nat = len(g.r) # number of atoms
     ind = range(nat) # indexes
     mat = csc_matrix((m,(ind,ind)),shape=(nat,nat),dtype=np.complex)
-    return mat # return
+    return np.array(mat.todense()) # return
 
