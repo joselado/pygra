@@ -7,6 +7,7 @@ g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=False)
 h.add_sublattice_imbalance(0.6)
 from pygra import topology
+topology.parallel.cores = 6
 
 op = h.get_operator("valley",projector=True) # valley operator
 (x1,y1) = topology.write_berry(h)

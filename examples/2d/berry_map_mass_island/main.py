@@ -11,7 +11,8 @@ g = geometry.honeycomb_lattice()
 g = g.supercell(11)
 h = g.get_hamiltonian(has_spin=False)
 def fm(r): 
-  if r.dot(r)<7.0: return 0.3
-  else: return -0.3
+  if np.sqrt(r.dot(r))<6.0: return 0.5
+  else: return -0.5
 h.add_sublattice_imbalance(fm)
-topology.berry_green_map(h,k=[0.3333333,0.3333333,0.0],nrep=3,integral=True)
+topology.berry_green_map(h,k=[0.0,0.0,0.0],nrep=3,
+        integral=True,eps=1e-2,delta=1e-2,operator="valley")

@@ -14,7 +14,8 @@ h0 = g.get_hamiltonian() # create hamiltonian of the system
 
 
 
-ps = np.linspace(0.,.1,5) # create the different KM couplings
+ps = np.linspace(0.,.1,10) # create the different KM couplings
+#ps = [0.1]
 es0 = [] # empty list for the total energies
 es1 = [] # empty list for the total energies
 
@@ -39,6 +40,9 @@ for p in ps: # loop over angles
                 mix=0.5,mf=mfoff,collinear=True)
   scfin = scftypes.hubbardscf(hin,nkp=5,filling=0.5,g=U,
                 mix=0.5,mf=mfoff,collinear=True)
+#  print(scfoff.total_energy)
+#  print(scfin.total_energy)
+#  exit()
   # alternatively, we can use a non-collinear formalism and go to the
   # ground state with using two different initializations
   # compute energies using non-collinear formalism but different initialization

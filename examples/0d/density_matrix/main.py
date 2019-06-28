@@ -1,8 +1,8 @@
 # Add the root path of the pygra library
 import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
-import islands
-import densitymatrix
+from pygra import islands
+from pygra import densitymatrix
 import numpy as np
 import time
 g = islands.get_geometry(name="honeycomb",n=4,clean=False) # get an island
