@@ -20,7 +20,7 @@ def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
   vc = coulomb_density_matrix(h.geometry,vc=2*g,**kwargs) # get the matrix
   mix = 1. - mix
   U = g # redefine
-  if h.has_spin: raise # not implemented
+#  if h.has_spin: raise # not implemented
   os.system("rm -f STOP") # remove stop file
   from scipy.linalg import eigh
   nat = h.intra.shape[0] # number of atoms
@@ -55,7 +55,9 @@ def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
 # occupied states
     eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi)
 # mean field
-    mf,edc = charge_mean_field(voccs,vc) # get the new mean field
+    # get the new mean field
+    if h.has_spin: mf,edc = charge_mean_field_spinful(voccs,vc) 
+    else: mf,edc = charge_mean_field(voccs,vc) # get the new mean field
     mf = mf/totkp # normalize
     edc = edc/totkp # normalize
     t3 = time.time()
@@ -113,8 +115,44 @@ def charge_mean_field(voccs,vc):
 
 
 
+def charge_mean_field_spinful(voccs,vc):
+    """Return the charge mean field, for a spinful Hamiltonian
+       Vc is the spinless matrix"""
+    n = vc.shape[0] # number of sites
+    charge = np.zeros(2*n) # initialize
+    mfup = np.zeros(n) # initialize
+    mfdn = np.zeros(n) # initialize
+    mf = np.zeros(2*n) # initialize
+    for w in voccs:
+        charge += np.abs(w)**2 # add contribution
+    chargeup = np.array([charge[2*i] for i in range(n)]) # up charge
+    chargedn = np.array([charge[2*i+1] for i in range(n)]) # down charge
+    for i in range(n): # loop over rows of the matrix
+        mfdn[i] = chargeup.dot(vc[i]) # get contribution
+        mfup[i] = chargedn.dot(vc[i]) # get contribution
+    # This formula is only ok if there is a single pair per ij
+    edc = -mfup@(vc@mfdn)
+    for i in range(n):
+        mf[2*i] = mfup[i]
+        mf[2*i+1] = mfdn[i]
+    return np.diag(mf),edc # return diagonal matrix
 
-def coulomb_density_matrix(g,rcut=6.0,vc=0.0):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def coulomb_density_matrix(g,rcut=30.0,vc=0.0):
     """Return an array with the Hartree terms"""
     g = g.copy() # copy geometry
     interactions = [] # empty list
