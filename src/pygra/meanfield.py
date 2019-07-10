@@ -176,7 +176,6 @@ def v_ij_spinless(i,j,n,g=1.0,d=[0,0,0]):
   return v
 
 
-
 def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0],contribution="AB"):
   """Return pair of operators for a V mean field"""
   v = interaction()
@@ -189,6 +188,35 @@ def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0],contribution="AB"):
   v.i = i
   v.j = j
   return v
+
+
+def v_ij_fast_coulomb(i,jvs,n):
+  """Return the interaction part for the fast Coulomb trick"""
+  v = interaction()
+  v.a = csc_matrix(([1.0],[[i],[i]]),shape=(n,n),dtype=np.complex) # cc
+  jj = range(n) # indexes
+  if len(jvs)!=n: raise # something wrong
+  v.b = csc_matrix((jvs,[jj,jj]),shape=(n,n),dtype=np.complex) # cdc
+  v.dir = [0,0,0] # direction of the neighbor
+  v.dhop = [0,0,0] # hopping that is affected
+  v.g = 1.0 # default value
+  v.contribution = "A"
+  return v
+
+
+
+def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
+  """Return the interaction part for the fast Coulomb trick"""
+  jvs2 = np.zeros(2*n) # initialize
+  if channel=="up":
+      for jj in range(n): jvs2[2*jj] = jvs[jj]
+      ii = 2*i+1
+  elif channel=="down":
+      for jj in range(n): jvs2[2*jj+1] = jvs[jj]
+      ii = 2*i
+  else: raise
+  return v_ij_fast_coulomb(ii,jvs2,2*n)
+
 
 
 
@@ -343,7 +371,7 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
             if dr>rcut: return 0.0
             return vc/dr*np.exp(-dr/rcut)
     for i in range(nat): # loop over atoms
-      v = 0.0 # initialize
+      vjs = np.zeros(nat) # initialize
       for d in g.neighbor_directions(): # loop
         rj = np.array(g.replicas(d)) # positions
         for j in range(nat): # loop over atoms
@@ -353,14 +381,16 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
           dr = dx*dx + dy*dy + dz*dz
           dr = np.sqrt(dr) # square root
           vt = vfun(dr) # interaction
-          v += vt # add contribution
-      if v>1e-3: # sizeble interaction
-        print("Total Coulomb term",v)
+          vjs[j] += vt # add contribution
+      if np.sum(vjs)>1e-3: # sizable interaction
+        print("Total Coulomb term",np.sum(vjs))
         if has_spin:
-          interactions.append(v_ij_density_spinless(2*i,2*j+1,2*nat,
-          g=v,d=[0,0,0],contribution="A"))
-          interactions.append(v_ij_density_spinless(2*i+1,2*j,2*nat,
-          g=v,d=[0,0,0],contribution="A"))
+          interactions.append(
+                  v_ij_fast_coulomb_spinful(i,vjs,nat,channel="up")
+                  )
+          interactions.append(
+                  v_ij_fast_coulomb_spinful(i,vjs,nat,channel="down")
+                  )
         else:
           interactions.append(v_ij_density_spinless(i,j,nat,
           g=v,d=[0,0,0],contribution="A"))
