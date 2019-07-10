@@ -182,13 +182,13 @@ class scfclass():
           interactions.append(meanfield.hubbard_density(i,nat,g=g)) 
   # store this interaction
       elif mode=="Coulomb": # Coulomb interaction
-        self.bloch_multicorrelator = True
-#        self.correlator_mode = "1by1" # mode to calculate the correlators
-        if self.hamiltonian.has_spin: raise
-        else: 
-            interactions = meanfield.coulomb_interaction(
-                    self.hamiltonian.geometry,
-                    vc=g,**kwargs)
+        interactions = meanfield.coulomb_interaction(
+                self.hamiltonian.geometry,has_spin=self.hamiltonian.has_spin,
+                vc=g,**kwargs)
+      elif mode=="fastCoulomb": # Coulomb interaction
+        interactions = meanfield.fast_coulomb_interaction(
+                self.hamiltonian.geometry,has_spin=self.hamiltonian.has_spin,
+                vc=g,**kwargs)
       elif mode=="V": # V interaction
 #        self.correlator_mode = "1by1" # mode to calculate the correlators
         self.bloch_multicorrelator = True
@@ -237,9 +237,9 @@ class scfclass():
     self.ijk = ijk # first array
     self.lamb = lamb # data array
     self.dir = np.array(dv,dtype=np.int) # data array
-    self.tensormf = algebra.sparsetensor.Tensor3(ijk[:,0],
-            ijk[:,1],ijk[:,2],lamb,
-            shape=(v.a.shape[0],v.a.shape[0],k))
+#    self.tensormf = algebra.sparsetensor.Tensor3(ijk[:,0],
+#            ijk[:,1],ijk[:,2],lamb,
+#            shape=(v.a.shape[0],v.a.shape[0],k))
   def update_expectation_values(self):
     """Calculate the expectation values of the different operators"""
     # this conjugate comes from being inconsistent
@@ -542,7 +542,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,fermi_shift=0.0,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
-                  broyden=False,callback=None):
+                  broyden=False,callback=None,**kwargs):
   """ Solve a generalized selfcnsistent problem"""
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
@@ -576,9 +576,9 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   if type(mode) is type(dict()): # of mode is a dictionary add several interactions
     print("Adding multiple interactions")
     for key in mode:
-      scf.setup_interaction(g=mode[key],mode=key) # create the interaction matrices
+      scf.setup_interaction(g=mode[key],mode=key,**kwargs) # create the interaction matrices
   else: # conventional way
-    scf.setup_interaction(g=g,mode=mode) # create the interaction matrices
+    scf.setup_interaction(g=g,mode=mode,**kwargs) # create the interaction matrices
   if type(old_mf) is type(dict()): # of mode is a dictionary add several interactions
     scf.mf = old_mf # initial mean field
   else:

@@ -7,17 +7,19 @@ from pygra import geometry
 from pygra import scftypes
 from pygra import operators
 from scipy.sparse import csc_matrix
-g = geometry.honeycomb_lattice()
+g = geometry.triangular_lattice()
 #g = geometry.bichain()
-#g = g.supercell(3)
+g = g.supercell(2)
 #g = geometry.triangular_lattice()
 #g = g.supercell(3)
-h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
+h = g.get_hamiltonian(has_spin=True) # create hamiltonian of the system
 h = h.get_multicell()
-mf = scftypes.guess(h,mode="CDW",fun=1.0) 
-scf = scftypes.selfconsistency(h,nkp=100,filling=0.5,g=10.0,
-                mix=0.9,mf=mf,mode="Coulomb")
+mf = scftypes.guess(h,mode="ferro",fun=1.0) 
+def vfun(r):
+    if r<1e-2: return 0.0
+    else: return 2.0*np.exp(-r)
+scf = scftypes.selfconsistency(h,nkp=10,filling=0.5,g=3.0,
+                mix=0.9,mf=mf,mode="Coulomb",vfun=vfun)
 h = scf.hamiltonian
-h.write_onsite()
-h.get_bands()
-print(h.extract("density"))
+h.get_bands(operator="sz")
+#print(h.extract("density"))

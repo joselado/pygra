@@ -177,7 +177,7 @@ def v_ij_spinless(i,j,n,g=1.0,d=[0,0,0]):
 
 
 
-def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0]):
+def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0],contribution="AB"):
   """Return pair of operators for a V mean field"""
   v = interaction()
   v.a = csc_matrix(([1.0],[[i],[i]]),shape=(n,n),dtype=np.complex) # cc
@@ -185,7 +185,7 @@ def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0]):
   v.dir = d # direction of the neighbor
   v.dhop = [0,0,0] # hopping that is affected
   v.g = g 
-  v.contribution = "AB"
+  v.contribution = contribution
   v.i = i
   v.j = j
   return v
@@ -287,31 +287,83 @@ def broyden_solver(scf):
 
 
 
-def coulomb_interaction(g,vc=0.0,rcut=20,**kwargs):
+def coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwargs):
     """Return a list with the Coulomb interaction terms"""
-#    from .selfconsistency.coulomb import coulomb_density_matrix
-#    m = coulomb_density_matrix(g,**kwargs)
-#    print(m[0]) ; exit()
     interactions = [] # empty list
     nat = len(g.r) # number of atoms
     lat = np.sqrt(g.a1.dot(g.a1)) # size of the unit cell
-    g.ncells = int(2*rcut/lat)+1 # number of unit cells to consider
+    rcut = 4.0
+    g.ncells = max([int(2*rcut/lat),1]) # number of unit cells to consider
     ri = g.r # positions
+    if vfun is None: # no function provided
+        def vfun(dr):
+            if dr<1e-4: return 0.0
+            if dr>rcut: return 0.0
+            return vc/dr*np.exp(-dr/rcut)
     for d in g.neighbor_directions(): # loop
       rj = np.array(g.replicas(d)) # positions
-      for i in range(nat):
-        for j in range(nat):
+      for i in range(nat): # loop over atoms
+        for j in range(nat): # loop over atoms
           dx = rj[j,0] - ri[i,0]
           dy = rj[j,1] - ri[i,1]
           dz = rj[j,2] - ri[i,2]
           dr = dx*dx + dy*dy + dz*dz
           dr = np.sqrt(dr) # square root
-          if dr<1e-4: v = 0.0
-          elif dr>rcut: v = 0.0
-          else: v = 1./dr*np.exp(-dr/rcut) # quench interaction
-          if v>1e-3:
-            interactions.append(v_ij_density_spinless(i,j,nat,
-            g=v,d=[0,0,0]))
+          v = vfun(dr) # interaction
+          if v>1e-3: # sizeble interaction
+            if has_spin:
+              interactions.append(v_ij_density_spinless(2*i,2*j+1,2*nat,
+              g=v,d=[0,0,0]))
+            else:
+              interactions.append(v_ij_density_spinless(i,j,nat,
+              g=v,d=[0,0,0]))
+    return interactions
+
+
+def coulomb_interaction_spinless(g,**kwargs):
+    return coulomb_interaction(g,has_spin=False,**kwargs)
+
+
+def coulomb_interaction_spinful(g,**kwargs):
+    return coulomb_interaction(g,has_spin=True,**kwargs)
+
+
+
+def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwargs):
+    """Return a list with the Coulomb interaction terms, summed over sites"""
+    interactions = [] # empty list
+    nat = len(g.r) # number of atoms
+    lat = np.sqrt(g.a1.dot(g.a1)) # size of the unit cell
+    rcut = 4.0
+    g.ncells = max([int(2*rcut/lat),1]) # number of unit cells to consider
+    ri = g.r # positions
+    if vfun is None: # no function provided
+        def vfun(dr):
+            if dr<1e-4: return 0.0
+            if dr>rcut: return 0.0
+            return vc/dr*np.exp(-dr/rcut)
+    for i in range(nat): # loop over atoms
+      v = 0.0 # initialize
+      for d in g.neighbor_directions(): # loop
+        rj = np.array(g.replicas(d)) # positions
+        for j in range(nat): # loop over atoms
+          dx = rj[j,0] - ri[i,0]
+          dy = rj[j,1] - ri[i,1]
+          dz = rj[j,2] - ri[i,2]
+          dr = dx*dx + dy*dy + dz*dz
+          dr = np.sqrt(dr) # square root
+          vt = vfun(dr) # interaction
+          v += vt # add contribution
+      if v>1e-3: # sizeble interaction
+        print("Total Coulomb term",v)
+        if has_spin:
+          interactions.append(v_ij_density_spinless(2*i,2*j+1,2*nat,
+          g=v,d=[0,0,0],contribution="A"))
+          interactions.append(v_ij_density_spinless(2*i+1,2*j,2*nat,
+          g=v,d=[0,0,0],contribution="A"))
+        else:
+          interactions.append(v_ij_density_spinless(i,j,nat,
+          g=v,d=[0,0,0],contribution="A"))
     return interactions
 
 
