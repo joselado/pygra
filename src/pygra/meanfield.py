@@ -190,13 +190,14 @@ def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0],contribution="AB"):
   return v
 
 
-def v_ij_fast_coulomb(i,jvs,n):
+def v_ij_fast_coulomb(i,jvs,n,vcut=1e-3):
   """Return the interaction part for the fast Coulomb trick"""
   v = interaction()
   v.a = csc_matrix(([1.0],[[i],[i]]),shape=(n,n),dtype=np.complex) # cc
   jj = range(n) # indexes
   if len(jvs)!=n: raise # something wrong
   v.b = csc_matrix((jvs,[jj,jj]),shape=(n,n),dtype=np.complex) # cdc
+  v.b.eliminate_zeros()
   v.dir = [0,0,0] # direction of the neighbor
   v.dhop = [0,0,0] # hopping that is affected
   v.g = 1.0 # default value
@@ -382,6 +383,7 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
           dr = np.sqrt(dr) # square root
           vt = vfun(dr) # interaction
           vjs[j] += vt # add contribution
+      vjs[vjs<1e-4] = 0.0 # discard near zeros
       if np.sum(vjs)>1e-3: # sizable interaction
         print("Total Coulomb term",np.sum(vjs))
         if has_spin:
@@ -391,9 +393,7 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
           interactions.append(
                   v_ij_fast_coulomb_spinful(i,vjs,nat,channel="down")
                   )
-        else:
-          interactions.append(v_ij_density_spinless(i,j,nat,
-          g=v,d=[0,0,0],contribution="A"))
+        else: raise
     return interactions
 
 

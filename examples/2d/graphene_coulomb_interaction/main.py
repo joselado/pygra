@@ -7,9 +7,12 @@ from pygra import geometry
 from pygra import scftypes
 from pygra import operators
 from scipy.sparse import csc_matrix
+from pygra import parallel
+
+#parallel.cores = 4
 g = geometry.triangular_lattice()
 #g = geometry.bichain()
-g = g.supercell(2)
+g = g.supercell(6)
 #g = geometry.triangular_lattice()
 #g = g.supercell(3)
 h = g.get_hamiltonian(has_spin=True) # create hamiltonian of the system

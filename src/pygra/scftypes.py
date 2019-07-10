@@ -11,6 +11,7 @@ from . import inout
 from . import algebra
 from . import meanfield
 from . import groundstate
+from . import parallel
 
 
 from .meanfield import guess # function to calculate guesses
@@ -246,12 +247,13 @@ class scfclass():
     # in the routines to calculate exectation values
     voccs = np.array(np.conjugate(self.wavefunctions)) # get wavefunctions
     ks = self.kvectors # kpoints
+#    self.correlator_mode = "plain"
     mode = self.correlator_mode # 
-#    mode = "1by1"
     if mode=="plain": # conventional mode
-      for v in self.interactions:
-        v.vav = (voccs*v.a*voccs.H).trace()[0,0]/self.kfac # <vAv>
-        v.vbv = (voccs*v.b*voccs.H).trace()[0,0]/self.kfac # <vBv>
+        plain_expectation_value(self)
+#      for v in self.interactions:
+#        v.vav = np.trace(voccs@v.a@np.conjugate(voccs).T)/self.kfac # <vAv>
+#        v.vbv = np.trace(voccs@v.b@np.conjugate(voccs).T)/self.kfac # <vBv>
     elif mode=="1by1": # conventional mode
       for v in self.interactions:
         phis = [self.hamiltonian.geometry.bloch_phase(v.dir,k*0.) for k in ks]
@@ -619,6 +621,31 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   file_gap.close() # close file
   if scf.scfmode=="filling":  scf.hamiltonian.shift_fermi(-scf.fermi)
   return scf # return mean field
+
+
+
+
+def plain_expectation_value(self):
+    """Compute the expectation values using the plain scheme"""
+    voccs = np.array(np.conjugate(self.wavefunctions))
+    if parallel.cores==1: # single core execution
+      for v in self.interactions:
+        v.vav = np.trace(voccs@v.a@np.conjugate(voccs).T)/self.kfac # <vAv>
+        v.vbv = np.trace(voccs@v.b@np.conjugate(voccs).T)/self.kfac # <vBv>
+    else: # multicore execution
+        ma = [v.a for v in self.interactions]
+        mb = [v.b for v in self.interactions]
+        kfac = self.kfac
+        def fun(i):
+            vav = np.trace(voccs@ma[i]@np.conjugate(voccs).T)/kfac
+            vbv = np.trace(voccs@mb[i]@np.conjugate(voccs).T)/kfac
+            return [vav,vbv]
+        # compute expectation values
+        vv = parallel.pcall(fun,range(len(self.interactions)))
+        for i in range(len(self.interactions)):
+            self.interactions[i].vav = vv[i][0]
+            self.interactions[i].vbv = vv[i][1]
+
 
 
 
