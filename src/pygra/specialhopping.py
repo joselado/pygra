@@ -35,8 +35,9 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0,dl=3.0,lambz=10.0):
       nr = len(r1) # 
       nmax = len(r1)*100 # maximum number of hoppings
       (ii,jj,ts,nout) = specialhoppingf90.twistedhopping(r1,r2,nmax,
-                                  cutoff,ti,lamb,lambi,lambz,1e-3,dl)
-      ts = -ts[0:nout]
+                                  cutoff,ti,lamb,lambi,lambz,1e-10,dl)
+      if nout>nmax: raise # sanity check
+      ts = ts[0:nout]
       ii = ii[0:nout]
       jj = jj[0:nout]
       out = csc_matrix((ts,(ii-1,jj-1)),shape=(nr,nr),dtype=np.complex) # matrix
@@ -45,8 +46,10 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0,dl=3.0,lambz=10.0):
     print("FORTRAN not working in specialhopping")
     def funhop(r1,r2):
       fh = twisted(cutoff=cutoff,ti=ti,lambi=lambi,lamb=lamb,dl=dl)
-      m = np.matrix([[fh(r1i,r2j) for r1i in r1] for r2j in r2])
-      return csc_matrix(m,dtype=np.complex)
+      m = np.array([[fh(r1i,r2j) for r1i in r1] for r2j in r2],dtype=np.complex)
+      m = csc_matrix(m,dtype=np.complex).T
+      m.eliminate_zeros()
+      return m
 #      raise
   return funhop # function
 

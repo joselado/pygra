@@ -102,7 +102,7 @@ class hamiltonian():
 #        print(csc_matrix(np.angle(hk)))
 #        exit()
       if operator is not None: hk = operator.H@hk@operator # project
-      out = (np.identity(hk.shape[0])*(e+1j*delta) - hk).I 
+      out = lg.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
 #      print(self.geometry.frac_r) 
 #      exit()
       return out
