@@ -140,14 +140,14 @@ def ldosmap(h,energies=np.linspace(-1.0,1.0,40),delta=None,nk=40):
     delta = (np.max(energies)-np.min(energies))/len(energies) # delta
   hkgen = h.get_hk_gen() # get generator
   dstot = np.zeros((len(energies),h.intra.shape[0])) # initialize
-  for ik in range(nk): 
-    print("Random k-point",ik,nk,end="\r")
-    k = np.random.random(3) # random k-point
+  def getd(k): # get LDOS
     hk = hkgen(k) # ge Hamiltonian
     ds = ldos_waves(hk,es=energies,delta=delta) # LDOS for this kpoint
-    dstot += ds # add
+    return ds
+  ks = [np.random.random(3) for ik in range(nk)] # kpoints
+  ds = parallel.pcall(getd,ks) # get densities
+  dstot = np.mean(ds,axis=0) # average over first axis
   print("LDOS finished")
-  dstot /=nk # normalize
   dstot = [spatial_dos(h,d) for d in dstot] # convert to spatial resolved DOS
   return np.array(dstot)
 
