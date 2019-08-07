@@ -7,6 +7,7 @@ from .operators import operator2list
 from . import parallel
 from . import kpm
 from . import timing
+from . import timing
 
 from .fermisurface import multi_fermi_surface
 
@@ -322,12 +323,17 @@ def eigenvalues(h0,nk):
     h.turn_dense()
     ks = klist.kmesh(h.dimensionality,nk=nk) # get grid
     hkgen = h.get_hk_gen() # get generator
-    es = [] # empty list
-    from . import timing
-    est = timing.Testimator(maxite=len(ks))
-    for k in ks: # loop
-      est.iterate()
-      es += lg.eigvalsh(hkgen(k)).tolist() # add
+    if parallel.cores==1:
+      es = [] # empty list
+      est = timing.Testimator(maxite=len(ks))
+      for k in ks: # loop
+        est.iterate()
+        es += lg.eigvalsh(hkgen(k)).tolist() # add
+    else:
+        f = lambda k: lg.eigvalsh(hkgen(k)) # add
+        es = parallel.pcall(f,ks) # call in parallel
+        es = np.array(es)
+        es = es.reshape(es.shape[0]*es.shape[1])
     return es # return all the eigenvalues
 
 
