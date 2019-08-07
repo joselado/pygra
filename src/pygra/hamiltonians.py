@@ -460,7 +460,8 @@ class hamiltonian():
       clean_hamiltonian(self)
   def get_operator(self,name,projector=False):
       """Return a certain operator"""
-      if name=="sx": return operators.get_sx(self)
+      if name=="None": return None
+      elif name=="sx": return operators.get_sx(self)
       elif name=="sy": return operators.get_sy(self)
       elif name=="sz": return operators.get_sz(self)
       elif name=="current": 
