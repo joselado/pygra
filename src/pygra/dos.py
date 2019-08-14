@@ -9,6 +9,7 @@ from . import checkclass
 from . import green
 from . import algebra
 from . import parallel
+from .klist import kmesh
 
 try:
 #  raise
@@ -231,7 +232,6 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 def dos_kmesh(h,nk=10,delta=1e-3,random=False,
         energies=np.linspace(-1,1,200),**kwargs):
     """Compute the DOS in a k-mesh by using the bandstructure function"""
-    from .klist import kmesh
     ks = kmesh(h.dimensionality,nk=nk)
     if random: ks = [np.random.random(3) for k in ks]
     # compute band structure
@@ -428,10 +428,12 @@ def convolve(x,y,delta=None):
 
 def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
         delta=0.01,ntries=10,nk=100,operator=None,
+        random=True,
         **kwargs):
   """Calculate the KDOS bands using the KPM"""
   hkgen = h.get_hk_gen() # get generator
-  numk = nk**h.dimensionality
+  ks = kmesh(h.dimensionality,nk=nk) # klist
+  if random: ks = [np.random.random(3) for k in ks]
   ytot = np.zeros(ne) # initialize
   npol = 5*int(scale/delta) # number of polynomials
   def f(k):
@@ -442,16 +444,16 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
                    ewindow=ewindow,ntries=ntries,**kwargs) # compute
     return (x,y)
   from . import parallel
+  numk = len(ks)
   if parallel.cores==1:
     tr = timing.Testimator("DOS",maxite=numk) # generate object
-    for ik in range(numk): # loop over kpoints
+    for ik in range(len(ks)): # loop over kpoints
       tr.iterate()
-      k = np.random.random(3)
+      k = ks[ik]
       (x,y) = f(k) # compute
       ytot += y # add contribution
     ytot /= nk # normalize
   else: # parallel calculation
-    ks = [np.random.random(3) for i in range(numk)] # different kpoints
     out = parallel.pcall(f,ks) # compute all
     ytot = np.mean([out[i][1] for i in range(numk)],axis=0) # average DOS
     x = out[0][0] # energies

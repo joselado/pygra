@@ -56,12 +56,9 @@ class hamiltonian():
     es = np.array(es)
     esf = es[es<energy]
     return len(esf)/len(es) # return filling
-  def set_filling(self,filling=0.5,nk=10,extrae=0.):
+  def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
-    es = spectrum.eigenvalues(self,nk=nk)
-    from .scftypes import get_fermi_energy
-    fill = filling + extrae/self.intra.shape[0] # filling
-    self.shift_fermi(-get_fermi_energy(es,fill)) # shift the fermi energy
+    spectrum.set_filling(self,filling=filling,**kwargs)
   def __init__(self,geometry=None):
     self.data = dict() # empty dictionary with various data
     self.has_spin = True # has spin degree of freedom

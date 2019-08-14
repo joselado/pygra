@@ -7,7 +7,7 @@ from .operators import operator2list
 from . import parallel
 from . import kpm
 from . import timing
-from . import timing
+from . import algebra
 
 from .fermisurface import multi_fermi_surface
 
@@ -388,4 +388,24 @@ def singlet_map(h,nk=40,nsuper=3,mode="abs"):
 
 
 
+def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
+    """Set the filling of a Hamiltonian"""
+    fill = filling + extrae/h.intra.shape[0] # filling
+    n = h.intra.shape[0]
+    use_kpm = n>algebra.maxsize # use the KPM method
+    if use_kpm: # use KPM
+        es,ds = h.get_dos(energies=np.linspace(-5.0,5.0,1000),
+                use_kpm=True,delta=delta,nk=nk,random=False)
+        from scipy.integrate import cumtrapz
+        di = cumtrapz(ds,es)
+        ei = (es[0:len(es)-1] + es[1:len(es)])/2.
+        di /= di[len(di)-1] # normalize
+        from scipy.interpolate import interp1d
+        f = interp1d(di,ei) # interpolating function
+        efermi = f(fill) # get the fermi energy
+    else: # dense Hamiltonian, use ED
+        es = eigenvalues(h,nk=nk)
+        from .scftypes import get_fermi_energy
+        efermi = get_fermi_energy(es,fill)
+    h.shift_fermi(-efermi) # shift the fermi energy
 
