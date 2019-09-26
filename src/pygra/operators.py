@@ -7,6 +7,7 @@ from .superconductivity import build_eh
 import scipy.linalg as lg
 #from bandstructure import braket_wAw
 from . import current
+from . import topology
 from . import superconductivity
 from .algebra import braket_wAw
 
@@ -436,6 +437,23 @@ def get_operator(op,k=[0.,0.,0.],h=None):
     if type(op) is np.array: 
         return lambda v: braket_wAw(v,op) # assume it yields a matrix
     else: raise
+
+
+def get_berry(h,**kwargs):
+    """Return Berry operator"""
+    return topology.berry_operator(h,**kwargs)
+
+def get_valley_berry(h,**kwargs):
+    """Return Valley Berry operator"""
+    op = get_valley(h,projector=True)
+    return topology.berry_operator(h,operator=op,**kwargs)
+
+
+def get_sz_berry(h,**kwargs):
+    """Return Valley Berry operator"""
+    sz = h.get_operator("sz")
+    def op(m,k=0): return sz@m
+    return topology.berry_operator(h,operator=op,**kwargs)
 
 
 
