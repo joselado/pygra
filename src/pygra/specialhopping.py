@@ -52,7 +52,7 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,
       nr = len(r1) # 
       nmax = len(r1)*100 # maximum number of hoppings
       (ii,jj,ts,nout) = specialhoppingf90.twistedhopping(r1,r2,nmax,
-                                  cutoff,ti,lamb,lambi,lambz,1e-10,dl)
+                                  cutoff,ti,lamb,lambi,lambz,1e-5,dl)
       if nout>nmax: raise # sanity check
       ts = ts[0:nout]
       ii = ii[0:nout]
