@@ -392,7 +392,9 @@ def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
     """Set the filling of a Hamiltonian"""
     fill = filling + extrae/h.intra.shape[0] # filling
     n = h.intra.shape[0]
-    use_kpm = n>algebra.maxsize # use the KPM method
+    if n>algebra.maxsize: # use the KPM method
+        use_kpm = True
+        print("Using KPM in set_filling")
     if use_kpm: # use KPM
         es,ds = h.get_dos(energies=np.linspace(-5.0,5.0,1000),
                 use_kpm=True,delta=delta,nk=nk,random=False)
