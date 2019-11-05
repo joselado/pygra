@@ -455,9 +455,13 @@ class hamiltonian():
       """Clean a Hamiltonian"""
       from .clean import clean_hamiltonian
       clean_hamiltonian(self)
-  def get_operator(self,name,projector=False,**kwargs):
+  def get_operator(self,name,projector=False,return_matrix=False,**kwargs):
       """Return a certain operator"""
-      if projector: return operators.get_matrix_operator(self,name,**kwargs)
+      if projector: 
+          print("projector is deprecated, use return_matrix")
+          return_matrix = True
+      if return_matrix: 
+          return operators.get_matrix_operator(self,name,**kwargs)
       else:
           from .operatorlist import get_scalar_operator
           return get_scalar_operator(self,name,**kwargs)

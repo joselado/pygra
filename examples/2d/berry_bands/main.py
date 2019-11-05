@@ -6,6 +6,6 @@ from pygra import topology
 from pygra import dos
 g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=True)
-h.add_zeeman(0.3)
-h.add_rashba(0.3)
-h.get_bands(operator="berry")
+#h.add_sublattice_imbalance(0.3)
+h.add_antiferromagnetism(0.3)
+h.get_bands(operator="szvalleyberry")

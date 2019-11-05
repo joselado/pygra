@@ -9,10 +9,10 @@ from pygra import topology
 #raise # this does not work yet
 g = geometry.honeycomb_lattice()
 g = g.supercell(11)
-h = g.get_hamiltonian(has_spin=False)
+h = g.get_hamiltonian(has_spin=True)
 def fm(r): 
   if np.sqrt(r.dot(r))<6.0: return 0.5
   else: return -0.5
-h.add_sublattice_imbalance(fm)
+h.add_antiferromagnetism(fm)
 topology.berry_green_map(h,k=[0.0,0.0,0.0],nrep=3,
-        integral=True,eps=1e-2,delta=1e-2,operator="valley")
+        integral=True,eps=1e-2,delta=1e-2,operator="valley_spin")

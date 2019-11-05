@@ -596,8 +596,7 @@ def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,operator=None,**kwargs):
   Write the Berry curvature of a kpoint in a file
   """
   if operator is not None:
-      if operator=="valley": 
-          operator = h.get_operator("valley",projector=True) 
+    operator = h.get_operator(operator,return_matrix=True) 
   if nk is None: # kpoint given
     out = berry_green_map_kpoint(h,operator=operator,**kwargs) # get the result
   else: # kpoint not given

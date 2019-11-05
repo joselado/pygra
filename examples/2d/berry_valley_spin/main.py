@@ -4,16 +4,16 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 from pygra import geometry
 from pygra import topology
 g = geometry.honeycomb_lattice()
-h = g.get_hamiltonian(has_spin=False)
-h.add_sublattice_imbalance(0.6)
+h = g.get_hamiltonian(has_spin=True)
+h.add_antiferromagnetism(0.6)
 from pygra import topology
 topology.parallel.cores = 6
 
-op = h.get_operator("valley",projector=True) # valley operator
+op = h.get_operator("valley_spin",return_matrix=True) # valley operator
 (x1,y1) = topology.write_berry(h)
 (x,y) = topology.write_berry(h,operator=op)
 import matplotlib.pyplot as plt
-plt.plot(x,y,c="blue",label="Valley Berry")
+plt.plot(x,y,c="blue",label="Valley Spin Berry")
 plt.scatter(x1,y1,c="red",label="Berry")
 plt.legend()
 plt.show()

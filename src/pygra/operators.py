@@ -455,15 +455,19 @@ def get_berry(h,**kwargs):
 
 def get_valley_berry(h,**kwargs):
     """Return Valley Berry operator"""
-    op = get_valley(h,projector=True)
+    return get_operator_berry(h,"valley",**kwargs)
+
+
+def get_operator_berry(h,name,**kwargs):
+    """Return Valley Berry operator"""
+    op = h.get_operator(name,return_matrix=True)
     return topology.berry_operator(h,operator=op,**kwargs)
+
 
 
 def get_sz_berry(h,**kwargs):
     """Return Valley Berry operator"""
-    sz = h.get_operator("sz")
-    def op(m,k=0): return sz@m
-    return topology.berry_operator(h,operator=op,**kwargs)
+    return get_operator_berry(h,"sz",**kwargs)
 
 
 def get_matrix_operator(h,name,k=None,**kwargs):
@@ -472,12 +476,12 @@ def get_matrix_operator(h,name,k=None,**kwargs):
     if name=="valley":
         op = get_valley(h,projector=True) # valley operator
         return op
-    elif name=="valley_spin":
+    elif name in ["valley_spin","spin_valley","valley_sz","sz_valley"]:
         op = get_valley(h,projector=True) # valley operator
         sz = h.get_operator("sz")
         return lambda m,k=None: op(m,k=k)@sz # return operator
     else:
-        op = sz = h.get_operator(name) # assume that it is a matrix
+        op = h.get_operator(name) # assume that it is a matrix
         return lambda m,k=None: op@m
 
 

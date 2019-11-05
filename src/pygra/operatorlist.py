@@ -4,8 +4,12 @@ import numpy as np
 def get_scalar_operator(self,name,**kwargs):
       """Return the conventional operator"""
       if name=="None": return None
-      elif name=="berry": return operators.get_berry(self,**kwargs)
-      elif name=="valleyberry": return operators.get_valley_berry(self,**kwargs)
+      elif name=="berry": 
+          return operators.get_berry(self,**kwargs)
+      elif name=="valleyberry": 
+          return operators.get_operator_berry(self,"valley",**kwargs)
+      elif name=="szvalleyberry": 
+          return operators.get_operator_berry(self,"sz_valley",**kwargs)
       elif name=="szberry": return operators.get_sz_berry(self,**kwargs)
       elif name=="sx": return operators.get_sx(self)
       elif name=="sy": return operators.get_sy(self)
