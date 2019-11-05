@@ -457,58 +457,10 @@ class hamiltonian():
       clean_hamiltonian(self)
   def get_operator(self,name,projector=False,**kwargs):
       """Return a certain operator"""
-      if name=="None": return None
-      elif name=="berry": return operators.get_berry(self,**kwargs)
-      elif name=="valleyberry": return operators.get_valley_berry(self,**kwargs)
-      elif name=="szberry": return operators.get_sz_berry(self,**kwargs)
-      elif name=="sx": return operators.get_sx(self)
-      elif name=="sy": return operators.get_sy(self)
-      elif name=="sz": return operators.get_sz(self)
-      elif name=="current": 
-          if self.dimensionality==1: return operators.get_current(self)
-          else: raise
-      elif name=="sublattice": return operators.get_sublattice(self,mode="both")
-      elif name=="sublatticeA": return operators.get_sublattice(self,mode="A")
-      elif name=="sublatticeB": return operators.get_sublattice(self,mode="B")
-      elif name=="interface": return operators.get_interface(self)
-      elif name=="spair": return operators.get_pairing(self,ptype="s")
-      elif name=="deltax": return operators.get_pairing(self,ptype="deltax")
-      elif name=="deltay": return operators.get_pairing(self,ptype="deltay")
-      elif name=="deltaz": return operators.get_pairing(self,ptype="deltaz")
-      elif name=="electron": return operators.get_electron(self)
-      elif name=="hole": return operators.get_hole(self)
-      elif name=="zposition": return operators.get_zposition(self)
-      elif name=="surface": return operators.get_surface(self)
-      elif name=="yposition": return operators.get_yposition(self)
-      elif name=="xposition": return operators.get_xposition(self)
-      elif name=="velocity": return operators.get_velocity(self)
-      elif name=="electrons": return operators.get_electron(self)
-      # total magnetizations
-      elif name=="mx": 
-        return self.get_operator("sx")*self.get_operator("electron")
-      elif name=="my": 
-        return self.get_operator("sy")*self.get_operator("electron")
-      elif name=="mz": 
-        return self.get_operator("sz")*self.get_operator("electron")
-      elif name=="valley": return operators.get_valley(self,projector=projector)
-      elif name=="inplane_valley": return operators.get_inplane_valley(self)
-      elif name=="valley_upper": 
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_valley(ht)
-      elif name=="inplane_valley_upper": 
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_inplane_valley(ht)
-      elif name=="valley_lower": 
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_valley(ht)
-      elif name=="ipr": return operators.ipr 
-      else: raise
+      if projector: return operators.get_matrix_operator(self,name,**kwargs)
+      else:
+          from .operatorlist import get_scalar_operator
+          return get_scalar_operator(self,name,**kwargs)
   def extract(self,name="mz"): 
       """Extract somethign from the Hamiltonian"""
       if self.has_eh: raise # not implemented

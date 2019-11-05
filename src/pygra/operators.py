@@ -466,4 +466,18 @@ def get_sz_berry(h,**kwargs):
     return topology.berry_operator(h,operator=op,**kwargs)
 
 
+def get_matrix_operator(h,name,k=None,**kwargs):
+    """Return a function that takes a matrix as input and returns another
+    matrix"""
+    if name=="valley":
+        op = get_valley(h,projector=True) # valley operator
+        return op
+    elif name=="valley_spin":
+        op = get_valley(h,projector=True) # valley operator
+        sz = h.get_operator("sz")
+        return lambda m,k=None: op(m,k=k)@sz # return operator
+    else:
+        op = sz = h.get_operator(name) # assume that it is a matrix
+        return lambda m,k=None: op@m
+
 
