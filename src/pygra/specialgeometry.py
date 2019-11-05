@@ -97,7 +97,7 @@ def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
   sublattice=True,r=1,rot=[1,1,0,0],g=None,dz=3.0):
   """Return the geometry for twisted multilayer graphene"""
   if g is None: g = geometry.honeycomb_lattice() # default is honeycomb
-  g.has_sublattice = False # no sublattice
+#  g.has_sublattice = False # no sublattice
   g = geometry.non_orthogonal_supercell(g,m=[[-1,0,0],[0,1,0],[0,0,1]])
   theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
   print("Theta",theta*180.0/np.pi)
@@ -115,6 +115,9 @@ def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
   else: raise
 #  g.r = np.concatenate([g1.r,g.r,g2.r]).copy()
   g.r = np.concatenate([gi.r for gi in gs]).copy() # all the positions
+  if g.has_sublattice:
+    g.sublattice = np.concatenate([gi.sublattice for gi in gs]).copy() 
+
 #  g.r = np.concatenate([g2.r,g.r]).copy()
  # g.r = g1.r
   g.r2xyz() # update
@@ -261,6 +264,7 @@ def twisted_multimultilayer(m0=3,
   del g # remove that list
   g = gs[0].copy() # overwrite g
   g.r = np.concatenate([gi.r for gi in gs]).copy() # all the positions
+  g.sublattice = np.concatenate([gi.sublattice for gi in gs]).copy() # all the positions
   g.r2xyz() # update
   g.real2fractional() # update fractional coordinates 
   g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])) # rotate

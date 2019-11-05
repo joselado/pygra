@@ -5,6 +5,7 @@ from pygra import geometry
 g = geometry.triangular_lattice()
 #g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=True)
+h.turn_dense()
 #h.shift_fermi(1.5)
 h.set_filling(0.5,nk=20)
 from pygra import response

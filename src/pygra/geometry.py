@@ -1533,9 +1533,9 @@ def neighbor_cells(num,dim=3):
 
 
 
-def write_profile(g,d,name="PROFILE.OUT",nrep=1,normal_order=False):
+def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
   """Write a certain profile in a file"""
-  if g.dimensionality == 0: nrep =1
+  if g.dimensionality == 0: nrep = 1
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   if normal_order:
