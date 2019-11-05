@@ -23,6 +23,6 @@ for U in Us: # loop over Us
 #                mix=0.9,mf=mf)
   h = scf.hamiltonian # get the Hamiltonian
   gap = h.get_gap() # compute the gap
-  f.write(str(U)+"   "+str(gap)+"\n")
+  f.write(str(U)+"   "+str(gap)+"\n") # save in a file
   
 f.close()
