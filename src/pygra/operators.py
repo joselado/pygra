@@ -24,6 +24,16 @@ def index(h,n=[0]):
 
 
 
+def rfunction2operator(h,f):
+    """Given a function that takes a position, return the operator"""
+    n = len(h.geometry.r)
+    val = [f(ri) for ri in h.geometry.r]
+    inds = range(n)
+    m = csc((val,(inds,inds)),shape=(n,n),dtype=np.complex)
+    return h.spinless2full(m) # return matrix
+
+
+
 
 
 

@@ -82,9 +82,9 @@ class hamiltonian():
     """ Generate kdependent hamiltonian"""
     if self.is_multicell: return multicell.hk_gen(self) # for multicell
     else: return hk_gen(self) # for normal cells
-  def get_ldos(self,nk=4,e=0.0,mode="arpack",delta=0.05,nrep=3):
+  def get_ldos(self,**kwargs):
       from . import ldos
-      ldos.ldos(self,e=e,delta=delta,nk=nk,mode=mode,nrep=nrep)
+      ldos.ldos(self,**kwargs)
   def get_gk_gen(self,delta=0.05,operator=None,canonical_phase=False):
     """Return the Green function generator"""
     hkgen = self.get_hk_gen() # Hamiltonian generator
@@ -124,6 +124,8 @@ class hamiltonian():
     """ Adds a sublattice imbalance """
     if self.geometry.has_sublattice and self.geometry.sublattice_number==2:
       add_sublattice_imbalance(self,mass)
+    else:
+        print("WARNING, no sublattice present, skipping")
   def add_antiferromagnetism(self,mass):
     """ Adds antiferromagnetic imbalanc """
     if self.geometry.has_sublattice:
@@ -427,9 +429,6 @@ class hamiltonian():
       else: raise
       ops = [o@op for o in ops] # define operators
       return spectrum.ev(self,operator=ops,**kwargs).real
-      
-#    from .magnetism import get_magnetization
-#    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
       """Return a 1d Hamiltonian"""
       if self.is_multicell: raise # not implemented

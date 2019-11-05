@@ -207,7 +207,7 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 
 
-def ldos2d(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
+def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
              random=True,num_wf=20):
   """ Calculate DOS for a 2d system"""
   if mode=="green":
@@ -245,8 +245,6 @@ def ldos2d(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
   go = go.supercell(nrep) # create supercell
   write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
 
-
-ldos = ldos2d
 
 
 def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
