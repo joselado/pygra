@@ -7,6 +7,11 @@ from .algebratk import sparsetensor
 
 maxsize = 10000
 
+def inv(m):
+    return dlg.inv(todense(m))
+
+
+
 def braket_wAw(w,A,wi=None):
   """
   Compute the braket of a wavefunction

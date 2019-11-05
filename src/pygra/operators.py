@@ -7,6 +7,7 @@ from .superconductivity import build_eh
 import scipy.linalg as lg
 #from bandstructure import braket_wAw
 from . import current
+from . import algebra
 from . import topology
 from . import superconductivity
 from .algebra import braket_wAw
@@ -287,10 +288,23 @@ def get_sublattice(h,mode="both"):
 
 def get_velocity(h):
   """Return the velocity operator"""
-  vk = current.current_operator(h)
-  def f(w,k=[0.,0.,0.]):
-    return braket_wAw(w,vk(k)).real
-  return f
+  if h.dimensionality==1:
+    vk = current.current_operator(h)
+    def f(w,k=[0.,0.,0.]):
+      return braket_wAw(w,vk(k)).real
+    return f
+  elif h.dimensionality==2:
+    def f(w,k=[0.,0.,0.]):
+      vx = current.derivative(h,k,order=[0,1])
+      vy = current.derivative(h,k,order=[1,0])
+      R = np.array(h.geometry.get_k2K())
+#      R = algebra.inv(R) # not sure if this is ok
+      v = [braket_wAw(w,vx),braket_wAw(w,vy),0]
+      v = np.array(v).real
+      return v@R@v # return the scalar product
+    return f
+  else: raise
+
 
 
 get_current = get_velocity

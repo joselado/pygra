@@ -10,7 +10,7 @@ def current_operator(h):
   """Get the current operator"""
   h = h.get_multicell()
   def fj(k0):
-      return derivative(h,k0[0])
+      return derivative(h,k0[0],order=[1])
   return fj
 
 
@@ -59,7 +59,8 @@ def derivative(h,k,order=None):
   """Calculate the derivative of the Hamiltonian"""
   ## The order parameter is kind of weird now, this must be fixed ##
   h = h.get_multicell() # get multicell Hamiltonian
-  order = [1 for i in range(h.dimensionality)] # order of the derivative
+  if order is None:
+    order = [1 for i in range(h.dimensionality)] # order of the derivative
   if h.dimensionality == 0: return None
   elif h.dimensionality == 1: # one dimensional
       mout = h.intra*0.0 # initialize

@@ -14,9 +14,8 @@ def get_scalar_operator(self,name,**kwargs):
       elif name=="sx": return operators.get_sx(self)
       elif name=="sy": return operators.get_sy(self)
       elif name=="sz": return operators.get_sz(self)
-      elif name=="current":
-          if self.dimensionality==1: return operators.get_current(self)
-          else: raise
+      elif name=="current": return operators.get_current(self)
+      elif name=="velocity": return operators.get_velocity(self)
       elif name=="sublattice": return operators.get_sublattice(self,mode="both")
       elif name=="sublatticeA": return operators.get_sublattice(self,mode="A")
       elif name=="sublatticeB": return operators.get_sublattice(self,mode="B")

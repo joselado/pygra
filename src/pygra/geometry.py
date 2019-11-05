@@ -154,6 +154,7 @@ class Geometry:
   def get_k2K_generator(self):
     R = self.get_k2K() # get the matrix
     def f(k):
+#      return R@np.array(k) # to natural coordinates
       r = np.matrix(k).T # real space vectors
       return np.array((R*r).T)[0]
     return f # return function
@@ -1200,7 +1201,7 @@ def get_k2K(g):
   uz = uz/np.sqrt(uz.dot(uz))
   a2kn = np.matrix([ux,uy,uz]) # matrix for the change of basis
   r2a = np.matrix([ux,uy,uz]).T.I # from real space to lattice vectors
-  R = a2kn*r2a*a2kn.T # rotation matrix
+  R = a2kn@r2a@a2kn.T # rotation matrix
   return R
 
 
