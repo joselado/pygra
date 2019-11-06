@@ -499,3 +499,24 @@ def get_matrix_operator(h,name,k=None,**kwargs):
         return lambda m,k=None: op@m
 
 
+def bool_layer_array(g,n=0):
+    """Return the lowest layer array"""
+    fac = []
+    z0 = sorted(np.unique(g.z).tolist())[n]
+    for z in g.z:
+        if abs(z-z0)<1e-3: fac.append(1)
+        else: fac.append(0)
+    fac = np.array(fac)
+    return fac
+
+
+bottom_layer = lambda g: bool_layer_array(g,n=0)
+top_layer = lambda g: bool_layer_array(g,n=1)
+
+def get_valley_layer(self,n=0):
+    """Get the valley operator for a specific layer"""
+    ht = self.copy() # create a dummy
+    fac = bool_layer_array(self.geometry,n=n) # create array
+    ht.geometry.sublattice = self.geometry.sublattice * fac
+    return get_valley(ht) # return the valley operator
+

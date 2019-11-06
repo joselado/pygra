@@ -39,27 +39,15 @@ def get_scalar_operator(self,name,**kwargs):
         return self.get_operator("sz")*self.get_operator("electron")
       elif name=="valley": return operators.get_valley(self)
       elif name=="inplane_valley": return operators.get_inplane_valley(self)
-      elif name=="valley_upper":
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_valley(ht)
+      elif name=="valley_upper" or name=="valley_top":
+        return operators.get_valley_layer(self,n=-1)
       elif name=="inplane_valley_upper":
         print("This operator only makes sense for TBG")
         ht = self.copy()
         ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
         return operators.get_inplane_valley(ht)
-      elif name=="valley_lower":
-        print("This operator only makes sense for twisted multilayers")
-        ht = self.copy()
-        zmin = np.min(self.geometry.z) # minimum
-        fac = []
-        for z in self.geometry.z:
-            if abs(z-zmin)<1e-3: fac.append(1)
-            else: fac.append(0)
-        fac = np.array(fac)
-        ht.geometry.sublattice = self.geometry.sublattice * fac
-        return operators.get_valley(ht)
+      elif name=="valley_lower" or name=="valley_bottom":
+        return operators.get_valley_layer(self,n=0)
       elif name=="ipr": return operators.ipr
       else: raise
 
