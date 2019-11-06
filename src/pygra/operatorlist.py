@@ -30,7 +30,6 @@ def get_scalar_operator(self,name,**kwargs):
       elif name=="surface": return operators.get_surface(self)
       elif name=="yposition": return operators.get_yposition(self)
       elif name=="xposition": return operators.get_xposition(self)
-      elif name=="velocity": return operators.get_velocity(self)
       elif name=="electrons": return operators.get_electron(self)
       elif name=="mx":
         return self.get_operator("sx")*self.get_operator("electron")
@@ -51,9 +50,15 @@ def get_scalar_operator(self,name,**kwargs):
         ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
         return operators.get_inplane_valley(ht)
       elif name=="valley_lower":
-        print("This operator only makes sense for TBG")
+        print("This operator only makes sense for twisted multilayers")
         ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
+        zmin = np.min(self.geometry.z) # minimum
+        fac = []
+        for z in self.geometry.z:
+            if abs(z-zmin)<1e-3: fac.append(1)
+            else: fac.append(0)
+        fac = np.array(fac)
+        ht.geometry.sublattice = self.geometry.sublattice * fac
         return operators.get_valley(ht)
       elif name=="ipr": return operators.ipr
       else: raise
