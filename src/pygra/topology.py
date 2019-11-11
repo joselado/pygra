@@ -509,7 +509,7 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,
     gym = f(e=e,k=k-dy) # compute at this k and this energy
     g = (gxp + gyp + gxm + gym)/4. # average Green function
     # Now apply the formula
-    gI = lg.inv(g) # inverse
+    gI = algebra.inv(g) # inverse
     omega = ((gxp-gxm)@(gyp-gym) - (gyp-gym)@(gxp-gxm))@gI
 #    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
 #    omega += -g*(gyp.I-gym.I)*(gxp-gxm)

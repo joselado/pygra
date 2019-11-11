@@ -84,7 +84,7 @@ class hamiltonian():
     else: return hk_gen(self) # for normal cells
   def get_ldos(self,**kwargs):
       from . import ldos
-      ldos.ldos(self,**kwargs)
+      return ldos.ldos(self,**kwargs)
   def get_gk_gen(self,delta=0.05,operator=None,canonical_phase=False):
     """Return the Green function generator"""
     hkgen = self.get_hk_gen() # Hamiltonian generator
@@ -100,9 +100,7 @@ class hamiltonian():
 #        print(csc_matrix(np.angle(hk)))
 #        exit()
       if operator is not None: hk = operator.H@hk@operator # project
-      out = lg.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
-#      print(self.geometry.frac_r) 
-#      exit()
+      out = algebra.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
       return out
     return f
   def print_hamiltonian(self):

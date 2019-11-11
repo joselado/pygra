@@ -13,7 +13,7 @@ from . import parallel
 from . import algebra
 
 def ldos0d(h,e=0.0,delta=0.01,write=True):
-  """Calculates the local density of states of a hamiltonian and
+  """Calculates the local density of states of a Hamiltonian and
      writes it in file"""
   if h.dimensionality==0:  # only for 0d
     iden = np.identity(h.intra.shape[0],dtype=np.complex) # create identity
@@ -244,6 +244,7 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
   go = h.geometry.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
+  return (x,y,d) # return LDOS
 
 
 

@@ -34,6 +34,13 @@ def rfunction2operator(h,f):
     return h.spinless2full(m) # return matrix
 
 
+def density2operator(h,d):
+    """Given a function that takes a position, return the operator"""
+    n = len(h.geometry.r)
+    if len(d)!=n: raise
+    inds = range(n)
+    m = csc((d,(inds,inds)),shape=(n,n),dtype=np.complex)
+    return h.spinless2full(m) # return matrix
 
 
 
