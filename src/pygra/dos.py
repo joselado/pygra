@@ -502,6 +502,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),
         ds = parallel.pcall(fun,energies) # compute DOS with an operator
         np.savetxt("DOS.OUT",np.matrix([energies,ds]).T) # write in a file
         return (energies,ds)
+      else: raise
 
 
 def autodos(h,auto=True,**kwargs):
