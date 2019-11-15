@@ -328,9 +328,9 @@ def eigenvalues(h0,nk):
       est = timing.Testimator(maxite=len(ks))
       for k in ks: # loop
         est.iterate()
-        es += lg.eigvalsh(hkgen(k)).tolist() # add
+        es += algebra.eigvalsh(hkgen(k)).tolist() # add
     else:
-        f = lambda k: lg.eigvalsh(hkgen(k)) # add
+        f = lambda k: algebra.eigvalsh(hkgen(k)) # add
         es = parallel.pcall(f,ks) # call in parallel
         es = np.array(es)
         es = es.reshape(es.shape[0]*es.shape[1])

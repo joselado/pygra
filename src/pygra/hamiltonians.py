@@ -50,9 +50,6 @@ class hamiltonian():
     return kchain(self,k)
   def get_eigenvectors(self,**kwargs):
       return get_eigenvectors(self,**kwargs)
-  def eigenvectors(self,**kwargs):
-      print("Deprecated eigenvectors method")
-      return self.get_eigenvectors(**kwargs)
   def get_filling(self,energy=0.5,nk=10):
     """Get the filling of a Hamiltonian at this energy"""
     es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
@@ -142,11 +139,9 @@ class hamiltonian():
     """Add electron hole degree of freedom"""
     self.get_eh_sector = get_eh_sector_odd_even # assign function
     turn_nambu(self)
-  def add_swave(self,delta=0.0,phi=None):
-    """ Adds spin mixing insite electron hole pairing"""
-    self.turn_nambu() # add electron hole
-    if phi is not None: delta = delta*np.exp(1j*phi*np.pi)
-    self.intra = self.intra + add_swave(delta=delta,rs=self.geometry.r,is_sparse=self.is_sparse)
+  def add_swave(self,*args,**kwargs):
+    """ Adds swave superconducting pairing"""
+    superconductivity.add_swave_to_hamiltonian(self,*args,**kwargs)
   def add_pairing(self,delta=0.0,**kwargs):
     """ Add a general pairing matrix, uu,dd,ud"""
     superconductivity.add_pairing_to_hamiltonian(self,delta=delta,**kwargs)

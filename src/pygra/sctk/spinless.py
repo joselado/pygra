@@ -1,5 +1,7 @@
 # function to work with spinless superconductivity
 from numba import jit
+from .. import algebra
+import numpy as np
 
 def onsite_delta_vev(h,nk=1,**kwargs):
     """Compute the expectation value of delta"""
@@ -28,4 +30,12 @@ def compute_pairing(ws,p):
     return p # return expectation value
 
 
+
+def add_swave(m,d):
+    """Add swave pairing to a Hamiltonian, input is an array"""
+    if m.shape[0]!=len(d): raise
+    md = np.diag(d,dtype=np.complex) # pairing matrix
+    mdh = np.conjugate(md.T)
+    m = algebra.bmat([[m,md],[mdh,-m]]) # return matrix
+    return m
 

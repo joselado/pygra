@@ -1,4 +1,4 @@
-from scipy.sparse import issparse
+from scipy.sparse import issparse,bmat
 from scipy.sparse import csc_matrix as csc
 import scipy.linalg as dlg
 import scipy.sparse.linalg as slg
@@ -9,6 +9,12 @@ maxsize = 10000
 
 def inv(m):
     return dlg.inv(todense(m))
+
+
+def densebmat(ms):
+    """Turn a block matrix dense"""
+    ms = [[todense(mi) for mi in mij] for mij in m]
+    return todense(bmat(ms)) # return block matrix
 
 
 

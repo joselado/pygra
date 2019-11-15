@@ -276,10 +276,6 @@ def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
       evals += [ie for ie in e]
       ws += [iw for iw in w]
       ps += [op(iw,k=k) for iw in w] # weights
-#      evals = np.concatenate([evals,e]) # store
-#      ws = np.concatenate([ws,w]) # store
-#    raise
-#    (evals,ws) = h.eigenvectors(nk) # get the different eigenvectors
   else:
     print("Diagonalizing in LDOS, DENSE mode")
     for k in ks: # loop

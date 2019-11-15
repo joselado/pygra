@@ -53,7 +53,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     htmp.intra = h.intra + old_mf # add mean field 
     t1 = time.time()
 # get eigenvectors
-    eigvals,eigvecs,kvectors = htmp.eigenvectors(nkp,kpoints=True)
+    eigvals,eigvecs,kvectors = htmp.get_eigenvectors(nk=nkp,kpoints=True)
     eigvecs = np.conjugate(eigvecs)
 # fermi energy
     t2 = time.time()
@@ -217,7 +217,7 @@ def hubbardscf_spinless(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     htmp.intra = h.intra + old_mf # add mean field 
     t1 = time.time()
 # get eigenvectors
-    eigvals,eigvecs,kvectors = htmp.eigenvectors(nkp,kpoints=True)
+    eigvals,eigvecs,kvectors = htmp.get_eigenvectors(nk=nkp,kpoints=True)
     eigvecs = np.conjugate(eigvecs)
 # fermi energy
     t2 = time.time()
