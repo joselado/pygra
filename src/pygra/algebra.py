@@ -10,6 +10,9 @@ maxsize = 10000
 def inv(m):
     return dlg.inv(todense(m))
 
+def dagger(m):
+    return np.conjugate(np.transpose(m))
+
 
 def densebmat(ms):
     """Turn a block matrix dense"""

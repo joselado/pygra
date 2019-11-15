@@ -207,14 +207,15 @@ def add_swave(delta=0.0,is_sparse=False,rs=None):
   return build_eh(zero,coupling=coupling,is_sparse=is_sparse) # return matrix
 
 
-def add_swave_to_hamiltonian(self,delta,phi=0.0):
+def add_swave_to_hamiltonian(self,delta,**kwargs):
     """Add the swave coupling to the Hamiltonian"""
-    if self.check_mode("spinless"): # spinless Hamiltonian
-        raise
+    # spinless Hamiltonian
+    if self.check_mode("spinless") or self.check_mode("spinless_nambu"): 
+        from .sctk import spinless
+        spinless.add_swave_to_hamiltonian(self,delta)
         # spinful Hamiltonian
     elif self.check_mode("spinful") or self.check_mode("spinful_nambu"): 
       self.turn_nambu() # add electron hole
-      delta = delta*np.exp(1j*phi*np.pi)
       self.intra = self.intra + add_swave(delta=delta,rs=self.geometry.r,is_sparse=self.is_sparse)
     else: raise
 

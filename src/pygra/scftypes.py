@@ -473,6 +473,8 @@ def get_gap(es,fermi):
 from .selfconsistency.hubbard import hubbardscf
 from .selfconsistency.coulomb import coulombscf
 
+repulsive_hubbard = hubbardscf
+from .selfconsistency.attractive_hubbard_spinless import attractive_hubbard
 
 def get_super_correlator(voccs,weight=None,totkp=1):
   """Get the different correlators for a superconducting system"""
@@ -554,7 +556,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mix=0.2,
   # generalate the necessary list of correlators
   if mf is None: # generate initial mean field
     try:  old_mf = inout.load(mf_file) # load the file
-    except: old_mf = meanfield.guess("random") # random guess
+    except: old_mf = meanfield.guess(h,"random") # random guess
   else: old_mf = mf # use guess
   # get the pairs for the correlators
   ndim = h.intra.shape[0] # dimension

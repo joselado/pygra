@@ -49,6 +49,7 @@ class hamiltonian():
   def kchain(self,k=0.):
     return kchain(self,k)
   def get_eigenvectors(self,**kwargs):
+      from .htk.eigenvectors import get_eigenvectors
       return get_eigenvectors(self,**kwargs)
   def modify_hamiltonian_matrices(self,f):
       """Modify all the matrices of a Hamiltonian"""
@@ -98,10 +99,12 @@ class hamiltonian():
         U = np.diag([self.geometry.bloch_phase(k,r) for r in frac_r])
         U = np.matrix(U) # this is without .H
         U = self.spinless2full(U) # increase the space if necessary
-        hk = U.H@hk@U
+        Ud = np.conjugate(U.T) # dagger
+        hk = Ud@hk@U
 #        print(csc_matrix(np.angle(hk)))
 #        exit()
-      if operator is not None: hk = operator.H@hk@operator # project
+      if operator is not None: 
+          hk = algebra.dagger(operator)@hk@operator # project
       out = algebra.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
       return out
     return f
@@ -213,7 +216,7 @@ class hamiltonian():
       self.has_spin = True # set spinful
   def remove_spin(self):
     """Removes spin degree of freedom"""
-    if self.check_mode("spinless"): return
+    if self.check_mode("spinless"): return # do nothing
     elif self.check_mode("spinful"):
         def f(m): return des_spin(m,component=0)
         self.modify_hamiltonian_matrices(f) # modify the matrices
@@ -596,74 +599,7 @@ def diagonalize(h,nkpoints=100):
 
 
 def diagonalize_hk(k):
-  return lg.eigh(hk(k))
-
-
-
-
-
-def get_eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
-  import scipy.linalg as lg
-  from scipy.sparse import csc_matrix as csc
-  shape = h.intra.shape
-  if h.dimensionality==0:
-    vv = algebra.eigh(h.intra)
-    vecs = [v for v in vv[1].transpose()]
-    if kpoints: return vv[0],vecs,[[0.,0.,0.] for e in vv[0]]
-    else: return vv[0],vecs
-  elif h.dimensionality>0:
-    f = h.get_hk_gen()
-    if k is None: 
-      from .klist import kmesh
-      kp = kmesh(h.dimensionality,nk=nk) # generate a mesh
-    else:  kp = np.array([k]) # kpoint given on input
-#    vvs = [lg.eigh(f(k)) for k in kp] # diagonalize k hamiltonian
-    nkp = len(kp) # total number of k-points
-    if sparse: # sparse Hamiltonians
-      vvs = [slg.eigsh(csc(f(k)),k=numw,which="LM",sigma=0.0,tol=1e-10) for k in kp] # 
-
-    else: # dense Hamiltonians
-      from . import parallel
-      if parallel.cores>1: # in parallel
-#        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
-        vvs = parallel.pcall(lambda k: algebra.eigh(f(k)),kp)
-      else: vvs = [algebra.eigh(f(k)) for k in kp] # 
-    nume = sum([len(v[0]) for v in vvs]) # number of eigenvalues calculated
-    eigvecs = np.zeros((nume,h.intra.shape[0]),dtype=np.complex) # eigenvectors
-    eigvals = np.zeros(nume) # eigenvalues
-
-    #### New way ####
-#    eigvals = np.array([iv[0] for iv in vvs]).reshape(nkp*shape[0],order="F")
-#    eigvecs = np.array([iv[1].transpose() for iv in vvs]).reshape((nkp*shape[0],shape[1]),order="F")
-#    if kpoints: # return also the kpoints
-#      kvectors = [] # empty list
-#      for ik in kp: 
-#        for i in range(h.intra.shape[0]): kvectors.append(ik) # store
-#      return eigvals,eigvecs,kvectors
-#    else:
-#      return eigvals,eigvecs
-
-    #### Old way, slightly slower but clearer ####
-    iv = 0
-    kvectors = [] # empty list
-    for ik in range(len(kp)): # loop over kpoints
-      vv = vvs[ik] # get eigenvalues and eigenvectors
-      for (e,v) in zip(vv[0],vv[1].transpose()):
-        eigvecs[iv] = v.copy()
-        eigvals[iv] = e.copy()
-        kvectors.append(kp[ik])
-        iv += 1
-    if kpoints: # return also the kpoints
-#      for iik in range(len(kp)):
-#        ik = kp[iik] # store kpoint 
-#        for e in vvs[iik][0]: kvectors.append(ik) # store
-      return eigvals,eigvecs,kvectors
-    else:
-      return eigvals,eigvecs
-  else:
-    raise
-
-
+  return algebra.eigh(hk(k))
 
 
 
@@ -887,7 +823,7 @@ def hk_gen(h):
       try: kp = k[0]
       except: kp = k
       tk = h.inter * h.geometry.bloch_phase([1.],kp) # get the bloch phase
-      ho = h.intra + tk + tk.H # hamiltonian
+      ho = h.intra + tk + algebra.dagger(tk) # hamiltonian
       return ho
     return hk  # return the function
   elif h.dimensionality == 2: 
@@ -903,7 +839,7 @@ def hk_gen(h):
       for p in ptk: # loop over hoppings
 #        tk = p[0]*np.exp(1j*np.pi*2.*(p[1].dot(k)))  # add bloch hopping
         tk = p[0]*h.geometry.bloch_phase(p[1],k)  # add bloch hopping
-        ho = ho + tk + tk.H  # add bloch hopping
+        ho = ho + tk + algebra.dagger(tk)  # add bloch hopping
       return ho
     return hk
   else: raise

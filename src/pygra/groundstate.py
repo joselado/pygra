@@ -5,7 +5,6 @@ from . import extract
 
 def swave(h,name="SWAVE.OUT",nrep=3):
   """Write the swave pairing of a Hamiltonian"""
-  if not h.has_spin: raise
   if not h.has_eh: raise
   d = h.extract("swave") # get the pairing
   g = h.geometry # get the geometry

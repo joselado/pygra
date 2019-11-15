@@ -104,7 +104,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   scf.hamiltonian.intra -= fermi*np.identity(ndim) # shift Fermi energy
   scf.total_energy = etot # store total energy
   scf.mf = mf # store mean field matrix
-  scf.magnetization = mag
+  scf.magnetization = mag # store magnetization
   scf.hamiltonian.write_magnetization() # write magnetization into a file
   return scf # return mean field
 
