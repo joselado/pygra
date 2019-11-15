@@ -463,9 +463,9 @@ def get_valley_taux(h,projector=False):
 def get_operator(op,k=[0.,0.,0.],h=None):
     """Get a function that acts as an operator"""
     if op is None: return None
-    if callable(op): 
+    elif callable(op): 
         return lambda v: op(v,k=k) # assume it yields a number
-    if type(op) is np.array: 
+    elif type(op) is np.array: 
         return lambda v: braket_wAw(v,op) # assume it yields a matrix
     else: raise
 
@@ -520,10 +520,10 @@ def bool_layer_array(g,n=0):
 bottom_layer = lambda g: bool_layer_array(g,n=0)
 top_layer = lambda g: bool_layer_array(g,n=1)
 
-def get_valley_layer(self,n=0):
+def get_valley_layer(self,n=0,**kwargs):
     """Get the valley operator for a specific layer"""
     ht = self.copy() # create a dummy
     fac = bool_layer_array(self.geometry,n=n) # create array
     ht.geometry.sublattice = self.geometry.sublattice * fac
-    return get_valley(ht) # return the valley operator
+    return get_valley(ht,**kwargs) # return the valley operator
 

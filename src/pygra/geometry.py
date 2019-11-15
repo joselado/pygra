@@ -1541,9 +1541,11 @@ def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
   go = go.supercell(nrep) # create supercell
   if normal_order:
       m = np.array([go.x,go.y,go.z,d.tolist()*(nrep**g.dimensionality)]).T
+      header = "x        y       z        profile"
   else:
       m = np.array([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
-  np.savetxt(name,m) # save in file
+      header = "x        y     profile      z"
+  np.savetxt(name,m,fmt='%.5f',delimiter="    ",header=header) # save in file
 
 
 

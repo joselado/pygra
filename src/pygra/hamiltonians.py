@@ -48,9 +48,11 @@ class hamiltonian():
     return get_spinful2full(self)(m) # return
   def kchain(self,k=0.):
     return kchain(self,k)
-  def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
-    return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
-                                 sparse=sparse,numw=numw)
+  def get_eigenvectors(self,**kwargs):
+      return get_eigenvectors(self,**kwargs)
+  def eigenvectors(self,**kwargs):
+      print("Deprecated eigenvectors method")
+      return self.get_eigenvectors(**kwargs)
   def get_filling(self,energy=0.5,nk=10):
     """Get the filling of a Hamiltonian at this energy"""
     es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
@@ -106,6 +108,10 @@ class hamiltonian():
   def print_hamiltonian(self):
     """Print hamiltonian on screen"""
     print_hamiltonian(self)
+  def check_mode(self,n):
+      """Verify the type of Hamiltonian"""
+      from .htk.mode import check_mode
+      return check_mode(self,n)
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
@@ -463,18 +469,9 @@ class hamiltonian():
       else:
           from .operatorlist import get_scalar_operator
           return get_scalar_operator(self,name,**kwargs)
-  def extract(self,name="mz"): 
-      """Extract somethign from the Hamiltonian"""
-      if self.has_eh: raise # not implemented
-      if name=="density":
-        return extract.onsite(self.intra,has_spin=self.has_spin)
-      elif name=="mx" and self.has_spin:
-        return extract.mx(self.intra)
-      elif name=="my" and self.has_spin:
-        return extract.my(self.intra)
-      elif name=="mz" and self.has_spin:
-        return extract.mz(self.intra)
-      else: raise
+  def extract(self,name): 
+      """Extract something from the Hamiltonian"""
+      return extract.extract_from_hamiltonian(self,name)
   def write_magnetization(self,nrep=5):
     """Extract the magnetization and write it in a file"""
     if not self.has_eh: # without electron hole
@@ -503,6 +500,9 @@ class hamiltonian():
               normal_order=normal_order,nrep=nrep)
   def write_hopping(self,**kwargs):
       groundstate.hopping(self,**kwargs)
+  def write_swave(self,**kwargs):
+      """Write the swave pairing"""
+      groundstate.swave(self,**kwargs)
   def get_ipr(self,**kwargs):
       """Return the IPR"""
       from . import ipr
@@ -628,7 +628,7 @@ def diagonalize_hk(k):
 
 
 
-def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
+def get_eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
   import scipy.linalg as lg
   from scipy.sparse import csc_matrix as csc
   shape = h.intra.shape
@@ -973,6 +973,7 @@ from .kanemele import generalized_kane_mele
 def turn_nambu(self):
   """Turn a Hamiltonian an Nambu Hamiltonian"""
   from .superconductivity import build_eh as nambu # redefine
+  if not self.has_spin: raise # error
   if self.has_eh: return # do nothing if already has eh
 #  self.get_eh_sector = get_eh_sector_odd_even # assign function
 #  if not self.has_eh: # if has not been assigned yet
