@@ -11,7 +11,7 @@ def scfswave(h0,u=0.0,nk=8,**kwargs):
     do_scf = True
     while do_scf:
       h = h0.copy() # copy Hamiltonian
-      h.add_pairing(d*u) # add the pairing to the Hamiltonian
+      h.add_swave(d*u) # add the pairing to the Hamiltonian
       d = onsite_delta_vev(h,nk=nk) # compute the pairing
       diff = np.max(np.abs(d-dold)) # compute the difference
       print("Error = ",diff) # Difference

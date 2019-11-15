@@ -50,6 +50,9 @@ class hamiltonian():
     return kchain(self,k)
   def get_eigenvectors(self,**kwargs):
       return get_eigenvectors(self,**kwargs)
+  def modify_hamiltonian_matrices(self,f):
+      """Modify all the matrices of a Hamiltonian"""
+      modify_hamiltonian_matrices(self,f)
   def get_filling(self,energy=0.5,nk=10):
     """Get the filling of a Hamiltonian at this energy"""
     es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
@@ -196,33 +199,18 @@ class hamiltonian():
       add_magnetism(self,m)
   def turn_spinful(self,enforce_tr=False):
     """Turn the hamiltonian spinful""" 
+    if self.has_spin: return # already spinful
     if self.is_sparse: # sparse Hamiltonian
       self.turn_dense() # dense Hamiltonian
       self.turn_spinful(enforce_tr=enforce_tr) # spinful
       self.turn_sparse()
     else: # dense Hamiltonian
-      if self.has_spin: return # already spinful
-      if self.is_multicell: # if multicell
-        from .multicell import turn_spinful as ts
-        ts(self) # turn spinful
-      else:
-        from .increase_hilbert import spinful
-        from .superconductivity import time_reversal
-        def fun(m):
-            if enforce_tr: return spinful(m,np.conjugate(m))
-            else: return spinful(m)
-        if not self.has_spin:
-          self.has_spin = True
-          self.intra = fun(self.intra) 
-          if self.dimensionality==0: pass
-          elif self.dimensionality==1:
-            self.inter = fun(self.inter) 
-          elif self.dimensionality==2:
-            self.tx = fun(self.tx) 
-            self.ty = fun(self.ty) 
-            self.txy = fun(self.txy) 
-            self.txmy = fun(self.txmy) 
-          else: raise
+      from .increase_hilbert import spinful
+      def fun(m):
+          if enforce_tr: return spinful(m,np.conjugate(m))
+          else: return spinful(m)
+      self.modify_hamiltonian_matrices(fun) # modify the matrices
+      self.has_spin = True # set spinful
   def remove_spin(self):
     """Removes spin degree of freedom"""
     if self.has_spin: # if has spin remove the component
@@ -968,32 +956,34 @@ from .kanemele import generalized_kane_mele
 def turn_nambu(self):
   """Turn a Hamiltonian an Nambu Hamiltonian"""
   from .superconductivity import build_eh as nambu # redefine
-  if not self.has_spin: raise # error
-  if self.has_eh: return # do nothing if already has eh
-#  self.get_eh_sector = get_eh_sector_odd_even # assign function
-#  if not self.has_eh: # if has not been assigned yet
-#    self.nambu_tauz = get_nambu_tauz(self.intra) # assign matrix
-  # add pairing
-  self.intra = nambu(self.intra,is_sparse=self.is_sparse)
-  if self.is_multicell: # for multicell hamiltonians
-    for i in range(len(self.hopping)): # loop over hoppings
-      self.hopping[i].m = nambu(self.hopping[i].m,is_sparse=self.is_sparse) # put in nambu form
-  else: # conventional way
-    if self.dimensionality==0: pass # one dimensional systems
-    elif self.dimensionality==1: # one dimensional systems
-      self.inter = nambu(self.inter,is_sparse=self.is_sparse)
-    elif self.dimensionality==2: # two dimensional systems
-      self.tx = nambu(self.tx,is_sparse=self.is_sparse)
-      self.ty = nambu(self.ty,is_sparse=self.is_sparse)
-      self.txy = nambu(self.txy,is_sparse=self.is_sparse)
-      self.txmy = nambu(self.txmy,is_sparse=self.is_sparse)
-    else: raise
+  if self.check_mode("spinful_nambu"): return # do nothing
+  if not self.check_mode("spinful"): raise # error
+  def f(m): return nambu(m,is_sparse=self.is_sparse)
+  self.modify_hamiltonian_matrices(f) # modify all the matrices
   self.has_eh = True
 
 
+
+def modify_hamiltonian_matrices(self,f):
+  """Apply a certain function to all the matrices"""
+  self.intra = f(self.intra)
+  if self.is_multicell: # for multicell hamiltonians
+    for i in range(len(self.hopping)): # loop over hoppings
+      self.hopping[i].m = f(self.hopping[i].m) # put in nambu form
+  else: # conventional way
+    if self.dimensionality==0: pass # one dimensional systems
+    elif self.dimensionality==1: # one dimensional systems
+      self.inter = f(self.inter)
+    elif self.dimensionality==2: # two dimensional systems
+      self.tx = f(self.tx)
+      self.ty = f(self.ty)
+      self.txy = f(self.txy)
+      self.txmy = f(self.txmy)
+    else: raise
+
+
+
 from . import inout
-
-
 
 def load(input_file="hamiltonian.pkl"):  return inout.load(input_file)
 
