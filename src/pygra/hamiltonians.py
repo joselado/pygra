@@ -213,21 +213,12 @@ class hamiltonian():
       self.has_spin = True # set spinful
   def remove_spin(self):
     """Removes spin degree of freedom"""
-    if self.has_spin: # if has spin remove the component
-      self.intra = des_spin(self.intra,component=0)
-      if self.is_multicell: # conventional
-        for i in range(len(self.hopping)):
-          self.hopping[i].m = des_spin(self.hopping[i].m)
-      else:
-        if self.dimensionality==1: # if one dimensional
-          self.inter = des_spin(self.inter,component=0)
-        elif self.dimensionality==2: # if one dimensional
-          self.tx = des_spin(self.tx,component=0)
-          self.txy = des_spin(self.txy,component=0)
-          self.ty = des_spin(self.ty,component=0)
-          self.txmy = des_spin(self.txmy,component=0)
-        else: raise
-      self.has_spin = False  # flag for nonspin calculation
+    if self.check_mode("spinless"): return
+    elif self.check_mode("spinful"):
+        def f(m): return des_spin(m,component=0)
+        self.modify_hamiltonian_matrices(f) # modify the matrices
+        self.has_spin = False # set to spinless
+    else: raise
   def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)
