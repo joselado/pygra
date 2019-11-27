@@ -3,6 +3,21 @@ from numba import jit
 from .. import algebra
 import numpy as np
 
+def onsite_delta_density_vev(h,nk=1,**kwargs):
+    """Compute the expectation value of delta"""
+    (es,ws) = h.get_eigenvectors(nk=nk,**kwargs) # compute the eigenvectors
+    fac = 1./(nk**h.dimensionality) # number of kpoints
+    wout = [] # empty list
+    for i in range(len(es)):
+        if es[i]<0.0: wout.append(ws[i]) # store
+    wout = np.array(wout) # transform to array
+    ni = h.intra.shape[0]//2 # number of sites
+    p = np.zeros(ni,dtype=np.complex) # initialize
+    d = np.zeros(ni,dtype=np.complex) # initialize
+    p = compute_pairing(wout,p)*fac # compute the pairing
+    d = compute_density(wout,p)*fac # compute the density
+    return p,d # return the pairing and density
+
 def onsite_delta_vev(h,nk=1,**kwargs):
     """Compute the expectation value of delta"""
     (es,ws) = h.get_eigenvectors(nk=nk,**kwargs) # compute the eigenvectors
@@ -13,9 +28,10 @@ def onsite_delta_vev(h,nk=1,**kwargs):
     wout = np.array(wout) # transform to array
     ni = h.intra.shape[0]//2 # number of sites
     p = np.zeros(ni,dtype=np.complex) # initialize
-    p = compute_pairing(wout,p) # compute the pairing
-    p = p*fac # normalize
-    return p # return the pairing
+    p = compute_pairing(wout,p)*fac # compute the pairing
+    return p # return the pairing and density
+
+
 
 @jit
 def compute_pairing(ws,p):
@@ -27,6 +43,25 @@ def compute_pairing(ws,p):
         for j in range(ni): # loop over components
             p[j] = p[j] + w[2*j]*np.conjugate(w[2*j+1]) # anomalous part
     return p # return expectation value
+
+
+@jit
+def compute_density(ws,p):
+    """Compute the electronic density"""
+    n = len(ws) # number of wavefunctions
+    ni = len(ws[0])//2 # number of electron components
+    for i in range(n): # loop over wavefunctions
+        w = ws[i] # store
+        for j in range(ni): # loop over components
+            p[j] = p[j] + w[2*j]*np.conjugate(w[2*j]) # anomalous part
+    return p # return expectation value
+
+
+
+
+
+
+
 
 
 
