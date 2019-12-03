@@ -316,7 +316,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
 
 
 
-def eigenvalues(h0,nk):
+def eigenvalues(h0,nk=10):
     """Return all the eigenvalues of a Hamiltonian"""
     from . import klist
     h = h0.copy() # copy hamiltonian
@@ -390,6 +390,7 @@ def singlet_map(h,nk=40,nsuper=3,mode="abs"):
 
 def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
     """Set the filling of a Hamiltonian"""
+    if h.has_eh: raise
     fill = filling + extrae/h.intra.shape[0] # filling
     n = h.intra.shape[0]
     use_kpm = False
@@ -411,4 +412,18 @@ def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
         from .scftypes import get_fermi_energy
         efermi = get_fermi_energy(es,fill)
     h.shift_fermi(-efermi) # shift the fermi energy
+
+
+
+def get_filling(h,**kwargs):
+    """Get the filling of a Hamiltonian at this energy"""
+    if h.check_mode("spinless_nambu"): # spinless Nambu Hamiltonian
+        from .sctk import spinless
+        return spinless.get_filling(h,**kwargs)
+    elif h.check_mode("spinful_nambu"): raise # spinful Nambu
+    else:
+      es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
+      es = np.array(es)
+      esf = es[es<energy]
+      return len(esf)/len(es) # return filling
 

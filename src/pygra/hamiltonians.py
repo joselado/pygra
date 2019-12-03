@@ -54,12 +54,9 @@ class hamiltonian():
   def modify_hamiltonian_matrices(self,f):
       """Modify all the matrices of a Hamiltonian"""
       modify_hamiltonian_matrices(self,f)
-  def get_filling(self,energy=0.5,nk=10):
+  def get_filling(self,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""
-    es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
-    es = np.array(es)
-    esf = es[es<energy]
-    return len(esf)/len(es) # return filling
+    return spectrum.get_filling(self,**kwargs) # eigenvalues
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)

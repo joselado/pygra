@@ -3,7 +3,7 @@ from numba import jit
 from .. import algebra
 import numpy as np
 
-def onsite_delta_density_vev(h,nk=1,**kwargs):
+def onsite_delta_density_vev(h,nk=10,**kwargs):
     """Compute the expectation value of delta"""
     (es,ws) = h.get_eigenvectors(nk=nk,**kwargs) # compute the eigenvectors
     fac = 1./(nk**h.dimensionality) # number of kpoints
@@ -15,16 +15,20 @@ def onsite_delta_density_vev(h,nk=1,**kwargs):
     p = np.zeros(ni,dtype=np.complex) # initialize
     d = np.zeros(ni,dtype=np.complex) # initialize
     p = compute_pairing(wout,p)*fac # compute the pairing
-    d = compute_density(wout,p)*fac # compute the density
+    d = compute_density(wout,d)*fac # compute the density
     return p,d # return the pairing and density
 
-def onsite_delta_vev(h,nk=1,**kwargs):
+def onsite_delta_vev(h,T=0.0,nk=10,**kwargs):
     """Compute the expectation value of delta"""
     (es,ws) = h.get_eigenvectors(nk=nk,**kwargs) # compute the eigenvectors
     fac = 1./(nk**h.dimensionality) # number of kpoints
     wout = [] # empty list
     for i in range(len(es)):
-        if es[i]<0.0: wout.append(ws[i]) # store
+        if T==0.0: # zero temperature
+            if es[i]<0.0: wout.append(ws[i]) # store
+        else: # finite temperature
+            fd = 1./(np.exp(es[i]/T)+1.0) # occupation
+            wout.append(ws[i]*fd)
     wout = np.array(wout) # transform to array
     ni = h.intra.shape[0]//2 # number of sites
     p = np.zeros(ni,dtype=np.complex) # initialize
@@ -117,4 +121,16 @@ def proje(n):
         m[2*i,2*i] = 1.0
     return m
 
-
+def get_filling(h,nk=10,**kwargs):
+    """Compute the expectation value of delta"""
+    if not h.check_mode("spinless_nambu"): raise
+    (es,ws) = h.get_eigenvectors(nk=nk,**kwargs) # compute the eigenvectors
+    fac = 1./(nk**h.dimensionality) # number of kpoints
+    wout = [] # empty list
+    for i in range(len(es)):
+        if es[i]<0.0: wout.append(ws[i]) # store
+    wout = np.array(wout) # transform to array
+    ni = h.intra.shape[0]//2 # number of sites
+    d = np.zeros(ni,dtype=np.complex) # initialize
+    d = compute_density(wout,d)*fac # compute the density
+    return np.mean(d).real # return the pairing and density
