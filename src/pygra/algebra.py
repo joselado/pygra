@@ -7,8 +7,20 @@ from .algebratk import sparsetensor
 
 maxsize = 10000
 
+
+def hermitian(m):
+    return np.transpose(np.conjugate(m))
+
+H = hermitian # alias
+
+
+
 def inv(m):
     return dlg.inv(todense(m))
+
+
+def trace(m):
+    return np.trace(m)
 
 def dagger(m):
     return np.conjugate(np.transpose(m))
