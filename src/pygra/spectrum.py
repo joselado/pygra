@@ -424,6 +424,6 @@ def get_filling(h,**kwargs):
     else:
       es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
       es = np.array(es)
-      esf = es[es<energy]
+      esf = es[es<0.0]
       return len(esf)/len(es) # return filling
 
