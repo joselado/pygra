@@ -1617,10 +1617,9 @@ def multireplicas(self,n):
 
 
 
-def write_vasp(g0):
+def write_vasp(g0,s=1.42):
     """Turn a geometry into vasp geometry"""
     g = g0.copy() # copy geometry
-    s = 1.42
     if g.dimensionality==3: pass
     elif g.dimensionality==2:
         g.r[:,2] -= np.min(g.r[:,2])
