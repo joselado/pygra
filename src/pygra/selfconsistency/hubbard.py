@@ -20,7 +20,7 @@ mf_file = "MF.pkl" # mean field file
 
 def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
                   maxerror=1e-05,silent=False,mf=None,
-                  smearing=None,collinear=False,fermi_shift=0.0,
+                  T=None,collinear=False,fermi_shift=0.0,
                   maxite=1000,save=False):
   """ Solve a selfconsistent Hubbard mean field"""
   mix = 1. - mix
@@ -59,7 +59,8 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     t2 = time.time()
     fermi = get_fermi_energy(eigvals,filling,fermi_shift=fermi_shift)
 # occupied states
-    eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi)
+    eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi,
+            smearing=T)
 # mean field
     mf,edc,charge,mag = magnetic_mean_field(voccs,U,collinear=collinear,
                                 totkp=totkp)

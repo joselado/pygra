@@ -5,6 +5,7 @@ from scipy.sparse import bmat
 from scipy.sparse import csc_matrix as csc
 from . import sculpt
 from .supercell import non_orthogonal_supercell
+from . import supercell as supercelltk
 from . import checkclass
 import scipy.linalg as lg
 
@@ -54,6 +55,8 @@ class Geometry:
       f = self.periodic_vector() # get the function
       self.get_distance = f # store that function
     self.dimensionality = 0 # set as finite
+  def get_orthogonal(self):
+      return supercelltk.target_angle(self,0.5)
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional

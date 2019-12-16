@@ -585,12 +585,12 @@ def interface_multienergy(h1,h2,k=[0.0,0.,0.],energies=[0.0],delta=0.01,
 
 
 
-def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],**kwargs):
+def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
   """Get the Green function of an interface"""
   from scipy.sparse import csc_matrix as csc
   from scipy.sparse import bmat
   fun1 = green_kchain_evaluator(h1,k=k,
-                   only_bulk=False,reverse=True,
+                   only_bulk=False,reverse=reverse,
                    **kwargs) # surface green function 
   out = [] # output
   for energy in energies: # loop

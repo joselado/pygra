@@ -443,7 +443,7 @@ def get_occupied_states(es,ws,ks,fermi,smearing=None,mine=None):
     if mine is None: mine = -1000000 # accept all
     else: mine = -np.abs(mine)
     for (e,v,k) in zip(es,ws,ks): # loop over eigenvals,eigenvecs
-      weight = np.sqrt((-np.tanh((e-fermi)/smearing) + 1.0)/2.0) # smearing
+      weight = 1./(np.exp((e-fermi)/smearing)+1.0) # occupation
       voccs.append(v*weight) # store
       eoccs.append(e*weight) # store
       koccs.append(k) # store

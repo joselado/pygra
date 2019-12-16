@@ -296,7 +296,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
   if mode=="mesh":
     from .klist import kmesh
     kp = kmesh(h.dimensionality,nk=nk)
-    etot = np.mean(parallel.pcall(enek,kp)) # compute total eenrgy
+    etot = np.mean(parallel.pcall(enek,kp)) # compute total energy
   elif mode=="random":
     kp = [np.random.random(3) for i in range(nk)] # random points
     etot = np.mean(parallel.pcall(enek,kp)) # compute total eenrgy
