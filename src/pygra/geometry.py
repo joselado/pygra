@@ -70,13 +70,16 @@ class Geometry:
       if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
       s = supercell1d(self,nsuper)
     elif self.dimensionality==2:
-      try: # two number given
+      try: # two numbers given
         nsuper1 = nsuper[0]
         nsuper2 = nsuper[1]
       except: # one number given
         nsuper1 = nsuper
         nsuper2 = nsuper
-      s = supercell2d(self,n1=nsuper1,n2=nsuper2)
+      if abs(nsuper1-np.round(nsuper1))>1e-6 or abs(nsuper2-np.round(nsuper2))>1e-6:
+          return supercelltk.target_angle_volume(self,angle=None,
+                  volume=nsuper1*nsuper2)
+      else: return supercell2d(self,n1=nsuper1,n2=nsuper2)
     elif self.dimensionality==3:
       try: # two number given
         nsuper1 = nsuper[0]
@@ -686,20 +689,17 @@ def triangular_lattice_tripartite():
   """
   Creates a triangular lattice with three sites per unit cell
   """
-  g0 = triangular_lattice() # generate a triangular lattice
-  g = g0.copy() # copy geometry
-  g.r = [g.r[0],g.r[0]+g.a1,g.r[0]+g.a2+g.a1] # positions
-  g.a1 = g0.a1 - g0.a2
-  g.a2 = g0.a1 + 2.*g0.a2
-  g.r2xyz() # 
-  g.center()
-  g.has_sublattice = True # does not have sublattice index
-  g.sublattice_number = 3 # three sublattices
-  g.sublattice = [0,1,2] # the three sublattices
-  g.has_sublattice = True # has sublattice index
-  g.update_reciprocal() # update reciprocal lattice vectors
-  return g
+  g = triangular_lattice()
+  return supercelltk.target_angle(g,1./3.,volume=3)
 
+
+
+def triangular_lattice_pentapartite():
+  """
+  Creates a triangular lattice with three sites per unit cell
+  """
+  g = triangular_lattice()
+  return supercelltk.target_angle(g,1./3.,volume=5)
 
 
 

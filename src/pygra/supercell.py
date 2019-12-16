@@ -139,8 +139,7 @@ def return_unique(rs1,rs2):
 #  """Request a unit cell with as many atoms"""
 
 
-
-def target_angle(g,angle,n=3):
+def target_angle_volume(g,angle=None,n=5,volume=None):
     """Return a supercell, targetting a certain new angle between vectors"""
     if g.dimensionality!=2: raise # only for 2d
     a1 = g.a1
@@ -154,15 +153,22 @@ def target_angle(g,angle,n=3):
             for l in range(-n,n+1):
                 a1n = i*a1 + j*a2
                 a2n = k*a1 + l*a2
-                if a1n.dot(a1n)<1e-6: continue # zero, next step
-                if a2n.dot(a2n)<1e-6: continue # zero, next step
-                u1 = a1n/a1n.dot(a1n) # normalize
-                u2 = a2n/a2n.dot(a2n) # normalize
-                diff = u1.dot(u2)-np.cos(angle*np.pi) # difference
+                v = lg.norm(np.cross(a1n,a2n)) # new volume
+                v /= lg.norm(np.cross(a1,a2)) # new volume
+                if abs(v)<1e-6: continue # zero volume
+                u1 = a1n/np.sqrt(a1n.dot(a1n)) # normalize
+                u2 = a2n/np.sqrt(a2n.dot(a2n)) # normalize
+                if angle is not None:
+                    diff = u1.dot(u2)-np.cos(angle*np.pi) # difference
+                else: diff = 0.0 # no difference
                 if abs(diff)<1e-6: 
+                    if volume is not None:
+                        if abs(v-volume)>1e-6: continue
+                        else: return [[i,j,0],[k,l,0],[0,0,1]]
                     out.append([[i,j,0],[k,l,0],[0,0,1]]) # orthogonal, return
-                    vs.append(lg.norm(np.cross(a1n,a2n))) # volume
+                    vs.append(v) # volume
       if len(out)==0: return None # nothng found
+      vs = np.array(vs) # as array
       return [o for (v,o) in sorted(zip(vs,out))][0]
     out = getm() # get rotation matrix
     if out is None: raise
@@ -171,4 +177,5 @@ def target_angle(g,angle,n=3):
     return g
 
 
+target_angle = target_angle_volume
 

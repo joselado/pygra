@@ -3,5 +3,4 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 from pygra import geometry
 g = geometry.triangular_lattice_tripartite()
-g = g.supercell(3)
 g.write()
