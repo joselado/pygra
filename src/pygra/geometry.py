@@ -61,13 +61,10 @@ class Geometry:
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
     if np.array(nsuper).shape==(3,3):
-#    try:
-#      nsuper[0][0] # if matrix is given
       return supercelltk.non_orthogonal_supercell(self,nsuper)
-#    except: pass # continue with normal way
     if self.dimensionality==1:
       if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
-      s = supercell1d(self,nsuper)
+      return supercell1d(self,nsuper)
     elif self.dimensionality==2:
       try: # two numbers given
         nsuper1 = nsuper[0]
