@@ -56,15 +56,14 @@ class Geometry:
       self.get_distance = f # store that function
     self.dimensionality = 0 # set as finite
   def get_orthogonal(self):
-      return supercelltk.target_angle(self,0.5)
+      return supercelltk.target_angle_volume(self,angle=0.5)
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
     if np.array(nsuper).shape==(3,3):
 #    try:
 #      nsuper[0][0] # if matrix is given
-      print("Supercell",nsuper)
-      return non_orthogonal_supercell(self,nsuper)
+      return supercelltk.non_orthogonal_supercell(self,nsuper)
 #    except: pass # continue with normal way
     if self.dimensionality==1:
       if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
