@@ -631,7 +631,7 @@ def supercell1d(g,nsuper):
 ########### begin 2d geometries ################
 ################################################
 
-def honeycomb_lattice():
+def honeycomb_lattice(n=1):
   """
   Create a honeycomb lattice
   """
@@ -648,6 +648,8 @@ def honeycomb_lattice():
   g.sublattice = [(-1.)**i for i in range(len(g.x))] # subattice number
   g.update_reciprocal() # update reciprocal lattice vectors
   g.get_fractional()
+  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+          same_length=True) 
   return g
 
 
@@ -662,7 +664,7 @@ def buckled_honeycomb_lattice(n=1):
 
 
 
-def triangular_lattice():
+def triangular_lattice(n=1):
   """
   Creates a triangular lattice
   """
@@ -676,6 +678,8 @@ def triangular_lattice():
   g.xyz2r() # create r coordinates
   g.has_sublattice = False # has sublattice index
   g.update_reciprocal() # update reciprocal lattice vectors
+  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+          same_length=True) 
   return g
 
 
@@ -686,7 +690,7 @@ def triangular_lattice_tripartite():
   Creates a triangular lattice with three sites per unit cell
   """
   g = triangular_lattice()
-  return supercelltk.target_angle(g,1./3.,volume=3)
+  return supercelltk.target_angle(g,angle=1./3.,volume=3,same_length=True)
 
 
 
@@ -695,7 +699,7 @@ def triangular_lattice_pentapartite():
   Creates a triangular lattice with three sites per unit cell
   """
   g = triangular_lattice()
-  return supercelltk.target_angle(g,1./3.,volume=5)
+  return supercelltk.target_angle(g,angle=1./3.,volume=5,same_length=True)
 
 
 
@@ -840,9 +844,9 @@ def lieb_lattice():
 
 
 
-def kagome_lattice():
+def kagome_lattice(n=1):
   """
-  Creates a honeycomb lattice
+  Creates a Kagome lattice
   """
   g = Geometry() # create geometry
   dx = 1./2.
@@ -858,6 +862,8 @@ def kagome_lattice():
   g.has_sublattice = True # does not have sublattice index
   g.sublattice_number = 3 # three sublattices
   g.sublattice = [0,1,2] # the three sublattices
+  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+          same_length=True) 
   return g
 
 
