@@ -678,7 +678,7 @@ def triangular_lattice(n=1):
   g.xyz2r() # create r coordinates
   g.has_sublattice = False # has sublattice index
   g.update_reciprocal() # update reciprocal lattice vectors
-  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+  if n>1: return supercelltk.target_angle_volume(g,angle=1./3.,volume=int(n),
           same_length=True) 
   return g
 
@@ -690,7 +690,8 @@ def triangular_lattice_tripartite():
   Creates a triangular lattice with three sites per unit cell
   """
   g = triangular_lattice()
-  return supercelltk.target_angle(g,angle=1./3.,volume=3,same_length=True)
+  return supercelltk.target_angle_volume(g,angle=1./3.,volume=3,
+          same_length=True)
 
 
 
