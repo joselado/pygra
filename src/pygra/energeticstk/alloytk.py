@@ -22,12 +22,12 @@ class Alloy():
         self.d2 = setup_distances(self,**kwargs) # store square distances
     def setup_interaction(self,f=None):
         """Setup the objects required to compute interactions"""
+        if type(f) is dict: f = dict2array(f,ns=self.nspecie)
         if f is None:
             self.get_energy_i = lambda ii: get_energy_i(self,self.fenergy,ii)
         elif callable(f): # input is a function
             self.get_energy_i = lambda ii: get_energy_i(self,f,ii)
         else:
-#            self.get_energy_i = lambda ii: get_energy_i(self,f,ii)
             self.get_energy_i = lambda ii: wrapper_get_energy_i(self,ii,f)
     def get_energy(self):
         return get_energy(self)
@@ -39,7 +39,7 @@ class Alloy():
     def supercell(self,n):
         supercell(self,n)
     def write(self):
-        np.savetxt("ALLOY.OUT",np.array([self.r[:,0],self.r[:,1],self.r[:,2],self.specie]).T)
+        write(self)
     def randomize(self,sp):
         """Randomize species"""
         ss = [0 for i in range(len(self.r))]
@@ -111,18 +111,21 @@ def get_energy_ij(self,f,ii,jj,n=1):
                 etot += f(d,si,sj) # function giving the energy
     return etot # return distances
 
+def different_random_index(self):
+    while True:
+       ii = np.random.randint(0,self.n)
+       jj = np.random.randint(0,self.n)
+       if self.specie[ii]!=self.specie[jj]: return (ii,jj)
+
 
 def minimize_energy(self,n=1000,mode="random",**kwargs):
     """Minimize the energy"""
     if mode=="random":
       eold = self.get_energy()
       for i in range(n):
-          while True:
-            ii = np.random.randint(0,self.n)
-            jj = np.random.randint(0,self.n)
-            if self.specie[ii]!=self.specie[jj]: break
+          (ii,jj) = different_random_index(self)
           eold = single_update(self,eold,ii,jj,**kwargs)
-    if mode=="brute":
+    elif mode=="brute":
         def itene():
           eold = self.get_energy()
           for i in range(self.n):
@@ -135,6 +138,7 @@ def minimize_energy(self,n=1000,mode="random",**kwargs):
             enew = itene() # iterate
             if abs(eold-enew)<1e-2: break
             eold = enew
+    else: raise # not recognized
 
 def single_update(self,eold,ii,jj,T=1e-7):
         s = self.specie.copy()
@@ -211,3 +215,42 @@ def supercell(self,n):
     self.specie = np.array(so)
     self.nspecie = len(self.specie)
     self.setup_distances()
+
+
+
+
+def write(self,scale=1.0):
+    r = self.r/scale
+    np.savetxt("ALLOY.OUT",np.array([r[:,0],r[:,1],r[:,2],self.specie]).T)
+    f = open("ATOMS.OUT","w")
+    for i in range(len(r)):
+        s = "S"+str(int(self.specie[i]))
+        f.write(s+"   ")
+        for ix in r[i]: f.write(str(ix)+"  ")
+        f.write("\n")
+    f.close()
+
+
+
+def dict2array(d,ns=None):
+    """Transform a dictionary into an array"""
+    nn = max([di[2] for di in d]) # number of neighbors
+    if ns is None:
+      ns = max([di[0] for di in d]) # number of neighbors
+    m = [np.zeros((ns,ns)) for i in range(nn)] # initialize
+    for di in d:
+        m[di[2]-1][di[0],di[1]] = d[di] # store value
+        m[di[2]-1][di[1],di[0]] = d[di] # store value
+    return np.array(m)
+
+
+def array2dict(v):
+    d = dict()
+    for ni in range(len(v)):
+        for i in range(len(v[ni])):
+          for j in range(len(v[ni])):
+              d[(i,j,ni+1)] = v[ni][i][j]
+    return d
+
+
+
