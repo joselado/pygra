@@ -139,7 +139,7 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None):
 def ldos_diagonalization(m,e=0.0,**kwargs):
     """Compute the LDOS using exact diagonalization"""
     if algebra.issparse(m): return ldos_arpack(m,e=e,**kwargs) # sparse
-    else: ldos_waves(m,es=[e],**kwargs)[0] # dense
+    else: return ldos_waves(m,es=[e],**kwargs)[0] # dense
 
 
 
