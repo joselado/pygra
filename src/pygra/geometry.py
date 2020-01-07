@@ -1229,7 +1229,7 @@ def get_reciprocal(a1,a2,a3):
   return b1,b2,b3
 
 
-def get_fractional(g,center=False):
+def get_fractional_function(g,center=False):
   """Get fractional coordinates"""
 #  if g.dimensionality<2: raise # stop 
   dim = g.dimensionality # dimensionality
@@ -1245,13 +1245,17 @@ def get_fractional(g,center=False):
   else: raise
   g.has_fractional = True # has fractional coordinates
   L = lg.inv(R) # inverse matrix
-  store = [] # empty list
-  for r in g.r:
-    rn = L@np.array(r)  # transform
-    store.append(rn) # store
+  def f(r):
+      if center: return (L@np.array(r))%1.0  # transform
+      else: return L@np.array(r)  # transform
+  return f
+
+
+def get_fractional(g,center=False):
+  dim = g.dimensionality # dimensionality
+  f = get_fractional_function(g,center=center)
+  store = [f(r) for r in g.r] # empty list
   store = np.array(store) # convert to array
-  if center: # center the unit cell
-      store = store%1.
   # if you remove the shift the Berry Green formalism does not work
   if dim>0: g.frac_x = store[:,0]
   if dim>1: g.frac_y = store[:,1]
