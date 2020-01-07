@@ -214,9 +214,10 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 
 
-def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
-             random=True,**kwargs):
+def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="green",
+             random=True,silent=False,write=True,**kwargs):
   """ Calculate DOS for a 2d system"""
+  if ks is not None and mode=="green": raise
   if mode=="green":
     from . import green
     if h.dimensionality!=2: raise # only for 2d
@@ -234,9 +235,10 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
     if nk is None: nk = 10
     hkgen = h.get_hk_gen() # get generator
     ds = [] # empty list
-    ks = klist.kmesh(h.dimensionality,nk=nk)
-    if random: ks = [np.random.random(3) for k in ks] # random mesh
-    ts = timing.Testimator(title="LDOS",maxite=len(ks))
+    if ks is None:
+      ks = klist.kmesh(h.dimensionality,nk=nk)
+      if random: ks = [np.random.random(3) for k in ks] # random mesh
+    ts = timing.Testimator(title="LDOS",maxite=len(ks),silent=silent)
     for k in ks: # loop over kpoints
       ts.iterate()
       hk = hkgen(k) # get Hamiltonian
@@ -249,7 +251,7 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
   x,y = g.x,g.y # get the coordinates
   go = h.geometry.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
-  write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
+  if write: write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
   return (x,y,d) # return LDOS
 
 
