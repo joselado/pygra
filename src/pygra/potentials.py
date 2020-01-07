@@ -84,9 +84,10 @@ def thue_morse(n,n0=0):
 
 def tbgAA(g):
     """Return a function that yields +1 for AA and -1 otherwise"""
-    from . import specialhopping,geometry
-    fij = specialhopping.twisted(ti=0.6)
-    h = g.get_hamiltonian(fun=fij,has_spin=False)
+    from . import geometry
+    from .specialhopping import twisted_matrix
+    h = g.get_hamiltonian(mgenerator=twisted_matrix(ti=0.3),
+            has_spin=False,is_sparse=True)
     h.set_filling(0.5,nk=1)
     ks = [[.5,0.,0.],[0.,.5,0.],[.5,.5,0.]]
     (x,y,d) = h.get_ldos(e=0.0,delta=0.01,ks=ks,mode="arpack",
@@ -99,12 +100,12 @@ def tbgAA(g):
     rf = np.array([funr(ri) for ri in g.r])
     fint = interpolate2d(rf[:,0:2],d) # interpolation
     return lambda ri: fint(funr(ri))[0] 
-    def f(ri):
-        dr = rf[:,0:3] - funr(ri)[0:3]
-        dr = np.sum(np.abs(dr),axis=1)
-        i = np.argmin(dr)
-        return d[i] # this one
-    return f
+#    def f(ri):
+#        dr = rf[:,0:3] - funr(ri)[0:3]
+#        dr = np.sum(np.abs(dr),axis=1)
+#        i = np.argmin(dr)
+#        return d[i] # this one
+#    return f
 
 
 
