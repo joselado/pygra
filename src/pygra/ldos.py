@@ -318,6 +318,13 @@ def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
     fo.write(name0+"\n") # name of the file
     fo.flush() # flush
   fo.close() # close file
+  fmap = open("DOSMAP.OUT","w")
+  for ii in range(len(h.geometry.x)):
+      for ie in range(len(es)):
+          fmap.write(str(ii)+"  ")
+          fmap.write(str(es[ie])+"  ")
+          fmap.write(str(outs[ie][ii])+"\n")
+  fmap.close()
   # Now calculate the DOS
   from .dos import calculate_dos
   es2 = np.linspace(min(es),max(es),len(es)*10)
