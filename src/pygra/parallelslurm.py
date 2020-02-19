@@ -9,7 +9,7 @@ def pcall(fin,xs):
     n = len(xs) # number of calculations
     f = lambda x: fin(x)
     main = "import dill as pickle\nimport os\n"
-    main += "import sys ; sys.path.append(os.environ['DMRGROOT'])\n"
+    main += "import sys ; sys.path.append(os.environ['PYGRAROOT'])\n"
     main += "try: ii = int(os.environ['SLURM_ARRAY_TASK_ID'])\n"
     main += "except: ii = 0\n"
     main += "f = pickle.load(open('function.obj','rb'))\n"
