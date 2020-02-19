@@ -1062,10 +1062,11 @@ def read(input_file="POSITIONS.OUT"):
 
 
 
-def bulk2ribbon(h,n=10):
-  """Converts a hexagonal bulk hamiltonian into a ribbon hamiltonian"""
-  from .hexagonal import bulk2ribbon as br
-  return br(h,n=n)
+from .ribbon import bulk2ribbon
+#def bulk2ribbon(h,n=10):
+#  """Converts a hexagonal bulk hamiltonian into a ribbon hamiltonian"""
+#  from .hexagonal import bulk2ribbon as br
+#  return br(h,n=n)
 
 
 def get_reciprocal2d(a1,a2):
