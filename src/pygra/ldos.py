@@ -214,16 +214,17 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 
 
-def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="green",
+def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
              random=True,silent=False,write=True,**kwargs):
   """ Calculate DOS for a 2d system"""
   if ks is not None and mode=="green": raise
   if mode=="green":
     from . import green
     if h.dimensionality!=2: raise # only for 2d
+    h = h.copy()
+    h.turn_dense()
     if nk is not None:
       print("LDOS using normal integration with nkpoints",nk)
-      h = h.turn_dense() # turn the matrix to dense
       gb,gs = green.bloch_selfenergy(h,energy=e,delta=delta,mode="full",nk=nk)
       d = [ -(gb[i,i]).imag for i in range(len(gb))] # get imaginary part
     else:

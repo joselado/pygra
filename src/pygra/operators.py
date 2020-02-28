@@ -350,7 +350,7 @@ def get_valley(h,projector=False,delta=None):
     es = es/(np.abs(es)+delta) # renormalize the valley eigenvalues
     vs = np.matrix(vs) # convert
     m0 = np.matrix(np.diag(es)) # build new hamiltonian
-    return vs*m0*vs.H # return renormalized operator
+    return vs@m0@vs.H # return renormalized operator
   if projector: # function returns a matrix
     def fun(m=None,k=None):
       if h.dimensionality>0 and k is None: raise # requires a kpoint
