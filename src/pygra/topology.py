@@ -591,6 +591,11 @@ def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
   return out # return result
 
 
+def spatial_berry_density(h,**kwargs):
+    return berry_green_map(h,integral=False,**kwargs)
+
+
+
 def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,operator=None,**kwargs):
   """
   Write the Berry curvature of a kpoint in a file
