@@ -12,6 +12,23 @@ from . import topology
 from . import superconductivity
 from .algebra import braket_wAw
 
+import numbers
+def isnumber(s):
+    return isinstance(s, numbers.Number)
+
+class Operator():
+    def __init__(self,m):
+        raise
+        if type(m)==np.array:
+            self.m = lambda k=None: m # create dummy function
+        elif type(m)==Operator: 
+            self.m = m.m
+        else: raise
+    def __mul__(self,a):
+        out = Operator(self)
+        out.m = lambda k=None: self.m(k=k)@a.m(k=k)
+        return out
+
 
 
 

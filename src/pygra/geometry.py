@@ -1234,7 +1234,7 @@ def get_fractional_function(g,center=False):
   """Get fractional coordinates"""
 #  if g.dimensionality<2: raise # stop 
   dim = g.dimensionality # dimensionality
-  if dim==0: return
+  if dim==0: return lambda x: x
   elif dim==1: # one dimensional
     R = np.array([g.a1,[0.,1.,0.],[0.,0.,1.]]).T # transformation matrix
     if np.max(np.abs(g.a1[1:2]))>1e-6: raise
@@ -1254,6 +1254,7 @@ def get_fractional_function(g,center=False):
 
 def get_fractional(g,center=False):
   dim = g.dimensionality # dimensionality
+  if dim==0: return
   f = get_fractional_function(g,center=center)
   store = [f(r) for r in g.r] # empty list
   store = np.array(store) # convert to array
