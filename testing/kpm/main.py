@@ -14,11 +14,11 @@ h = g.get_hamiltonian()
 m = h.intra
 m = m/6.
 points = 200 # number of polynomials
-t1 = time.clock()
+t1 = time.perf_counter()
 musp = kpm.full_trace(m,use_fortran=False) # full trace
-t2 = time.clock()
+t2 = time.perf_counter()
 musf = kpm.full_trace(m,use_fortran=True) # full trace
-t3 = time.clock()
+t3 = time.perf_counter()
 print "FORTRAN ",t3-t2
 print "Python  ",t2-t1
 

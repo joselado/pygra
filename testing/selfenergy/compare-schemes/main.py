@@ -31,21 +31,21 @@ import time
 
 for e in es:
   delta = 0.001
-  told = time.clock()  
+  told = time.perf_counter()  
 #  g,selfe = green.bloch_selfenergy(h,energy=e,delta=delta,nk=500,
 #                                     mode="renormalization")
-#  print time.clock() - told
-  told = time.clock()  
+#  print time.perf_counter() - told
+  told = time.perf_counter()  
 #  g2,selfe2 = green.bloch_selfenergy(h,energy=e,delta=delta,nk=200,
 #                                     mode="full")
-#  print time.clock() - told
-  told = time.clock()  
+#  print time.perf_counter() - told
+  told = time.perf_counter()  
   g3,selfe3 = green.bloch_selfenergy(h,energy=e,delta=delta,nk=500,
                                      mode="adaptive")
   g = g3
   selfe = selfe3
-#  print time.clock() - told
-  told = time.clock()  
+#  print time.perf_counter() - told
+  told = time.perf_counter()  
 #  print np.max(np.abs(g-g2)),np.max(np.abs(selfe-selfe2))
 #  print np.max(np.abs(g2-g3)),np.max(np.abs(selfe2-selfe3))
   print np.max(np.abs(g-g3)),np.max(np.abs(selfe-selfe3))

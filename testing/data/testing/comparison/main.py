@@ -51,13 +51,13 @@ for ncell in ns:
   #g = g.supercell(nrep)
   import dyson2d
   import time
-  t0 = time.clock()
+  t0 = time.perf_counter()
   # renormalization method
   g1 = renor_dos(e)  # compute kpoints in parallel
-  t1 = time.clock()
+  t1 = time.perf_counter()
   # bloch method
   g2 = dyson2d.dyson2d(h2.intra,h2.tx,h2.ty,h2.txy,h2.txmy,ncell,ncell,300,ez) 
-  t2 = time.clock()
+  t2 = time.perf_counter()
   print "Renorm = ",t1-t0,"      Bloch = ",t2-t1
   print "Error = ",np.max(np.abs(g1-g2)),np.max(np.abs(g1))
   t1s += [t1-t0]

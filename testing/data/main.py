@@ -27,19 +27,19 @@ e = 0.7 # energy
 import green
 import time
 
-t0 = time.clock()
+t0 = time.perf_counter()
 ### OLD METHOD ###
 g1,selfe1 = green.bloch_selfenergy(h1,energy=e,delta=delta,nk=200,
                                      mode="adaptative")
 
 
-t1 = time.clock()
+t1 = time.perf_counter()
 ### NEW METHOD ###
 
 g2,selfe2 = green.supercell_selfenergy(h2,e=e,delta=delta,nk=300,nsuper=ncell)
 
 
-t2 = time.clock()
+t2 = time.perf_counter()
 
 ## Output results
 

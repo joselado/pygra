@@ -41,17 +41,17 @@ dos2 = []
 dos1 = []
 es = np.linspace(-4.0,4.0,100)
 for e in es: 
-  t0 = time.clock()
+  t0 = time.perf_counter()
   ez = e+delta*1j
   # renormalization method
   g1 = renor_dos(e)  # compute kpoints in parallel
   diag1 = [g1[i,i].imag for i in range(len(g1))]
-  t1 = time.clock()
+  t1 = time.perf_counter()
   
   # bloch method
   g2 = dyson2d.dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,2,2,300,ez) 
   diag2 = [g2[i,i].imag for i in range(len(g2))]
-  t2 = time.clock()
+  t2 = time.perf_counter()
   print "Renorm = ",t1-t0,"      Bloch = ",t2-t1
 
   dos2 += [-sum(diag2)]

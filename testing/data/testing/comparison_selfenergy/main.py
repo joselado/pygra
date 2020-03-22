@@ -52,13 +52,13 @@ for ncell in ns:
   
   #g = g.supercell(nrep)
   import time
-  t0 = time.clock()
+  t0 = time.perf_counter()
   # renormalization method
   g1,selfe1 = renor_dos(e)  # compute kpoints in parallel
-  t1 = time.clock()
+  t1 = time.perf_counter()
   # bloch method
   g2,selfe2,ins = green.supercell_selfenergy(h2,e=e,delta=delta,nk=300,nsuper=ncell)
-  t2 = time.clock()
+  t2 = time.perf_counter()
   print "Error in intracell = ",np.max(np.abs(ins-h1.intra))
   print "Renorm = ",t1-t0,"      Bloch = ",t2-t1
   print "Error in bulk green = ",np.max(np.abs(g1-g2))

@@ -36,7 +36,7 @@ def hubbardscf(h,U=1.0,nkp = 100,filling=0.5,mag=None,mix=0.5,
   totkp = nkp**(h.dimensionality) # total number of kpoints
   while True: # infinite loop
     htmp.intra = h.intra + old_mf # add mean field 
-    t1 = time.clock()
+    t1 = time.perf_counter()
     eigvals,eigvecs = htmp.eigenvectors(nkp) # get eigenvectors
     # get the fermi energy
     ne = len(eigvals) ; ifermi = int(round(ne*filling)) # index for fermi
@@ -51,13 +51,13 @@ def hubbardscf(h,U=1.0,nkp = 100,filling=0.5,mag=None,mix=0.5,
           eoccs.append(e) # store
       voccs = np.matrix(np.array(voccs))  # as array
       eoccs = np.array(eoccs)  # as array
-    t2 = time.clock()
+    t2 = time.perf_counter()
     # get the necessary expectation values and matrices
     (vdup,vddn,vxc,ndn,nup,xc) = get_udxc(voccs,totkp=totkp) # density and XC
     # full mean field matrix
     if collinear: mf = ndn + nup 
     else: mf = ndn + nup - xc - xc.H
-    t3 = time.clock()
+    t3 = time.perf_counter()
 #    print("Times",t2-t1,t3-t2)
     mf = U*mf.todense() # new intramatrix
     error = np.max(np.abs(old_mf-mf)) # absolute difference

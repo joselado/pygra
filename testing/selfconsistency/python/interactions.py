@@ -54,7 +54,7 @@ def selfconsistency(h,ab_list=None,nkp = 100,filling=0.5,old_mf=None,mix=0.5):
 
   while True: # infinite loop
     htmp.intra = h.intra + old_mf # add mean field 
-    t1 = time.clock()
+    t1 = time.perf_counter()
     eigvals,eigvecs = htmp.eigenvectors(nkp) # get eigenvectors
     # get the fermi energy
     ne = len(eigvals) ; ifermi = int(round(ne*filling))
@@ -66,7 +66,7 @@ def selfconsistency(h,ab_list=None,nkp = 100,filling=0.5,old_mf=None,mix=0.5):
         voccs.append(v) # store
     voccs = np.matrix(np.array(voccs))  # as array
 #    print(voccs.shape)
-    t2 = time.clock()
+    t2 = time.perf_counter()
     for iab in ab_list: # loop over mean field matrices
       a = iab.a
       b = iab.b
@@ -74,7 +74,7 @@ def selfconsistency(h,ab_list=None,nkp = 100,filling=0.5,old_mf=None,mix=0.5):
       vav = (voccs*a*voccs.H).trace()[0,0] # <vAv>
       vbv = (voccs*b*voccs.H).trace()[0,0] # <vBv>
       mf = mf + (vav*b + vbv*a)*g # mean field hamiltonian 
-    t3 = time.clock()
+    t3 = time.perf_counter()
     print("Times",t2-t1,t3-t2)
     mf = mf.todense() # new intramatrix
     if h.dimensionality==1:  mf = mf/float(nkp) # normalize by nkvectors

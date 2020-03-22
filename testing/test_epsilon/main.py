@@ -40,16 +40,16 @@ if True:
   #h.add_antiferromagnetism(.1)
   ks = np.linspace(.0,.1,100)
   fo = open("CHI2D.OUT","w")
-  told = time.clock()
+  told = time.perf_counter()
   for q in ks:
-    told = time.clock()
+    told = time.perf_counter()
     ms = chi.collinear_chi1d(h,energies=energies,q=q,U=U,adaptive=False,delta=delta,nk=600)
-#    print "Coll",told - time.clock()
-#    told = time.clock()
+#    print "Coll",told - time.perf_counter()
+#    told = time.perf_counter()
 #    ms = chi.chi1d(h,energies=energies,q=q,U=U,adaptive=False,delta=delta,nk=100)
 #    ms = chi.collinear_chi1d(h,energies=energies,q=q,U=U,adaptive=True,delta=delta,nk=100)
-#    print "Nonoll",told - time.clock()
-    told = time.clock()
+#    print "Nonoll",told - time.perf_counter()
+    told = time.perf_counter()
     ms = chi.sumchi(ms) # sum all the elements
 #    ms = energies*ms
     for (ei,mi) in zip(energies,ms):
@@ -60,14 +60,14 @@ if True:
 #####################
 #####################
 else:  # compare both schemes
-  told = time.clock() # current time
+  told = time.perf_counter() # current time
   ms1 = chi.collinear_chi1d(h,energies=energies,q=.002,U=U,adaptive=False,delta=delta,nk=1000)
   ms1 = np.array([np.sum(mi) for mi in ms1])
-  print "Coll",time.clock()-told
-  told = time.clock()
+  print "Coll",time.perf_counter()-told
+  told = time.perf_counter()
 #  ms = chi.chi1d(h,energies=energies,q=.002,U=U,adaptive=False,delta=delta)
   ms = chi.collinear_chi1d(h,energies=energies,q=.002,U=U,adaptive=True,delta=delta)
-  print "Nonoll",time.clock()-told
+  print "Nonoll",time.perf_counter()-told
   ms = np.array([np.sum(mi) for mi in ms])
   print "Difference",np.sum(np.abs(ms1-ms))
   import pylab as py
