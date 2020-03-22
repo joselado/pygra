@@ -137,7 +137,7 @@ class scfclass():
       self.hamiltonian.hopping = multicell.collect_hopping(self.hamiltonian)
   def setup_interaction(self,mode="Hubbard",g=1.0,**kwargs):
     """Create the operators that will determine the interactions"""
-    if timing: t0 = time.clock()
+    if timing: t0 = time.perf_counter()
     interactions = [] # empty list
     has_eh = self.hamiltonian.has_eh # has electron hole
     nat = self.sites # number of sites
@@ -212,7 +212,7 @@ class scfclass():
               interactions.append(meanfield.v_ij_spinless(i,j,nat,g=2*g,d=d)) 
       else: raise # ups
     self.interactions += interactions # store list
-    if timing: print("Time in creating MF operators",time.clock()-t0)
+    if timing: print("Time in creating MF operators",time.perf_counter()-t0)
     self.setup_multicorrelator()
   def setup_multicorrelator(self):
     """Create the neccesary arrays to calculate the different
@@ -352,13 +352,13 @@ class scfclass():
     except: 
         print("WARNING, hamiltonian is non hermitian in mean field")
         raise
-    t1 = time.clock()
+    t1 = time.perf_counter()
     self.update_occupied_states(fermi_shift=self.fermi_shift)
-    t2 = time.clock()
+    t2 = time.perf_counter()
     self.update_expectation_values() # calculate expectation values
-    t3 = time.clock()
+    t3 = time.perf_counter()
     self.update_mean_field(mixing=mixing) # calculate mean field
-    t4 = time.clock()
+    t4 = time.perf_counter()
     self.iteration += 1
     if not self.silent:
       print("Time in diagonalization",t2-t1)
