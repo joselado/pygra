@@ -26,7 +26,7 @@ library. You will find among others:
 ## Band structure of graphene
 ```python
 from pygra import geometry
-g = geometry.honeycomb_lattice # get the geometry object
+g = geometry.honeycomb_lattice() # get the geometry object
 h = g.get_hamiltonian() # get the Hamiltonian object
 h.get_bands() # compute the band structure
 ```
@@ -98,6 +98,7 @@ h.get_bands() # calculate band structure
 ```python
 from pygra import geometry
 from pygra import spectrum
+import numpy as np
 g = geometry.kagome_lattice()
 h = g.get_hamiltonian()
 spectrum.multi_fermi_surface(h,nk=60,energies=np.linspace(-4,4,100),
