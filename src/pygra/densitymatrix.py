@@ -27,7 +27,7 @@ def full_dm(h,use_fortran=True,nk=10,delta=1e-2):
 def full_dm_python(n,es,vs):
   """Calculate the density matrix"""
 #  dm = [[0. for i in range(n)] for j in range(n)] # zero matrix
-  dm = np.zeros((n,n)) +0j
+  dm = np.zeros((n,n),dtype=np.complex)
   for ie in range(len(es)): # loop
     if es[ie]<0.: # if below Fermi energy
       for i in range(n):
@@ -58,6 +58,16 @@ def restricted_dm(h,use_fortran=True,mode="KPM",pairs=[],
     return out
   else: raise
        
+from . import algebra
 
-
+def occupied_projector(m,delta=0.0):
+    """Return a projector onto the occupied states"""
+    (es,vs) = algebra.eigh(m) # diagonalize
+    vs = vs.T # transpose
+#    vs = vs[es<0.0] # occupied states
+    if use_fortran:
+      dm = density_matrixf90.density_matrix(np.array(es),np.array(vs),delta)
+      return np.array(dm)
+    else:
+      return np.array(full_dm_python(m.shape[0],es,np.array(vs)))
 
