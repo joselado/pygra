@@ -2,7 +2,7 @@ import numpy as np
 from .. import algebra
 from .. import densitymatrix
 
-def real_space_chern(h):
+def real_space_chern(h,operator=None):
     """Compute the real space Chern number"""
     if h.dimensionality!=0: raise
     X = h.get_operator("xposition")
@@ -16,12 +16,18 @@ def real_space_chern(h):
     r = h.geometry.r
     dr = np.array([ri.dot(ri) for ri in r])
     rcut = np.max(dr)/3.
-    scale = np.pi*rcut/len(dr[dr<rcut])
-    Ph = P#np.conjugate(P.T)
+    scale = np.pi*rcut/len(dr[dr<rcut]) # scaling for the Chern number
+#    Ph = np.conjugate(P.T) # dagger
     A,B = P@X@P,P@Y@P # define the two operators
-    C = np.pi*2*np.diagonal(A@B - B@A).imag # diagonal part
+    if operator is not None: # in case there is a certain projector
+        C1 = A@operator@B - B@A@operator # compute the commutator
+        C2 = A@B@operator - B@operator@A # compute the commutator
+        C = (C1+C2)/2. # average
+    else: C = A@B - B@A # compute the commutator
+    C = np.pi*2*np.diagonal(C).imag # diagonal part
     C = C/scale # normalize
 #    print(P - P@P)
+    C = h.full2profile(C) # resum if necessary
     h.geometry.write_profile(C,name="REAL_SPACE_CHERN.OUT")
 
 

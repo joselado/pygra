@@ -57,6 +57,10 @@ class hamiltonian():
   def get_filling(self,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""
     return spectrum.get_filling(self,**kwargs) # eigenvalues
+  def full2profile(self,x):
+      """Transform a 1D array in the full space to the spatial basis"""
+      from .increase_hilbert import full2profile
+      return full2profile(self,x)
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)

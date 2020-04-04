@@ -19,6 +19,5 @@ def fm(r):
 h.add_sublattice_imbalance(fm)
 #h.add_haldane(lambda r1,r2: fm((r1+r2)/2))
 from pygra import parallel
-parallel.cores = 4
 topology.berry_green_map(h,k=[0.,0.,0.0],nrep=3,
         integral=True,eps=1e-4,delta=1e-2,operator="valley")
