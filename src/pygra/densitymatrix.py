@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
+from numba import jit
 
 try:
   from . import density_matrixf90
@@ -28,12 +29,25 @@ def full_dm_python(n,es,vs):
   """Calculate the density matrix"""
 #  dm = [[0. for i in range(n)] for j in range(n)] # zero matrix
   dm = np.zeros((n,n),dtype=np.complex)
+  return full_dm_python_jit(n,es,vs,dm)
+
+
+@jit(nopython=True)
+def full_dm_python_jit(n,es,vs,dm):
+  """Auxiliary function to compute the density matrix"""
   for ie in range(len(es)): # loop
     if es[ie]<0.: # if below Fermi energy
       for i in range(n):
         for j in range(n): 
-          dm[i,j] += vs[ie][i].conjugate()*vs[ie][j] # add contribution
+          dm[i,j] = dm[i,j] + vs[ie][i].conjugate()*vs[ie][j] # add contribution
   return dm
+
+
+
+
+
+
+
 
 
 def restricted_dm(h,use_fortran=True,mode="KPM",pairs=[],
