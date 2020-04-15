@@ -61,6 +61,9 @@ class hamiltonian():
       """Transform a 1D array in the full space to the spatial basis"""
       from .increase_hilbert import full2profile
       return full2profile(self,x)
+  def get_hopping_dict(self):
+      """Return the dictionary with the hoppings"""
+      return multicell.get_hopping_dict(self)
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)
@@ -76,6 +79,7 @@ class hamiltonian():
     self.is_sparse = False
     self.is_multicell = False # for hamiltonians with hoppings to several neighbors
     self.hopping_dict = {} # hopping dictonary
+    self.has_hopping_dict = False # has hopping dictonary
     self.non_hermitian = False # non hermitian Hamiltonian
     if not geometry is None:
 # dimensionality of the system

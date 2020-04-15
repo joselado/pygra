@@ -415,6 +415,7 @@ def get_gap(es,fermi):
 
 from .selfconsistency.hubbard import hubbardscf
 from .selfconsistency.coulomb import coulombscf
+from .selfconsistency.densitydensity import densitydensity
 
 repulsive_hubbard = hubbardscf
 from .selfconsistency.attractive_hubbard_spinless import attractive_hubbard
