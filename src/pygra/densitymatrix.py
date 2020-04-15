@@ -64,7 +64,7 @@ def full_dm_python_d_jit(n,es,vs,ks,d,dm):
   for ie in range(len(es)): # loop
     k = ks[ie] # get kpoint
     kd = k[0]*d[0] + k[1]*d[1] + k[2]*d[2] # compute scalar product
-    phi = np.exp(-1j*np.pi*kd) # compute phase
+    phi = np.exp(1j*np.pi*kd*2) # compute phase
 #    phi = 0.0
     if es[ie]<0.: # if below Fermi energy
       for i in range(n):

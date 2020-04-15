@@ -7,12 +7,15 @@ from pygra import geometry
 from pygra import scftypes
 from scipy.sparse import csc_matrix
 g = geometry.honeycomb_lattice()
-g = g.supercell(9)
+g = g.supercell(1)
 h = g.get_hamiltonian() # create hamiltonian of the system
 mf = scftypes.guess(h,mode="antiferro")
 U = 3.0
-scf = scftypes.selfconsistency(h,nkp=1,filling=0.5,g=U,
-              mix=0.9,mf=mf,mode="U")
+from pygra.selfconsistency import densitydensity
+from pygra import scftypes
+#hubbard = densitydensity.hubbard
+hubbard = scftypes.hubbardscf
+scf = hubbard(h,nk=10,U=U)
 h = scf.hamiltonian # get the Hamiltonian
-h.write_magnetization()
+#h.write_magnetization()
 h.get_bands() # calculate band structure

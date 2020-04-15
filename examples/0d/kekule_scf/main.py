@@ -5,6 +5,9 @@ import numpy as np
 from pygra import geometry
 from pygra import scftypes
 g = geometry.honeycomb_lattice()
+#g = geometry.square_lattice()
+#g = geometry.triangular_lattice()
+#g = geometry.kagome_lattice()
 #g = geometry.chain()
 g = g.supercell(6)
 h = g.get_hamiltonian() # create hamiltonian of the system
@@ -17,12 +20,15 @@ for key in v: v[key] *= 4.0
 
 def callback_mf(mf):
     n = mf[(0,0,0)].shape[0]
-    for i in range(n): mf[(0,0,0)][i,i] = 0.0
+    for i in range(n): mf[(0,0,0)][i,i] = np.trace(mf[(0,0,0)])/mf[(0,0,0)].shape[0]
     return mf
+
+#callback_mf = None
 
 scf = scftypes.densitydensity(h,nk=1,filling=0.5,v=v,callback_mf=callback_mf)
 h = scf.hamiltonian # get the Hamiltonian
 from pygra import groundstate
+h.get_bands()
 #exit()
 #h = h.supercell(3)
 groundstate.hopping(h) # write three replicas

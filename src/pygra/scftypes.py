@@ -396,12 +396,8 @@ def get_occupied_states(es,ws,ks,fermi,smearing=None,mine=None):
   return eoccs,voccs,koccs
 
 
-def get_fermi_energy(es,filling,fermi_shift=0.0):
-  """Return the Fermi energy"""
-  ne = len(es) ; ifermi = int(round(ne*filling)) # index for fermi
-  sorte = np.sort(es) # sorted eigenvalues
-  fermi = (sorte[ifermi-1] + sorte[ifermi])/2.+fermi_shift # fermi energy
-  return fermi
+from .spectrum import get_fermi_energy
+
 
 def get_gap(es,fermi):
   """Return the gap"""
@@ -487,11 +483,12 @@ def write_magnetization(mag):
 
 
 def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mix=0.2,
-                  maxerror=1e-05,silent=False,mf=None,
+                  maxerror=1e-05,silent=False,mf=None,nk=None,
                   smearing=None,fermi_shift=0.0,save=True,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
                   broyden=False,callback=None,**kwargs):
   """ Solve a generalized selfcnsistent problem"""
+  if nk is not None: nkp = nk # redefine
   mf_file = "MF.pkl"
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms

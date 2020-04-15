@@ -526,8 +526,7 @@ def kchain(h,k=[0.,0.,0.]):
 
 def get_hopping_dict(h):
     """Return the hopping dictionary"""
-    h = h.copy()
-    h.turn_multicell()
+    h = h.get_multicell()
     out = dict()
     out[(0,0,0)] = h.intra
     for t in h.hopping: out[tuple(t.dir)] = t.m # store

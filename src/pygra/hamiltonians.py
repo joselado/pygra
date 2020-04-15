@@ -123,6 +123,9 @@ class hamiltonian():
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
+  def get_fermi4filling(self,filling,**kwargs):
+      """Return the fermi energy for a certain filling"""
+      return spectrum.get_fermi4filling(self,filling,**kwargs)
   def get_dos(self,**kwargs):
       from . import dos
       return dos.dos(self,**kwargs)

@@ -107,7 +107,7 @@ def normal_term_ji_jit(v,dm,out):
 
 def update_hamiltonian(tdict,mf):
     """Update the hoppings with the mean field"""
-    out = dict() # initialize
+    out = deepcopy(tdict) # copy
     for key in mf:
         out[key] = tdict[key] + mf[key] # add contribution
     return out # return dictionary
@@ -117,7 +117,9 @@ def mix_mf(mf,mf0,mix=0.8):
     """Mix mean fields"""
     out = dict() # initialize
     for key in mf: # loop
-        out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
+        if key not in mf0: out[key] = mf[key]
+        else: out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
+        #out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
     return out
 
 
@@ -126,7 +128,9 @@ def diff_mf(mf0,mf):
     """Difference mean fields"""
     out = 0.0 # initialize
     for key in mf: # loop
-        out += np.mean(np.abs(mf0[key] - mf[key])) # add contribution
+        if key not in mf0: out += np.mean(np.abs(mf[key]))
+        else: out += np.mean(np.abs(mf0[key] - mf[key])) # add contribution
+        #out += np.mean(np.abs(mf0[key] - mf[key])) # add contribution
     return out # return
 
 
@@ -142,9 +146,11 @@ def set_hoppings(h,hop):
     """Add the hoppings to the Hamiltonian"""
     h.is_multicell = True
     class Hop: pass
-    h.intra = h.intra*0.0 # set to zero
+#    h.intra = h.intra*0.0 # set to zero
+    h.intra = hop[(0,0,0)]
     hopping = [] # empty list
     for key in hop: # loop
+        if key==(0,0,0): continue
         t = Hop() # generate
         t.dir = np.array(key) # transform to array
         t.m = hop[key] # matrix
@@ -175,48 +181,87 @@ def get_mf(v,dm):
         d2 = (-d[0],-d[1],-d[2]) # minus this direction
         # add the normal terms
         m = normal_term_ij(v[d],dm[d2]) # get matrix
+#        print(d)
+#        print(np.abs(m))
+        #print(np.abs(v[d]))
+        #print(np.abs(dm[d2]))
         mf[d] = mf[d] + m # add normal term
-        mf[d2] = mf[d2] + dag(m) # add the normal terms
+        #if d==(0,0,0): 
+        mf[d2] = mf[d2] + dag(m) # add normal term
+        m = normal_term_ii(v[d],dm[(0,0,0)]) # get matrix
+#        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
+        m = normal_term_jj(v[d2],dm[(0,0,0)]) # get matrix
+#        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
     return mf
+
+def get_dc_energy(v,dm):
+    """Compute double counting energy"""
+    out = 0.0
+    for d in v: # loop over interactions
+        d2 = (-d[0],-d[1],-d[2]) # minus this direction
+        n = v[d].shape[0] # shape
+        for i in range(n): # loop
+          for j in range(n): # loop
+              out -= v[d][i,j]*dm[(0,0,0)][i,i]*dm[(0,0,0)][j,j]
+              c = dm[d][i,j] # cross term
+              out += v[d][i,j]*c*np.conjugate(c) # add contribution
+    #print("DC energy",out.real)
+    return out.real
+
+
 
 
 mf_file = "MF.pkl" 
 
-def densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
-        maxerror=1e-5,filling=None,callback_mf=None,**kwargs):
+def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
+        maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
+        callback_h=None,**kwargs):
     """Perform the SCF mean field"""
-    h0.turn_dense()
 #    if not h0.check_mode("spinless"): raise # sanity check
-    h = h0.copy() # initial Hamiltonian
+    h1 = h0.copy() # initial Hamiltonian
+    h1.turn_dense()
+    h1.nk = nk # store the number of kpoints
     if mf is None:
       try: mf = inout.load(mf_file) # load the file
       except: 
           mf = dict()
-          for d in v: mf[d] = np.random.random(h.intra.shape) 
+          for d in v: mf[d] = np.exp(1j*np.random.random(h1.intra.shape))
+          mf[(0,0,0)] = mf[(0,0,0)] + mf[(0,0,0)].T.conjugate()
     else: pass # initial guess
     ii = 0
     os.system("rm -f STOP") # remove stop file
-    hop0 = hamiltonian2dict(h) # create dictionary
-    def f(mf):
+    hop0 = hamiltonian2dict(h1) # create dictionary
+    def f(mf,h=h1):
       """Function to minimize"""
 #      print("Iteration #",ii) # Iteration
+      h = h1.copy()
       if os.path.exists("STOP"): return mf # return result
       hop = update_hamiltonian(hop0,mf) # add the mean field to the Hamiltonian
       set_hoppings(h,hop) # set the new hoppings in the Hamiltonian
+      if callback_h is not None:
+          h = callback_h(h) # callback for the Hamiltonian
       t0 = time.clock() # time
       dm = get_dm(h,nk=nk) # get the density matrix
+      if callback_dm is not None:
+          dm = callback_dm(dm) # callback for the density matrix
       t1 = time.clock() # time
       mf = get_mf(v,dm) # return the mean field
       if callback_mf is not None:
-          mf = callback_mf(mf)
+          mf = callback_mf(mf) # callback for the mean field
       t2 = time.clock() # time
       print("Time in density matrix = ",t1-t0) # Difference
       print("Time in the normal term = ",t2-t1) # Difference
-      return mf
+      scf = SCF() # create object
+      scf.hamiltonian = h # store
+      scf.mf = mf # store mean field
+      scf.dm = dm # store density matrix
+      scf.v = v # store interaction
+      return scf
     if solver=="plain":
       do_scf = True
       while do_scf:
-        mfnew = f(mf) # new vector
+        scf = f(mf) # new vector
+        mfnew = scf.mf # new vector
         t0 = time.clock() # time
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
@@ -225,25 +270,89 @@ def densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         print("ERROR",diff)
         print()
         if diff<maxerror: 
-          do_scf = False
-    else:
-        print("Solver used:",solver)
-        import scipy.optimize as optimize 
-        if solver=="newton": fsolver = optimize.newton_krylov
-        elif solver=="anderson": fsolver = optimize.anderson
-        elif solver=="broyden": fsolver = optimize.broyden2
-        elif solver=="linear": fsolver = optimize.linearmixing
-        else: raise
-        def fsol(x): return x - f(x) # function to solve
-        dold = fsolver(fsol,dold,f_tol=maxerror)
-    scf = SCF() # create object
-    h = h0.copy() # copy Hamiltonian
-    set_hoppings(h,mf) # set the new hoppings in the Hamiltonian
-    h.intra = mf[(0,0,0)] # set the intra-term
-    inout.save(mf,mf_file) # save the mean field
-    scf.hamiltonian = h # store
-    scf.mf = mf # store mean field
-    return scf # return SCF object
+            inout.save(scf.mf,mf_file) # save the mean field
+            return scf
+      do_scf = False
+#    else:
+#        print("Solver used:",solver)
+#        import scipy.optimize as optimize 
+#        if solver=="newton": fsolver = optimize.newton_krylov
+#        elif solver=="anderson": fsolver = optimize.anderson
+#        elif solver=="broyden": fsolver = optimize.broyden2
+#        elif solver=="linear": fsolver = optimize.linearmixing
+#        else: raise
+#        def fsol(x): return x - f(x) # function to solve
+#        dold = fsolver(fsol,dold,f_tol=maxerror)
+
+
+def densitydensity(h,filling=0.5,**kwargs):
+    """Function for density-density interactions"""
+    if h.has_eh: raise
+    h = h.get_multicell()
+    h.turn_dense()
+    def callback_h(h):
+        """Set the filling"""
+        fermi = h.get_fermi4filling(filling,nk=h.nk) # get the filling
+        print("Fermi energy",fermi)
+        h.fermi = fermi
+        h.shift_fermi(-fermi) # shift by the fermi energy
+        return h
+#    callback_h = None
+    scf = generic_densitydensity(h,callback_h=callback_h,**kwargs)
+    # Now compute the total energy
+    h = scf.hamiltonian
+    etot = h.get_total_energy(nk=h.nk)
+    etot += h.fermi*h.intra.shape[0]*filling # add the Fermi energy
+    print("Occupied energies",etot)
+    etot += get_dc_energy(scf.v,scf.dm) # add the double counting energy
+    etot = etot.real
+    scf.total_energy = etot
+    print("##################")
+    print("Total energy",etot)
+    print("##################")
+    return scf
+
+
+
+
+def hubbard(h,U=1.0,**kwargs):
+    """Wrapper to perform a Hubbard model calculation"""
+    if h.has_eh: raise # not implemented
+    h = h.copy() # copy Hamiltonian
+    h.turn_multicell() # multicell Hamiltonian
+    n = h.intra.shape[0]//2 # number of spinless sites
+    zero = h.intra*0. # initialize
+    for i in range(n): 
+        zero[2*i,2*i+1] = U # Hubbard interaction
+    v = dict() # dictionary
+    v[(0,0,0)] = zero 
+    return densitydensity(h,v=v,**kwargs)
+
+
+def Vinteraction(h,V1=1.0,V2=0.0,**kwargs):
+    """Wrapper to perform a Hubbard model calculation"""
+    if h.has_eh: raise # not implemented
+    if h.has_spin: raise # not implemented
+    h = h.get_multicell() # multicell Hamiltonian
+    h.turn_dense()
+    # define the function
+    nd = h.geometry.neighbor_distances() # distance to first neighbors
+    def fun(r1,r2):
+        dr = r1-r2
+        dr = np.sqrt(dr.dot(dr)) # distance
+        if abs(dr-nd[0])<1e-6: return V1
+        if abs(dr-nd[1])<1e-6: return V2
+        return 0.0
+    hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
+            fun=fun) 
+    v = hv.get_hopping_dict() # hopping dictionary
+    def callback_dm(dm):
+        m = dm[(0,0,0)]
+        for i in range(len(m[0])): print(i,m[i,i].real)
+        return dm
+    return densitydensity(h,v=v,callback_dm=callback_dm,**kwargs)
+
+
 
 
 
