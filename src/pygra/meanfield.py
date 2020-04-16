@@ -223,7 +223,7 @@ spinful_guesses = ["Fully random","ferro","antiferro",
         "ferroX","ferroY","CDW","dimerization"]
 
 
-def guess(h,mode="ferro",fun=0.01):
+def guess(h,mode="ferro",fun=0.1):
   """Return a mean field matrix guess given a certain Hamiltonian"""
   h0 = h.copy() # copy Hamiltonian
   h0 = h0.get_multicell() # multicell
@@ -245,6 +245,9 @@ def guess(h,mode="ferro",fun=0.01):
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = 1j*(m - m.T.conjugate())
     return m
+  elif mode=="Haldane":
+      h = h.copy() ; h.clean() ; h.add_haldane(fun) # Haldane coupling
+      return h.get_hopping_dict()
   elif mode=="Fully random": return None
   elif mode=="CDW":
     h0.add_onsite(h.geometry.sublattice)
