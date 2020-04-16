@@ -928,15 +928,17 @@ def honeycomb_lattice_C6():
   with C6 rotational symmetry
   """
   g = honeycomb_lattice() # create geometry
-  m = [[2,1,0],[1,2,0],[0,0,1]]
-  g = non_orthogonal_supercell(g,m)
-  g.r[0] = g.r[0] + g.a2
-  g.r[1] = g.r[1] + g.a2
-  g.r[4] = g.r[4] - g.a2 + g.a1
-  # if it looks stupid but it works, it is not stupid
-  g.r2xyz()
-  g.update_reciprocal() # update reciprocal lattice vectors
-  return g
+  return supercelltk.target_angle_volume(g,angle=1./3.,volume=3,
+          same_length=True)
+#  m = [[2,1,0],[1,2,0],[0,0,1]]
+#  g = non_orthogonal_supercell(g,m)
+#  g.r[0] = g.r[0] + g.a2
+#  g.r[1] = g.r[1] + g.a2
+#  g.r[4] = g.r[4] - g.a2 + g.a1
+#  # if it looks stupid but it works, it is not stupid
+#  g.r2xyz()
+#  g.update_reciprocal() # update reciprocal lattice vectors
+#  return g
  
 
 

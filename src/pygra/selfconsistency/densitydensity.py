@@ -145,7 +145,7 @@ def hamiltonian2dict(h):
 def set_hoppings(h,hop):
     """Add the hoppings to the Hamiltonian"""
     h.is_multicell = True
-    class Hop: pass
+    from ..multicell import Hopping as Hop
 #    h.intra = h.intra*0.0 # set to zero
     h.intra = hop[(0,0,0)]
     hopping = [] # empty list
@@ -189,9 +189,9 @@ def get_mf(v,dm):
         #if d==(0,0,0): 
         mf[d2] = mf[d2] + dag(m) # add normal term
         m = normal_term_ii(v[d],dm[(0,0,0)]) # get matrix
-#        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
+        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
         m = normal_term_jj(v[d2],dm[(0,0,0)]) # get matrix
-#        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
+        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
     return mf
 
 def get_dc_energy(v,dm):
@@ -205,24 +205,32 @@ def get_dc_energy(v,dm):
               out -= v[d][i,j]*dm[(0,0,0)][i,i]*dm[(0,0,0)][j,j]
               c = dm[d][i,j] # cross term
               out += v[d][i,j]*c*np.conjugate(c) # add contribution
-    #print("DC energy",out.real)
+    print("DC energy",out.real)
     return out.real
 
 
+def obj2mf(a):
+    if type(a)==np.ndarray or type(a)==np.matrix:
+        return {(0,0,0):a}
+    else: return a
 
 
 mf_file = "MF.pkl" 
 
 def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
+        load_mf=True,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
+    mf = obj2mf(mf)
     h1 = h0.copy() # initial Hamiltonian
     h1.turn_dense()
     h1.nk = nk # store the number of kpoints
     if mf is None:
-      try: mf = inout.load(mf_file) # load the file
+      try: 
+          if load_mf: mf = inout.load(mf_file) # load the file
+          else: raise
       except: 
           mf = dict()
           for d in v: mf[d] = np.exp(1j*np.random.random(h1.intra.shape))
@@ -268,6 +276,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         t1 = time.clock() # time
         print("Time in mixing",t1-t0)
         print("ERROR",diff)
+        #print("Mixing",dmix)
         print()
         if diff<maxerror: 
             inout.save(scf.mf,mf_file) # save the mean field
@@ -329,10 +338,9 @@ def hubbard(h,U=1.0,**kwargs):
     return densitydensity(h,v=v,**kwargs)
 
 
-def Vinteraction(h,V1=1.0,V2=0.0,**kwargs):
+def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     if h.has_eh: raise # not implemented
-    if h.has_spin: raise # not implemented
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
     # define the function
@@ -346,11 +354,21 @@ def Vinteraction(h,V1=1.0,V2=0.0,**kwargs):
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             fun=fun) 
     v = hv.get_hopping_dict() # hopping dictionary
-    def callback_dm(dm):
-        m = dm[(0,0,0)]
-        for i in range(len(m[0])): print(i,m[i,i].real)
-        return dm
-    return densitydensity(h,v=v,callback_dm=callback_dm,**kwargs)
+    if h.has_spin: #raise # not implemented
+        for d in v: # loop
+            m = v[d] ; n = m.shape[0]
+            m1 = np.zeros((2*n,2*n),dtype=np.complex)
+            for i in range(n):
+              for j in range(n): 
+                  m1[2*i,2*j] = m[i,j]
+                  m1[2*i+1,2*j] = m[i,j]
+                  m1[2*i,2*j+1] = m[i,j]
+                  m1[2*i+1,2*j+1] = m[i,j]
+            v[d] = m1 # store
+        for i in range(n):
+            v[(0,0,0)][2*i,2*i+1] += U # add
+        #    v[(0,0,0)][2*i+1,2*i] += U/2. # add
+    return densitydensity(h,v=v,**kwargs)
 
 
 

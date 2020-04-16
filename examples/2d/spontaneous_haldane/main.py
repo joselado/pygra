@@ -8,7 +8,7 @@ g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
 nk = 10
 filling = 0.5
-g = 2.0 # interaction
+g = 1.0 # interaction
 
 from pygra.selfconsistency import densitydensity
 #scf = scftypes.selfconsistency(h,nk=nk,filling=filling,g=g,mode="V")

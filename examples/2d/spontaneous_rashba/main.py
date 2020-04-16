@@ -4,17 +4,21 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 import numpy as np
 from pygra import geometry
 from pygra import groundstate
+from pygra import topology
 g = geometry.honeycomb_lattice()
-g = g.supercell(3)
-g.dimensionality = 0
-h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
+h = g.get_hamiltonian(has_spin=True) # create hamiltonian of the system
+nk = 10
 filling = 0.5
 
-from pygra.selfconsistency import densitydensity
+from pygra import meanfield
 #scf = scftypes.selfconsistency(h,nk=nk,filling=filling,g=g,mode="V")
-scf = densitydensity.Vinteraction(h,V1=2.0,V2=1.0,filling=filling)
+h.add_zeeman([0.,0.,1.0])
+mf = meanfield.guess(h,"dimerization")
+mf = None
+scf = meanfield.Vinteraction(h,V1=0.5,V2=0.5,nk=nk,filling=filling,
+        mf=mf,mix=0.2)
 h = scf.hamiltonian # get the Hamiltonian
-h.get_bands() # calculate band structure
-from pygra import topology
+h.get_bands(operator="sz") # calculate band structure
 groundstate.hopping(h)
 topology.write_berry(h)
+h.write_onsite()

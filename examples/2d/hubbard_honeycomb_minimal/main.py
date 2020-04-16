@@ -11,11 +11,13 @@ g = g.supercell(1)
 h = g.get_hamiltonian() # create hamiltonian of the system
 mf = scftypes.guess(h,mode="antiferro")
 U = 3.0
-from pygra.selfconsistency import densitydensity
 from pygra import scftypes
-#hubbard = densitydensity.hubbard
-hubbard = scftypes.hubbardscf
-scf = hubbard(h,nk=10,U=U)
+from pygra import meanfield
+hubbard = meanfield.hubbardscf
+#hubbard = scftypes.hubbardscf
+filling = 0.5
+mf = meanfield.guess(h,mode="antiferro")
+scf = hubbard(h,nk=10,U=U,filling=filling,mf=mf)
 h = scf.hamiltonian # get the Hamiltonian
 #h.write_magnetization()
 h.get_bands() # calculate band structure
