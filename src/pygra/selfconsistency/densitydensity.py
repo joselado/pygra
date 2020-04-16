@@ -246,8 +246,8 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
     def f(mf,h=h1):
       """Function to minimize"""
 #      print("Iteration #",ii) # Iteration
+      mf0 = deepcopy(mf) # copy
       h = h1.copy()
-      if os.path.exists("STOP"): return mf # return result
       hop = update_hamiltonian(hop0,mf) # add the mean field to the Hamiltonian
       set_hoppings(h,hop) # set the new hoppings in the Hamiltonian
       if callback_h is not None:
@@ -266,6 +266,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       scf = SCF() # create object
       scf.hamiltonian = h # store
       scf.mf = mf # store mean field
+      if os.path.exists("STOP"): scf.mf = mf0 # use the guess
       scf.dm = dm # store density matrix
       scf.v = v # store interaction
       return scf

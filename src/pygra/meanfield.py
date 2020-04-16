@@ -248,6 +248,9 @@ def guess(h,mode="ferro",fun=0.1):
   elif mode=="Haldane":
       h = h.copy() ; h.clean() ; h.add_haldane(fun) # Haldane coupling
       return h.get_hopping_dict()
+  elif mode in ["antihaldane","valley"]:
+      h = h.copy() ; h.clean() ; h.add_antihaldane(fun) # Haldane coupling
+      return h.get_hopping_dict()
   elif mode=="Fully random": return None
   elif mode=="CDW":
     h0.add_onsite(h.geometry.sublattice)
