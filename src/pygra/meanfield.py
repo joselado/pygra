@@ -220,7 +220,7 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
 
 
 spinful_guesses = ["Fully random","ferro","antiferro",
-        "ferroX","ferroY","CDW","dimerization","Haldane"]
+        "ferroX","ferroY","ferroZ","CDW","dimerization","Haldane"]
 
 
 def guess(h,mode="ferro",fun=0.1):
