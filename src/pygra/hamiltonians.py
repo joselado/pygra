@@ -128,7 +128,7 @@ class hamiltonian():
       return spectrum.get_fermi4filling(self,filling,**kwargs)
   def get_dos(self,**kwargs):
       from . import dos
-      return dos.dos(self,**kwargs)
+      return dos.get_dos(self,**kwargs)
   def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
     return get_bands_nd(self,**kwargs)
