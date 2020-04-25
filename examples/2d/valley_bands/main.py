@@ -6,5 +6,5 @@ g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian(has_spin=True)
 from pygra import operators
 
-op0 = h.get_operator("valley")
-h.get_bands(operator=op0)
+op = h.get_operator("valley")
+h.get_bands(operator=op)
