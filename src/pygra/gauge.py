@@ -25,6 +25,6 @@ def canonical_gauge_transformation(self,k):
 def Operator2canonical_gauge(h,op):
     """transform an operator into canonical gauge, assuming that
     it is linear"""
-    U = operators.Operator(lambda v,k=None: canonical_gauge_transformation(h,k)*v)
-    Ud = operators.Operator(lambda v,k=None: canonical_gauge_transformation(h,k).T.conjugate()*v)
+    U = operators.Operator(lambda v,k=None: canonical_gauge_transformation(h,k)@v)
+    Ud = operators.Operator(lambda v,k=None: canonical_gauge_transformation(h,k).T.conjugate()@v)
     return Ud*op*U
