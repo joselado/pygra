@@ -607,8 +607,10 @@ def berry_green_map(h,nrep=5,k=[0.,0.,0.],operator=None,nk=None,**kwargs):
   if nk is None: # kpoint given
     out = berry_green_map_kpoint(h,k=k,operator=operator,**kwargs) 
   else: # kpoint not given
-    nk = 1
-    print("Gamma point only")
+    if operator is not None: 
+        from . import gauge
+        operator = gauge.Operator2canonical_gauge(h,operator)
+        print("Fixing the gauge in the operator")
     ks = klist.kmesh(h.dimensionality,nk) # kpoints
     def f(ki):
         print("kpoint",ki)
