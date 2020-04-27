@@ -411,9 +411,10 @@ def get_valley(h,projector=False,delta=None):
       hk = hkgen(k) # evaluate Hamiltonian
       hk = sharpen(hk) # sharpen the valley
       return braket_wAw(w,hk).real # return the braket
-  if h.dimensionality==0: 
-      return fun(np.identity(h.intra.shape[0])) # zero dimensional
-  else: return fun # return function
+#  if h.dimensionality==0: 
+#      return fun(np.identity(h.intra.shape[0])) # zero dimensional
+#  else: 
+  return fun # return function
 
 
 
