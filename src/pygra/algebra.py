@@ -128,6 +128,7 @@ accelerate = False
 
 def eigh(m):
     """Wrapper for linalg"""
+    m = todense(m)
     if np.max(np.abs(m.imag))<error: m = m.real # real matrix
     if not accelerate: return dlg.eigh(m)
 #    from . import algebraf90
@@ -160,6 +161,7 @@ def eigh(m):
 def eigvalsh(m):
     """Wrapper for linalg"""
     m = todense(m) # turn the matrix dense
+    if np.max(np.abs(m.imag))<error: m = m.real # real matrix
     if not accelerate: return dlg.eigvalsh(m)
     # check if doing slices helps
     n = m.shape[0] # size of the matrix

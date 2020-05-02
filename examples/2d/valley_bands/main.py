@@ -3,6 +3,7 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 from pygra import geometry
 g = geometry.honeycomb_lattice()
+g = g.supercell(4)
 h = g.get_hamiltonian(has_spin=True)
 from pygra import operators
 

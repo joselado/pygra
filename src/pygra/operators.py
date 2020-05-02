@@ -19,12 +19,14 @@ def isnumber(s):
     return isinstance(s, numbers.Number)
 
 class Operator():
-    def __init__(self,m):
+    def __init__(self,m,linear=True):
         """Initialization"""
+        self.linear = linear
         if type(m)==np.ndarray or issparse(m):
             self.m = lambda v,k=None: m@v # create dummy function
         elif type(m)==Operator: 
             self.m = m.m
+            self.linear = m.linear
         elif isinstance(m, numbers.Number): 
             self.m = lambda v,k=None: m*v
         elif callable(m): 
@@ -37,14 +39,16 @@ class Operator():
         if type(a)==Operator:
             out = Operator(self)
             out.m = lambda v,k=None: self.m(a.m(v,k=k),k=k)
+            out.linear = self.linear and a.linear
             return out
         else:
-            return self + Operator(a) # convert to operator
+            return self*Operator(a) # convert to operator
     def __add__(self,a):
         """Define the add method"""
         if type(a)==Operator:
             out = Operator(self)
             out.m = lambda v,k=None: self.m(v,k=k) + a.m(v,k=k)
+            out.linear = self.linear and a.linear
             return out
         else:
             return self + Operator(a) # convert to operator

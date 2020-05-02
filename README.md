@@ -110,10 +110,12 @@ spectrum.multi_fermi_surface(h,nk=60,energies=np.linspace(-4,4,100),
 Parts of the code are written in Fortran for a matter of performance.
 To compile those functions you need to execute "install.sh" In case
 they are not compiled, the library will still work but certain parts
-will be substantially slower.
+will be substantially slower. Compiling the fortran routines requires
+having a fortran compiler, such as gfortran.
 
 Parts of the code rely on Python libraries
  - numpy
  - scipy
  - multiprocess
+ - numba
 

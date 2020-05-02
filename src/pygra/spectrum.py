@@ -277,7 +277,7 @@ def real_space_vev(h,operator=None,nk=1,nrep=3,name="REAL_SPACE_VEV.OUT",
     rho = operator(dm,k=[0.,0.,0.]) # compute the projected DM
     rho = np.diag(rho).real # extract the diagonal
     rho = h.full2profile(rho) # resum if necessary
-    h.geometry.write_profile(rho,nrep=3,name=name)
+    h.geometry.write_profile(rho,nrep=5,name=name)
     return rho
 
 
