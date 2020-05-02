@@ -102,6 +102,7 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
       def diagf(m): # diagonalization routine
           return algebra.eigh(m) # all eigenvals and eigenfuncs
     else: 
+      def diagf(m): # diagonalization routine
           return algebra.eigvalsh(m) # all eigenvals and eigenfuncs
   else: # using arpack
     h = h.copy()

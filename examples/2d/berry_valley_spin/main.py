@@ -9,7 +9,7 @@ h.add_antiferromagnetism(0.6)
 from pygra import topology
 topology.parallel.cores = 6
 
-op = h.get_operator("valley_spin",return_matrix=True) # valley operator
+op = h.get_operator("valley")*h.get_operator("sz") # valley operator
 (x1,y1) = topology.write_berry(h)
 (x,y) = topology.write_berry(h,operator=op)
 import matplotlib.pyplot as plt
