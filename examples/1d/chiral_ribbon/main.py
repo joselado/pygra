@@ -2,7 +2,7 @@
 import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 # zigzag ribbon
-from pygra importgeometry
+from pygra import geometry
 import ribbon
 g = geometry.honeycomb_lattice()
 g = ribbon.bulk2ribbon(g,n=5,boundary=[6,1])
