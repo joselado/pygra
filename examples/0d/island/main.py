@@ -6,4 +6,4 @@ import numpy as np
 g = islands.get_geometry(name="honeycomb",n=3,nedges=3,rot=0.0) # get an island
 # maximum distance to the origin
 h = g.get_hamiltonian(has_spin=True) # get the Hamiltonian
-h.get_bands(operator=h.get_operator("sx"))
+h.get_bands(operator=h.get_operator("IPR"))
