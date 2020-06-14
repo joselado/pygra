@@ -23,7 +23,7 @@ class Operator():
         """Initialization"""
         self.linear = linear
         self.matrix = None
-        if type(m)==np.ndarray or issparse(m):
+        if type(m)==np.ndarray or issparse(m) or type(m)==np.matrix:
             self.m = lambda v,k=None: m@v # create dummy function
             self.matrix = m
         elif type(m)==Operator: 
