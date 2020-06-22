@@ -20,6 +20,7 @@ def ldosr_generator(h,rs=1,es=np.linspace(-1.,1.,100),
         drs = [g.r[i]-r for i in inds] # distances
         dr = np.array([np.sqrt(ir.dot(ir)) for ir in drs]) # distances
         ws = np.exp(-dr/rs) # relative weight
+        ws = ws/np.sum(ws) # normalize
         yout = 0. # initialize
         for i in range(len(inds)):
             ii = inds[i] # get this index
