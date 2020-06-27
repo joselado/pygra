@@ -3,7 +3,7 @@
 *.swp
 *.pyc
 *.o
-*.OUT
+*.OUT*
 *.in
 *.pkl
 __pycache__/
