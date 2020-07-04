@@ -4,21 +4,16 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 # zigzag ribbon
 import numpy as np
 from pygra import geometry
-from pygra import scftypes
+from pygra import meanfield
 g = geometry.honeycomb_lattice()
 h = g.get_hamiltonian() # create hamiltonian of the system
-h = h.get_multicell()
-h.shift_fermi(0.6)
-h.add_swave(0.0)
-mf = scftypes.guess(h,mode="swave",fun=0.02)
-mode = {"U":-2}
-from pygra import algebra
-algebra.accelerate = True
-scf = scftypes.selfconsistency(h,nkp=5,
-              mix=0.9,mf=None,mode=mode)
-             
+h.add_swave(0.001) # add swave
+mf = meanfield.guess(h,mode="swave",fun=0.02)
+scf = meanfield.hubbardscf(h,nk=5,mf=mf,U=-2.0,filling=0.7)
 h = scf.hamiltonian
-print(h.extract("swave"))
+print("Delta",h.extract("swave"))
+print("Onsite",h.extract("density"))
 h.write_swave()
+h.get_bands()
 #scf.hamiltonian.get_bands(operator="electron")
 
