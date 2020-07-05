@@ -1,6 +1,6 @@
 import numpy as np
 
-from .operators import isnumber
+from .algebra import isnumber
 
 is_number = isnumber
 

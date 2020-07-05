@@ -8,6 +8,15 @@ from .algebratk import sparsetensor
 from numba import jit
 from . import parallel
 
+
+
+
+import numbers
+def isnumber(s):
+    return isinstance(s, numbers.Number)
+
+
+
 maxsize = 10000
 
 
