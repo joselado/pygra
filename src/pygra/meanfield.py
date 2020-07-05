@@ -220,7 +220,8 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
 
 
 spinful_guesses = ["Fully random","ferro","antiferro",
-        "ferroX","ferroY","ferroZ","CDW","dimerization","Haldane"]
+        "ferroX","ferroY","ferroZ","CDW","dimerization","Haldane",
+        "kanemele","rashba"]
 
 
 def guess(h,mode="ferro",fun=0.1):
@@ -245,9 +246,19 @@ def guess(h,mode="ferro",fun=0.1):
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = 1j*(m - m.T.conjugate())
     return m
+  elif mode=="kekule":
+      h0.turn_multicell()
+      h0.add_kekule(fun) # Haldane coupling
+      return h0.get_hopping_dict()
   elif mode=="Haldane":
-      h = h.copy() ; h.clean() ; h.add_haldane(fun) # Haldane coupling
-      return h.get_hopping_dict()
+      h0.add_haldane(fun) # Haldane coupling
+      return h0.get_hopping_dict()
+  elif mode=="rashba":
+      h0.add_rashba(fun) # Haldane coupling
+      return h0.get_hopping_dict()
+  elif mode=="kanemele":
+      h0.add_kane_mele(fun) # Haldane coupling
+      return h0.get_hopping_dict()
   elif mode in ["antihaldane","valley"]:
       h = h.copy() ; h.clean() ; h.add_antihaldane(fun) # Haldane coupling
       return h.get_hopping_dict()

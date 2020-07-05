@@ -11,9 +11,10 @@ g = g.supercell(4)
 h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
 nk = 10
 filling = 0.5
-
-scf = meanfield.Vinteraction(h,V1=3.0,nk=nk,filling=filling)
+mf = meanfield.guess(h,"dimerization")
+scf = meanfield.Vinteraction(h,V1=2.0,nk=nk,filling=filling,mf=mf)
 h = scf.hamiltonian # get the Hamiltonian
 h.get_bands() # calculate band structure
 from pygra import topology
 groundstate.hopping(h)
+print(np.round(h.intra,3).real)

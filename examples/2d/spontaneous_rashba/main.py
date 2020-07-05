@@ -15,7 +15,7 @@ from pygra import meanfield
 h.add_zeeman([0.,0.,1.0])
 mf = meanfield.guess(h,"dimerization")
 mf = None
-scf = meanfield.Vinteraction(h,V1=0.5,V2=0.5,nk=nk,filling=filling,
+scf = meanfield.Vinteraction(h,V1=1.0,V2=1.0,nk=nk,filling=filling,
         mf=mf,mix=0.2)
 h = scf.hamiltonian # get the Hamiltonian
 h.get_bands(operator="sz") # calculate band structure

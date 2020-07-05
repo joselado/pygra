@@ -14,8 +14,8 @@ nk = 10
 h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
 #scf = scftypes.selfconsistency(h,nk=nk,filling=filling,g=g,mode="V")
 mf = meanfield.guess(h,"dimerization")
-scf = meanfield.Vinteraction(h,V1=4.0,mf=mf,
-        V2=2.0,nk=nk,filling=filling,mix=0.3)
+scf = meanfield.Vinteraction(h,V1=3.0,mf=mf,
+        V2=0.0,nk=nk,filling=filling,mix=0.3)
 h = scf.hamiltonian # get the Hamiltonian
 h.get_bands() # calculate band structure
 from pygra import groundstate
