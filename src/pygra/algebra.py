@@ -15,8 +15,8 @@ def hermitian(m):
     return np.transpose(np.conjugate(m))
 
 H = hermitian # alias
-
-
+get_dagger = hermitian
+dagger = hermitian
 
 def inv(m):
     return dlg.inv(todense(m))
@@ -24,9 +24,6 @@ def inv(m):
 
 def trace(m):
     return np.trace(m)
-
-def dagger(m):
-    return np.conjugate(np.transpose(m))
 
 
 def densebmat(ms):
