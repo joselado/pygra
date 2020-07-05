@@ -265,7 +265,7 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,compute_cross=True,
+        load_mf=True,compute_cross=True,compute_dd=True,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -299,7 +299,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
       t1 = time.perf_counter() # time
-      mf = get_mf(v,dm,compute_cross=compute_cross,
+      mf = get_mf(v,dm,compute_cross=compute_cross,compute_dd=compute_dd,
               has_eh=h0.has_eh) # return the mean field
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field

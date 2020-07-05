@@ -41,6 +41,9 @@ def densebmat(ms):
     return todense(bmat(ms)) # return block matrix
 
 
+def dot(a,b):
+    """Compute the scalar product"""
+    return np.dot(np.conjugate(a),b)
 
 def braket_wAw(w,A,wi=None):
   """

@@ -396,7 +396,8 @@ class hamiltonian():
       return spectrum.ev(self,operator=ops,**kwargs).real
   def get_1dh(self,k=0.0):
       """Return a 1d Hamiltonian"""
-      if self.is_multicell: raise # not implemented
+      if self.is_multicell: # not implemented
+          self = self.get_no_multicell() # return the no multicell Hamiltonian
       if not self.dimensionality==2: raise # not implemented
       intra,inter = kchain(self,k) # generate intra and inter
       hout = self.copy() # copy the Hamiltonian

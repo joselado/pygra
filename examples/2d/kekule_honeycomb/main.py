@@ -13,11 +13,12 @@ filling = 0.5
 nk = 10
 h = g.get_hamiltonian(has_spin=False) # create hamiltonian of the system
 #scf = scftypes.selfconsistency(h,nk=nk,filling=filling,g=g,mode="V")
-mf = meanfield.guess(h,"dimerization")
-scf = meanfield.Vinteraction(h,V1=3.0,mf=mf,
-        V2=0.0,nk=nk,filling=filling,mix=0.3)
+mf = meanfield.guess(h,"kekule")
+#mf = None
+scf = meanfield.Vinteraction(h,V1=6.0,mf=mf,
+        V2=4.0,nk=nk,filling=filling,mix=0.3)
 h = scf.hamiltonian # get the Hamiltonian
-h.get_bands() # calculate band structure
+h.get_bands(operator="valley") # calculate band structure
 from pygra import groundstate
 groundstate.hopping(h,nrep=3) # write three replicas
 h.write_onsite(nrep=3) # write three replicas
