@@ -21,4 +21,5 @@ scf = hubbard(h,nk=10,U=U,filling=filling,mf=mf,solver="plain",maxerror=1e-8)
 #scf = hubbard(h,nk=10,U=U,filling=filling,mf=scf.mf,solver="broyden1")
 h = scf.hamiltonian # get the Hamiltonian
 #h.write_magnetization()
+print(scf.identify_symmetry_breaking())
 h.get_bands() # calculate band structure

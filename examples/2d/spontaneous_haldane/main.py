@@ -11,7 +11,9 @@ nk = 10
 filling = 0.5
 
 mf = meanfield.guess(h,"Haldane") # initialization
+mf = None
 scf = meanfield.Vinteraction(h,mf=mf,V2=2.0,nk=nk,filling=filling,mix=0.1)
+print(scf.identify_symmetry_breaking())
 h = scf.hamiltonian # get the Hamiltonian
 h.get_bands() # calculate band structure
 from pygra import topology
