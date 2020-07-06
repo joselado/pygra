@@ -247,9 +247,13 @@ def guess(h,mode="ferro",fun=0.1):
   elif mode=="ferroZ":
       if h.has_spin: h0.add_zeeman([0.,0.,fun])
   elif mode=="random":
-    n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
-    m = m + m.T.conjugate()
-    return m
+      dd = h.get_dict()
+      for key in dd:
+          n = dd[key].shape[0]
+          dd[key] = np.random.random(n) + 1j*np.random.random(n)
+      dd = MultiHopping(dd)
+      dd = dd + dd + dd.get_dagger()
+      return dd.get_dict()
   elif mode=="dimerization":
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = 1j*(m - m.T.conjugate())
@@ -446,7 +450,7 @@ def identify_symmetry_breaking(h0,h):
     for s in symmetry_breaking: # loop over contributions
         d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
         proj = dd.dot(d0) # compute the projection
-        if proj>1e-5: out.append(s)
+        if np.abs(proj)>1e-5: out.append(s)
     return out
 
 
