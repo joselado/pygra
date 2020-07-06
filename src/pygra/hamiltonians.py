@@ -61,10 +61,10 @@ class hamiltonian():
     return spectrum.get_filling(self,**kwargs) # eigenvalues
   def reduce(self):
       return hamiltonianmode.reduce_hamiltonian(self)
-  def full2profile(self,x):
+  def full2profile(self,x,**kwargs):
       """Transform a 1D array in the full space to the spatial basis"""
-      from .increase_hilbert import full2profile
-      return full2profile(self,x)
+      from .htk.matrixcomponent import full2profile
+      return full2profile(self,x,**kwargs)
   def get_hopping_dict(self):
       """Return the dictionary with the hoppings"""
       return multicell.get_hopping_dict(self)
@@ -281,6 +281,10 @@ class hamiltonian():
       hop[(0,0,0)] = self.intra
       for t in self.hopping: hop[tuple(t.dir)] = t.m
       return hop # return dictionary
+  def get_multihopping(self):
+      """Return a multihopping object"""
+      from .multihopping import MultiHopping
+      return MultiHopping(self.get_dict())
   def copy(self):
       """
       Return a copy of the hamiltonian
