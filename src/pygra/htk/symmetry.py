@@ -3,7 +3,9 @@ from ..superconductivity import time_reversal
 
 def has_time_reversal_symmetry(h):
     """Check if a Hamiltonian breaks time reversal symmetry"""
-    if h.has_eh: return NotImplemented
+    if h.has_eh: 
+        print("WARNING, time reversal not implemented for BdG")
+        return False
     else:
         if h.has_spin: f = time_reversal
         else: f = lambda x: np.conjugate(x)

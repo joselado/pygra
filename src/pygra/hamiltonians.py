@@ -251,7 +251,12 @@ class hamiltonian():
       if self.dimensionality==0: pass
       elif self.dimensionality==1: pass
       elif self.dimensionality==2: 
-          return topology.chern(self,**kwargs)
+          if self.has_time_reversal_symmetry():
+              return topology.z2_invariant(self,**kwargs)
+          else:
+              print("Computing Chern")
+              return topology.chern(self,**kwargs)
+      else: raise
   def shift_fermi(self,fermi): self.add_onsite(fermi)  
   def first_neighbors(self):
     """ Create first neighbor hopping"""
