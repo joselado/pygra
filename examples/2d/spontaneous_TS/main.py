@@ -20,15 +20,16 @@ h = g.get_hamiltonian()
 #h.add_antiferromagnetism(lambda r: 0.8*np.sign(r[2]))
 h.add_antiferromagnetism(lambda r: 0.8*(r[2]>0))
 h.add_swave(lambda r: 0.8*(r[2]<0))
+h.add_onsite(lambda r: 0.8*(r[2]<0))
 #h.add_swave(0.0)
 mf = meanfield.guess(h,"kanemele")
 #mf = meanfield.guess(h,"random")
 h.add_kane_mele(0.04)
-#mf = None
-#scf = meanfield.Vinteraction(h,V1=3.0,U=0.0,mf=mf,V2=3.0,V3=0.0,nk=10,filling=0.5,mix=0.2,compute_dd=False)
+mf = None
+scf = meanfield.Vinteraction(h,V1=3.0,U=0.0,mf=mf,V2=3.0,V3=0.0,nk=10,filling=0.5,mix=0.2,compute_dd=False)
 mix0 = h.extract("spin_mixing")
 print("Mixing in original Hamiltonian",h.extract("spin_mixing"))
-#h = scf.hamiltonian
+h = scf.hamiltonian
 print("Mixing in new Hamiltonian",h.extract("spin_mixing"))
 mix1 = h.extract("spin_mixing")
 print("Enhancement of the spin mixing",mix1/mix0)
