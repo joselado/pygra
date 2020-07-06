@@ -24,7 +24,7 @@ h.add_onsite(lambda r: 0.8*(r[2]<0))
 #h.add_swave(0.0)
 mf = meanfield.guess(h,"kanemele")
 #mf = meanfield.guess(h,"random")
-h.add_kane_mele(0.04)
+#h.add_kane_mele(0.04)
 mf = None
 scf = meanfield.Vinteraction(h,V1=3.0,U=0.0,mf=mf,V2=3.0,V3=0.0,nk=10,filling=0.5,mix=0.2,compute_dd=False)
 mix0 = h.extract("spin_mixing")
