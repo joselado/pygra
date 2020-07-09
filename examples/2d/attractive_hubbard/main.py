@@ -17,4 +17,4 @@ mf = meanfield.guess(h,mode="random")
 scf = meanfield.Vinteraction(h,nk=4,U=U,filling=0.7,mf=mf,
         compute_anomalous=True,compute_dd=False)
 h = scf.hamiltonian # get the Hamiltonian
-h.get_bands() # calculate band structure
+h.get_bands(operator="electron") # calculate band structure
