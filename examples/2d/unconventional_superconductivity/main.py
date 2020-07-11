@@ -13,7 +13,7 @@ h = g.get_hamiltonian() # create hamiltonian of the system
 # superconducting state is a p-wave superfluid state with
 # odd superconductivity
 
-h.add_zeeman([20.,0.,0.0]) # add ferromagnetism
+h.add_zeeman([0.,0.,20.0]) # add ferromagnetism
 h.turn_nambu() # setup a Nambu hamiltonian
 
 
@@ -22,9 +22,8 @@ h.turn_nambu() # setup a Nambu hamiltonian
 # V1 is the first neighbor charge-charge interaction
 # V2 is the second neighbor charge-charge interaction
 mf = meanfield.guess(h,"random") # random intialization
-scf = meanfield.Vinteraction(h,U=0.0,V1=-6.0,V2=0.0,
-        nk=20,filling=0.1,mf=mf,mix=0.3,
-        compute_normal=False)
+scf = meanfield.Vinteraction(h,U=0.0,V1=-3.0,V2=0.0,
+        nk=20,filling=0.2,mf=mf,mix=0.3)
 from pygra import scftypes
 
 
