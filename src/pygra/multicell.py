@@ -27,56 +27,76 @@ class Hopping():
 
 
 def turn_multicell(h):
-  """Transform a normal hamiltonian into a multicell hamiltonian"""
-  if h.is_multicell: return h # if it is already multicell
-  ho = h.copy() # copy hamiltonian
-  hoppings = [] # list of hoppings
-  # directions
-  dirs = []
-  if h.dimensionality == 0: ts = []
-  elif h.dimensionality == 1: # one dimensional
-    dirs.append(np.array([1,0,0]))
-    ts = [h.inter.copy()]
-    ho.inter = None
-  elif h.dimensionality == 2: # two dimensional
-    dirs.append(np.array([1,0,0]))
-    dirs.append(np.array([0,1,0]))
-    dirs.append(np.array([1,1,0]))
-    dirs.append(np.array([1,-1,0]))
-    ts = [h.tx.copy(),h.ty.copy(),h.txy.copy(),h.txmy.copy()]
-    del ho.tx
-    del ho.ty
-    del ho.txy
-    del ho.txmy
-  else: raise
-  for (d,t) in zip(dirs,ts): # loop over hoppings
-    hopping = Hopping() # create object
-    hopping.m = t
-    hopping.dir = d
-    hoppings.append(hopping) # store
-    hopping = Hopping() # create object
-    hopping.m = t.H
-    hopping.dir = -d
-    hoppings.append(hopping) # store
-  ho.hopping = hoppings # store all the hoppings
-  ho.is_multicell = True # multicell hamiltonian
-  return ho
+    """Transform a normal hamiltonian into a multicell hamiltonian"""
+    if h.is_multicell: return h # if it is already multicell
+    ho = h.copy() # copy hamiltonian
+    # directions
+    dirs = []
+    if h.dimensionality == 0: ts = []
+    elif h.dimensionality == 1: # one dimensional
+      dirs.append(np.array([1,0,0]))
+      ts = [h.inter.copy()]
+      ho.inter = None
+    elif h.dimensionality == 2: # two dimensional
+      dirs.append(np.array([1,0,0]))
+      dirs.append(np.array([0,1,0]))
+      dirs.append(np.array([1,1,0]))
+      dirs.append(np.array([1,-1,0]))
+      ts = [h.tx.copy(),h.ty.copy(),h.txy.copy(),h.txmy.copy()]
+      del ho.tx
+      del ho.ty
+      del ho.txy
+      del ho.txmy
+    else: raise
+    dd = dict() # dictionary
+    dd[(0,0,0)] = h.intra
+    for (d,t) in zip(dirs,ts): dd[tuple(d)] = t
+    return set_dictionary(ho,dd) # return this Hamiltonian
 
 
-def get_tij(h,rij=np.array([0.,0.,0.]),zero=False):
-  """Get the hopping between cells with certain indexes"""
-  drij = tuple([int(round(ir)) for ir in rij]) # put as integer
-  if not h.has_hopping_dict:
-      h.hopping_dict = get_hopping_dict(h)
-      h.has_hopping_dict = True
-  if drij in h.hopping_dict: return h.hopping_dict[drij]
-  else:
-      if zero: return h.intra*0.0
-      else: return None
+def set_multihopping(ho,dd):
+    """Set a multihopping as the Hamiltonian"""
+    dd = dd.get_dict()
+    return set_dictionary(ho,dd) # return this Hamiltonian
+
+
+
+def set_dictionary(ho,dd):
+    """Set a dictionary as the Hamiltonian"""
+    ho.intra = dd[(0,0,0)] # intracell
+    hoppings = [] # list of hoppings
+    for d in dd: # loop over hoppings
+        t = dd[d] # matrix
+        if d==(0,0,0): continue
+        hopping = Hopping() # create object
+        hopping.m = t
+        hopping.dir = np.array(d)
+        hoppings.append(hopping) # store
+        hopping = Hopping() # create object
+        hopping.m = np.conjugate(t).T
+        hopping.dir = -np.array(d)
+        hoppings.append(hopping) # store
+    ho.hopping = hoppings # store all the hoppings
+    ho.is_multicell = True # multicell hamiltonian
+    return ho
+
+
+def generate_get_tij(h):
+    """Get the hopping between cells with certain indexes"""
+    hdict = h.get_multihopping().get_dict() # generate the multihopping object
+    mzero = hdict[(0,0,0)]*0.
+    def fun(rij=np.array([0.,0.,0.]),zero=False):
+        drij = tuple([int(round(ir)) for ir in rij]) # put as integer
+        if drij in hdict: return hdict[tuple(drij)]
+        else:
+            if zero: return mzero
+            else: return None
+    return fun
 
 def hk_gen(h):
   """Generate a k dependent hamiltonian"""
-  if h.is_multicell==False: raise
+  if not h.is_multicell:
+      h = h.get_multicell()
   # get the non zero hoppings
   hopping = [] # empty list
   for t in h.hopping: # loop
@@ -155,7 +175,7 @@ def bulk2ribbon(hin,n=10,sparse=True,nxt=6,ncut=6):
   from . import sculpt # rotate the geometry
   hr.geometry = sculpt.rotate_a2b(hr.geometry,hr.geometry.a1,np.array([1.,0.,0.]))
   hr.geometry.celldis = hr.geometry.a1[0]
-
+  get_tij = generate_get_tij(h) # return a function to abtain the hoppings
   def superhopping(dr=[0,0,0]): 
     """ Return a matrix with the hopping of the supercell"""
     intra = [[None for i in range(n)] for j in range(n)] # intracell term
@@ -163,7 +183,7 @@ def bulk2ribbon(hin,n=10,sparse=True,nxt=6,ncut=6):
       for jj in range(n): # loop over jj
         d = np.array([dr[0],ii-jj+dr[1],dr[2]])
         if d.dot(d)>ncut*ncut: continue # skip iteration
-        m = get_tij(h,rij=d) # get the matrix
+        m = get_tij(rij=d) # get the matrix
         if m is not None: intra[ii][jj] = csc_matrix(m) # store
         else: 
           if ii==jj: intra[ii][jj] = csc_matrix(h.intra*0.)
@@ -251,6 +271,7 @@ def supercell_hamiltonian(hin,nsuper=[1,1,1],sparse=True,ncut=3):
       for k in range(nsuper[2]):
         pos.append(np.array([i,j,k])) # store position inside the supercell
   zero = csc_matrix(np.zeros(h.intra.shape,dtype=np.complex)) # zero matrix
+  get_tij = generate_get_tij(h) # return a function to abtain the hoppings
   def superhopping(dr=[0,0,0]): 
     """ Return a matrix with the hopping of the supercell"""
     rs = [dr[0]*nsuper[0],dr[1]*nsuper[1],dr[2]*nsuper[2]] # supercell vector
@@ -261,7 +282,7 @@ def supercell_hamiltonian(hin,nsuper=[1,1,1],sparse=True,ncut=3):
       for jj in range(n): # loop over cells
         d = pos[jj] + np.array(rs) -pos[ii] # distance
       #  if d.dot(d)>ncut*ncut: continue # skip iteration
-        m = get_tij(h,rij=d) # get the matrix
+        m = get_tij(rij=d) # get the matrix
         if m is not None: 
           intra[ii][jj] = csc_matrix(m) # store
     intra = csc_matrix(bmat(intra)) # convert to matrix
