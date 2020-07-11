@@ -11,7 +11,7 @@ h = g.get_hamiltonian() # create hamiltonian of the system
 
 # We will take a ferromagnetic triangular lattice, whose
 # superconducting state is a p-wave superfluid state with
-# odd frequency superconductivity
+# odd superconductivity
 
 h.add_zeeman([20.,0.,0.0]) # add ferromagnetism
 h.turn_nambu() # setup a Nambu hamiltonian
