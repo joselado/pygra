@@ -585,16 +585,20 @@ def identify_superconductivity(h,tol=1e-5):
     """Given a Hamiltonian, identify the kind of superconductivity"""
     tol = 0.1
     if not h.has_eh: return [] # empty list
-    else: # if it has superconductivity
+    dd = h.get_multihopping()
+    if dd.norm()<tol: return []
+    else: 
+        out = []
+        out.append("Superconductivity")
         k = np.random.random(3) # random k-vector
         m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
         m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
         d1 = get_eh_sector(m1,i=0,j=1) # pairing matrix
         d2 = get_eh_sector(m2,i=0,j=1) # pairing matrix
-        out = [] # output
-        # first check if there is SC
-        if np.max(np.abs(d1))>tol: out.append("Superconductivity") 
-        else: return []
+        ddc = dd.get_dagger() # compute the dagger
+   #     if (dd+ddc).norm()<tol: out.append("Odd superconductivity")
+   #     if (dd-ddc).norm()<tol: out.append("Even superconductivity")
+
         # now check if it has some symmetry
         if np.max(np.abs(d1+d2))<tol: out.append("Odd superconductivity")
         if np.max(np.abs(d1-d2))<tol: out.append("Even superconductivity")

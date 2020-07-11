@@ -307,9 +307,9 @@ def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
     if h1.dimensionality==3:
       g2d = h1.geometry.copy() # copy Hamiltonian
       g2d = sculpt.set_xy_plane(g2d)
-      kpath = klist.default(g2d,nk=100)
+      kpath = klist.default(g2d,nk=len(energies))
     elif h1.dimensionality==2:
-      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,40)]
+      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,len(energies))]
     else: raise
   fo = open("KDOS.OUT","w")
   fo.write("# k, E, Surface, Bulk\n")
