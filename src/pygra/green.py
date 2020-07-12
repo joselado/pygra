@@ -432,16 +432,6 @@ def bloch_selfenergy(h,nk=100,energy = 0.0, delta = 0.01,mode="full",
 def get1dhamiltonian(hin,k=[0.0,0.,0.],reverse=False):
   """Return onsite and hopping matrix for a 1D Hamiltonian"""
   from . import multicell
-#  h = hin.copy() # copy Hamiltonian
-#  if h.dimensionality != 2: raise # only for 2d
-#  if h.is_multicell: # multicell Hamiltonian
-#    h = multicell.turn_no_multicell(h) # convert into a normal Hamiltonian
-#  tky = h.ty*np.exp(1j*np.pi*2.*k)
-#  tkxy = h.txy*np.exp(1j*np.pi*2.*k)
-#  tkxmy = h.txmy*np.exp(-1j*np.pi*2.*k)  # notice the minus sign !!!!
-  # chain in the x direction
-#  ons = h.intra + tky + tky.H  # intra of k dependent chain
-#  hop = h.tx + tkxy + tkxmy  # hopping of k-dependent chain
   (ons,hop) = multicell.kchain(hin,k=k)
   if reverse: return (ons,algebra.hermitian(hop)) # return 
   else: return (ons,hop) # return 
@@ -498,7 +488,7 @@ def green_kchain_evaluator(h,k=0.,delta=0.01,only_bulk=True,
 #    print(hs)
     if hs is not None: # surface matrix provided
       ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
-      sigma = hop@sf@hop.H # selfenergy
+      sigma = hop@sf@algebra.dagger(hop) # selfenergy
       if callable(hs): ons2 = ons + hs(k)
       else: ons2 = ons + hs
       sf = algebra.inv(ez - ons2 - sigma) # return Dyson

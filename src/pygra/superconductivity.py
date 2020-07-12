@@ -583,7 +583,6 @@ def nambu_anomalous_reordering(n):
 
 def identify_superconductivity(h,tol=1e-5):
     """Given a Hamiltonian, identify the kind of superconductivity"""
-    tol = 0.1
     if not h.has_eh: return [] # empty list
     dd = h.get_multihopping()
     if dd.norm()<tol: return []

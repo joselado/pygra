@@ -10,6 +10,7 @@ from copy import deepcopy
 from numba import jit
 from .. import utilities
 from ..multihopping import MultiHopping
+from .. import algebra
 
 class Interaction():
     def __init__(self,h=None):
@@ -481,25 +482,19 @@ def hubbard(h,U=1.0,**kwargs):
       return densitydensity(h,v=v,compute_cross=False,**kwargs)
 
 
-def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
+def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
+        constrains=[],**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
     # define the function
     nd = h.geometry.neighbor_distances() # distance to first neighbors
- #   def fun(r1,r2):
- #       dr = r1-r2
- #       dr = np.sqrt(dr.dot(dr)) # distance
- #       if abs(dr-nd[0])<1e-6: return V1/2.
- #       if abs(dr-nd[1])<1e-6: return V2/2.
- #       return 0.0
     from .. import specialhopping
     mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.,V3/2.],nd[0:3])
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             mgenerator=mgenerator) 
- #   hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
- #           fun=fun) 
     v = hv.get_hopping_dict() # hopping dictionary
+    U = obj2geometryarray(U,h.geometry) # convert to array
     if h.has_spin: #raise # not implemented
         for d in v: # loop
             m = v[d] ; n = m.shape[0]
@@ -512,9 +507,15 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
                   m1[2*i+1,2*j+1] = m[i,j]
             v[d] = m1 # store
         for i in range(n):
-            v[(0,0,0)][2*i,2*i+1] += U/2. # add
-            v[(0,0,0)][2*i+1,2*i] += U/2. # add
-    return densitydensity(h,v=v,**kwargs)
+            v[(0,0,0)][2*i,2*i+1] += U[i]/2. # add
+            v[(0,0,0)][2*i+1,2*i] += U[i]/2. # add
+    # Now put the constrains if necessary
+    from . import mfconstrains
+    def callback_mf(mf):
+        """Put the constrains in the mean field if necessary"""
+        mf = mfconstrains.enforce_constrains(mf,h,constrains)
+        return mf
+    return densitydensity(h,v=v,callback_mf=callback_mf,**kwargs)
 
 
 
@@ -525,3 +526,14 @@ class SCF():
         return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0,
                 tol=10*self.tol,**kwargs)
 
+
+
+
+
+def obj2geometryarray(U,g):
+    """Convert an object to an array"""
+    if algebra.isnumber(U):
+        return np.array([U for ir in g.r]) # same for all
+    elif callable(U):
+        return np.array([U(ir) for ir in g.r]) # call for each
+    else: raise
