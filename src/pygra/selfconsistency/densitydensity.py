@@ -292,10 +292,11 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,compute_cross=True,compute_dd=True,
+        load_mf=True,compute_cross=True,compute_dd=True,verbose=1,
         compute_anomalous=True,compute_normal=True,info=False,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
+    if verbose>1: info=True
 #    if not h0.check_mode("spinless"): raise # sanity check
     mf = obj2mf(mf)
     h1 = h0.copy() # initial Hamiltonian
@@ -356,7 +357,7 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
         t1 = time.clock() # time
         if info: print("Time in mixing",t1-t0)
-        print("ERROR in the SCF cycle",diff)
+        if verbose>0: print("ERROR in the SCF cycle",diff)
         #print("Mixing",dmix)
         if info: print()
         if diff<maxerror: 

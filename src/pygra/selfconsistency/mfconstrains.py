@@ -29,6 +29,15 @@ def remove_magnetism_spinful(m):
     return m
 
 
+def remove_offplane_magnetism_spinful(m):
+    n = m.shape[0]//2 # number of orbitals
+    for i in range(n):
+        d = (m[2*i,2*i] + m[2*i+1,2*i+1])/2. # average charge
+        m[2*i,2*i] = d # set
+        m[2*i+1,2*i+1] = d # set
+    return m
+
+
 
 def remove_inplane_magnetism_spinful(m):
     n = m.shape[0]//2 # number of orbitals
@@ -65,14 +74,14 @@ def remove_spinful_sector(h,removef):
 def remove_charge(h):
     return remove_spinful_sector(h,remove_onsite_spinful)
 
-
 def remove_magnetism(h):
     return remove_spinful_sector(h,remove_magnetism_spinful)
-
 
 def remove_inplane_magnetism(h):
     return remove_spinful_sector(h,remove_inplane_magnetism_spinful)
 
+def remove_offplane_magnetism(h):
+    return remove_spinful_sector(h,remove_offplane_magnetism_spinful)
 
 
 def enforce_constrains(mf,h,constrains=[]):
@@ -83,6 +92,10 @@ def enforce_constrains(mf,h,constrains=[]):
             mf = remove_charge(h)(mf) # remove charge renormalization
         if c=="no_magnetism":
             mf = remove_magnetism(h)(mf) # remove magnetism
+        if c=="no_inplane_magnetism":
+            mf = remove_inplane_magnetism(h)(mf) # remove inplane magnetism
+        if c=="no_offplane_magnetism":
+            mf = remove_offplane_magnetism(h)(mf) # remove inplane magnetism
     return mf
 
 
