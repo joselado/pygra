@@ -21,8 +21,9 @@ hubbard = meanfield.hubbardscf
 #hubbard = scftypes.hubbardscf
 filling = 0.5
 mf = meanfield.guess(h,mode="antiferro")
-scf = hubbard(mb,nk=10,U=U,filling=filling,mf=mf)
-h = scf.hamiltonian # get the Hamiltonian
+scf = hubbard(mb,nk=20,U=U,mf=mf,mu=0.0,verbose=1,
+        constrains=["no_charge"])
+#h = scf.hamiltonian # get the Hamiltonian
 #h.write_magnetization()
-print(scf.identify_symmetry_breaking())
-h.get_bands() # calculate band structure
+#print(scf.identify_symmetry_breaking())
+#h.get_bands() # calculate band structure

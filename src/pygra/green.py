@@ -3,6 +3,7 @@ import numpy as np
 import scipy.linalg as lg
 from . import multicell
 from . import algebra
+from numba import jit
 
 
 #try:
@@ -644,7 +645,7 @@ def green_generator(h,nk=20):
   ii = 0 # counter
   for ik in np.linspace(0.,1.,nk,endpoint=False): # loop
     for jk in np.linspace(0.,1.,nk,endpoint=False): # loop
-      estmp,wfstmp = lg.eigh(hkgen([ik,jk])) # get eigens
+      estmp,wfstmp = algebra.eigh(hkgen([ik,jk])) # get eigens
 #      estmp,wfstmp = lg.eigh(hkgen(np.random.random(2))) # get eigens
       es[ii,:] = estmp.copy() # copy
       ks[ii,:] = np.array([ik,jk]) # store
@@ -655,24 +656,26 @@ def green_generator(h,nk=20):
   from scipy.integrate import simps
   def getgreen(energy,delta=0.001):
     """Return the Green function"""
-    delta = 2./nk
-#    store = np.zeros((nk*nk,shape),dtype=np.complex) # storage array
-    zero = np.matrix(np.zeros(shape),dtype=np.complex) # zero matrix
-    for ii in range(nk*nk): # loop over kpoints
-      v = energy + delta*1j - es[ii,:] # array
-      C = np.matrix(np.diag(1./v)) # matrix
-      A = np.matrix(wfs[ii,:,:]) # get the matrix with wavefunctions
-#      store[ii,:,:] = A.H*C*A # store contribution
-      zero += A.H@C@A # add contribution
-#    for i in range(shape[0]): # loop 
-#      for j in range(shape[0]): # loop 
-#        m = store[:,i,j].reshape((nk,nk)) # transform into a grid
-#        zero[i,j] =  # normalize
-    zero /= nk*nk # normalize
-    ediag = np.matrix(np.identity(shape[0]))*(energy + delta*1j)
-    selfenergy = ediag - h.intra - zero.I
+    zero = np.array(np.zeros(shape,dtype=np.complex)) # zero matrix
+    zero = getgreen_jit(wfs,es,energy,delta,zero)
+    ediag = np.array(np.identity(shape[0]))*(energy + delta*1j)
+    selfenergy = ediag - h.intra - algebra.inv(zero)
     return zero,selfenergy
   return getgreen # return function
+
+@jit(nopython=True)
+def getgreen_jit(wfs,es,energy,delta,zero):
+    """Jit summation of Bloch Green's function"""
+    shape = wfs[0].shape
+    for ii in range(len(es)): # loop over kpoints
+      v = energy + delta*1j - es[ii,:] # array
+      C = zero*0.0 # initilaize
+      for j in range(len(v)): C[j,j] = 1./v[j]
+      A = wfs[ii,:,:] # get the matrix with wavefunctions
+      zero += np.conjugate(A).T@C@A # add contribution
+    zero /= len(es) # normalize
+    return zero
+
 
 
 
@@ -688,7 +691,7 @@ def green_operator(h0,operator,e=0.0,delta=1e-3,nk=10):
     if callable(operator): # callable operator
       for k in ks: # loop over kpoints
         hk = hkgen(k) # Hamiltonian
-        o0 = lg.inv(iden*(e+1j*delta) - hk) # Green's function
+        o0 = algebra.inv(iden*(e+1j*delta) - hk) # Green's function
         if callable(operator): o1 = operator(k)
         else: o1 = operator
         out += -(o0@o1).trace().imag # Add contribution

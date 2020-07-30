@@ -156,19 +156,6 @@ def hamiltonian2dict(h):
 def set_hoppings(h,hop):
     """Add the hoppings to the Hamiltonian"""
     h.set_multihopping(MultiHopping(hop))
-#    return
-#    h.is_multicell = True
-#    from ..multicell import Hopping as Hop
-#    h.intra = h.intra*0.0 # set to zero
-#    h.intra = hop[(0,0,0)]
-#    hopping = [] # empty list
-#    for key in hop: # loop
-#        if key==(0,0,0): continue
-#        t = Hop() # generate
-#        t.dir = np.array(key) # transform to array
-#        t.m = hop[key] # matrix
-#        hopping.append(t) # store
-#    h.hopping = hopping # store
 
 def get_dm(h,v,nk=1):
     """Get the density matrix"""
@@ -176,10 +163,7 @@ def get_dm(h,v,nk=1):
     if h.dimensionality>0:
         for key in v: ds.append(key) # store
     dms = h.get_density_matrix(ds=ds,nk=nk) # get all the density matrices
-    dm = dict()
-    for i in range(len(ds)): 
-        dm[ds[i]] = dms[i] # store
-    return dm # return dictionary with the density matrix
+    return dms # return dictionary
 
 
 
