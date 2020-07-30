@@ -145,34 +145,37 @@ def diff_mf(mf0,mf):
 
 
 def hamiltonian2dict(h):
-    out = dict() # create dictionary
-    if not h.is_multicell: raise
-    out[(0,0,0)] = h.intra
-    for t in h.hopping: out[tuple(t.dir)] = t.m # store
-    return out
+    return h.get_dict() # return dictionary
+#    out = dict() # create dictionary
+#    if not h.is_multicell: raise
+#    out[(0,0,0)] = h.intra
+#    for t in h.hopping: out[tuple(t.dir)] = t.m # store
+#    return out
 
 
 def set_hoppings(h,hop):
     """Add the hoppings to the Hamiltonian"""
-    h.is_multicell = True
-    from ..multicell import Hopping as Hop
+    h.set_multihopping(MultiHopping(hop))
+#    return
+#    h.is_multicell = True
+#    from ..multicell import Hopping as Hop
 #    h.intra = h.intra*0.0 # set to zero
-    h.intra = hop[(0,0,0)]
-    hopping = [] # empty list
-    for key in hop: # loop
-        if key==(0,0,0): continue
-        t = Hop() # generate
-        t.dir = np.array(key) # transform to array
-        t.m = hop[key] # matrix
-        hopping.append(t) # store
-    h.hopping = hopping # store
+#    h.intra = hop[(0,0,0)]
+#    hopping = [] # empty list
+#    for key in hop: # loop
+#        if key==(0,0,0): continue
+#        t = Hop() # generate
+#        t.dir = np.array(key) # transform to array
+#        t.m = hop[key] # matrix
+#        hopping.append(t) # store
+#    h.hopping = hopping # store
 
 def get_dm(h,v,nk=1):
     """Get the density matrix"""
     ds = [(0,0,0)] # directions
     if h.dimensionality>0:
         for key in v: ds.append(key) # store
-    dms = densitymatrix.full_dm(h,ds=ds,nk=nk) # get all the density matrices
+    dms = h.get_density_matrix(ds=ds,nk=nk) # get all the density matrices
     dm = dict()
     for i in range(len(ds)): 
         dm[ds[i]] = dms[i] # store
@@ -335,8 +338,8 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
       t2 = time.perf_counter() # time
-      if info: print("Time in density matrix = ",t1-t0) # Difference
-      if info: print("Time in the normal term = ",t2-t1) # Difference
+      if verbose>1: print("Time in density matrix = ",t1-t0) # Difference
+      if verbose>1: print("Time in the normal term = ",t2-t1) # Difference
       scf = SCF() # create object
       scf.hamiltonian = h # store
 #      h.check() # check the Hamiltonian
@@ -356,10 +359,9 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
         t1 = time.clock() # time
-        if info: print("Time in mixing",t1-t0)
+        if verbose>1: print("Time in mixing",t1-t0)
         if verbose>0: print("ERROR in the SCF cycle",diff)
         #print("Mixing",dmix)
-        if info: print()
         if diff<maxerror: 
             scf = f(mfnew) # last iteration, with the unmixed mean field
             inout.save(scf.mf,mf_file) # save the mean field
@@ -430,7 +432,7 @@ def get_array2mf(scf):
     return fa2mf # return function
 
 
-def densitydensity(h,filling=0.5,info=False,**kwargs):
+def densitydensity(h,filling=0.5,mu=None,verbose=0,**kwargs):
     """Function for density-density interactions"""
     if h.has_eh: 
         if not h.has_spin: return NotImplemented # only for spinful
@@ -438,22 +440,26 @@ def densitydensity(h,filling=0.5,info=False,**kwargs):
     h.turn_dense()
     def callback_h(h):
         """Set the filling"""
-        fermi = h.get_fermi4filling(filling,nk=h.nk) # get the filling
-        if info: print("Fermi energy",fermi)
-        h.fermi = fermi
-        h.shift_fermi(-fermi) # shift by the fermi energy
+        if mu is None:
+          fermi = h.get_fermi4filling(filling,nk=h.nk) # get the filling
+          if verbose>1: print("Fermi energy",fermi)
+          h.fermi = fermi
+          h.shift_fermi(-fermi) # shift by the fermi energy
+        else: h.shift_fermi(-mu) # shift by mu
         return h
 #    callback_h = None
-    scf = generic_densitydensity(h,callback_h=callback_h,info=info,**kwargs)
+    scf = generic_densitydensity(h,callback_h=callback_h,verbose=verbose,
+            **kwargs)
     # Now compute the total energy
     h = scf.hamiltonian
     etot = h.get_total_energy(nk=h.nk)
-    etot += h.fermi*h.intra.shape[0]*filling # add the Fermi energy
+    if mu is None: 
+        etot += h.fermi*h.intra.shape[0]*filling # add the Fermi energy
     #print("Occupied energies",etot)
     etot += get_dc_energy(scf.v,scf.dm) # add the double counting energy
     etot = etot.real
     scf.total_energy = etot
-    if info:
+    if verbose>1:
       print("##################")
       print("Total energy",etot)
       print("##################")

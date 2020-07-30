@@ -33,6 +33,13 @@ class Embedding():
                         raise
             else: pass
         else: self.m = h.intra.copy() # pristine one
+    def get_gf(self,e=0.0,delta=1e-2,nsuper=1,nk=100): 
+        """Return the bulk Green's function"""
+        if self.nsuper is None: # old way
+            g,selfe = green.supercell_selfenergy(self.h0,e=e,delta=delta,nk=nk,
+                    nsuper=nsuper)
+        else: raise # not implemented
+        return g # return the Green's function
     def ldos(self,e=0.0,delta=1e-2,nsuper=1,nk=100,operator=None,**kwargs):
         """Compute the local density of states"""
         h = self.h0
@@ -82,6 +89,19 @@ class Embedding():
             fo.write(name0+"\n") # name of the file
             np.savetxt(name,np.array([x,y,d]).T) # save data
         np.savetxt("MULTILDOS/DOS.OUT",np.array([es,ds]).T)
+    def get_density_matrix(self,nk=nk,ds=[(0,0,0)]):
+        """Return the density matrix"""
+        for d in ds: # loop over directions
+            if d not in [[0,0,0]]: raise # not implemented
+        raise # not implemnted yet
+    def set_multihopping(self,mh):
+        """Set a multihopping as the impurity"""
+        dd = mh.get_dict() # get the dictionary
+        for d in dd:
+            if d not in [(0,0,0)]: raise # not implemented
+            else:
+                self.m = dd[d] # copy intra cell matrix
+
 
 
 
