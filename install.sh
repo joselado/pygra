@@ -1,3 +1,3 @@
 #!/usr/bin/bash
 
-python pygra/compilefortran.py
+python src/pygra/compilefortran.py
