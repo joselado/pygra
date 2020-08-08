@@ -84,6 +84,8 @@ def remove_offplane_magnetism(h):
     return remove_spinful_sector(h,remove_offplane_magnetism_spinful)
 
 
+
+
 def enforce_constrains(mf,h,constrains=[]):
     """Given a list of constrains, return a function that enforces
     all of them in the mean field"""
@@ -96,6 +98,11 @@ def enforce_constrains(mf,h,constrains=[]):
             mf = remove_inplane_magnetism(h)(mf) # remove inplane magnetism
         if c=="no_offplane_magnetism":
             mf = remove_offplane_magnetism(h)(mf) # remove inplane magnetism
+        if c=="no_normal_term":
+            if h.has_eh:
+                from ..sctk.extract import extract_anomalous_dict
+                mf = extract_anomalous_dict(mf)
+            else: raise
     return mf
 
 

@@ -9,28 +9,27 @@ import numpy as np
 omega = 1./np.sqrt(2)
 
 g = geometry.bichain()
-g = g.supercell(20) # get the geometry
+g = g.supercell(40) # get the geometry
 g.dimensionality = 0
 
 h = g.get_hamiltonian() # compute Hamiltonian
-delta = .0
-maf = .5
+phi = 0.5
+delta = 2.*np.cos(phi)
+maf = 2.*np.sin(phi)*np.array([1.,0.,0.])
 def fsc(r): return delta*np.cos(omega*np.pi*2*r[0])
 def faf(r): return maf*np.sin(omega*np.pi*2*r[0])
 h.add_antiferromagnetism(faf)
 h.add_swave(fsc)
-
-mf = meanfield.guess(h,"random")
-
 mf = None
+filling=0.5
+h.set_filling(filling)
+mf = meanfield.guess(h,"random")
+scf = meanfield.Vinteraction(h,V1=-2.0,mf=mf,
+        filling=filling,mix=0.1,verbose=1,
+        constrains = ["no_normal_term"]
+        )
 
-scf = meanfield.Vinteraction(h,V1=1.0,mf=mf,
-        filling=0.5,mix=0.1,
-        compute_normal=True,
-        compute_dd=False,
-        compute_anomalous=True)
-
-
+print(scf.identify_symmetry_breaking())
 hscf = scf.hamiltonian
 
 

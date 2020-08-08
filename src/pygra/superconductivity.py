@@ -367,9 +367,9 @@ def nambu2block(m):
 def extract_pairing(m):
   """Extract the pairing from a matrix, assuming it has the Nambu form"""
   nr = m.shape[0]//4 # number of positions
-  uu = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  dd = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  ud = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  uu = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  dd = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  ud = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
   for i in range(nr): # loop over positions
     for j in range(nr): # loop over positions
         ud[i,j] = m[4*i,4*j+2]
@@ -585,10 +585,16 @@ def identify_superconductivity(h,tol=1e-5):
     """Given a Hamiltonian, identify the kind of superconductivity"""
     if not h.has_eh: return [] # empty list
     dd = h.get_multihopping()
-    if dd.norm()<tol: return []
+    if dd.norm()<tol: return [] # nothing
     else: 
         out = []
-        out.append("Superconductivity")
+        out.append("Superconductivity") # is superconducting
+        (uum,ddm,udm) = dict2absdeltas(dd.get_dict()) # extract absolute value of deltas
+        if np.max(uum)>tol: out.append("up-up pairing")
+        if np.max(ddm)>tol: out.append("down-down pairing")
+        if np.max(udm)>tol: out.append("up-down pairing")
+
+        if h.dimensionality==0: return out
         k = np.random.random(3) # random k-vector
         m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
         m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
@@ -603,6 +609,28 @@ def identify_superconductivity(h,tol=1e-5):
         if np.max(np.abs(d1-d2))<tol: out.append("Even superconductivity")
 #        print(np.round(d1-d2,2),tol)
         return out
+
+
+
+def dict2absdeltas(mf):
+    """Given a hopping dictionary, extract the absolute value of
+    the three deltas, uu,dd and ud. This function should be used for
+    qualitative checks"""
+    for key in mf: n = mf[key].shape[0]//4 # number of sites
+    uu = np.zeros(n)
+    dd = np.zeros(n)
+    ud = np.zeros(n)
+    for key in mf: # loop over keys
+        m = mf[key]
+        (uut,ddt,udt) = extract_pairing(m) # extract the three matrices
+        uu += np.sum(np.abs(uut),axis=0)
+        dd += np.sum(np.abs(ddt),axis=0)
+        ud += np.sum(np.abs(udt),axis=0)
+    return (uu,dd,ud)
+
+
+
+
 
 
 def check_nambu():
