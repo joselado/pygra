@@ -14,7 +14,7 @@ def get():
     m = np.random.random(3)-0.5
     m = m/np.sqrt(m.dot(m)) # random magnetic field
     h.add_zeeman(m)
-    nk = 100
+    nk = 30
     filling = 0.5
     h.turn_nambu()
     mf = meanfield.guess(h,"random")
