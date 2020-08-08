@@ -162,6 +162,11 @@ def extract_from_hamiltonian(self,name):
         return extract_spin_mixing(self)
     elif name=="hopping_spin_mixing":
         return extract_hopping_spin_mixing(self)
+    elif name=="superfluidity": # extract the absolute value
+        if self.has_eh:
+            from .superconductivity import dict2absdeltas
+            (uu,dd,ud) = dict2absdeltas(self.get_multihopping().get_dict())
+            return uu+dd+ud
     else: raise
 
 
