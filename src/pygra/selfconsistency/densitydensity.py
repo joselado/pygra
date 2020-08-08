@@ -339,10 +339,10 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       while do_scf:
         scf = f(mf) # new vector
         mfnew = scf.mf # new vector
-        t0 = time.clock() # time
+        t0 = time.perf_counter() # time
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
-        t1 = time.clock() # time
+        t1 = time.perf_counter() # time
         if verbose>1: print("Time in mixing",t1-t0)
         if verbose>0: print("ERROR in the SCF cycle",diff)
         #print("Mixing",dmix)
