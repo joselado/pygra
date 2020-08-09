@@ -3,6 +3,7 @@ from __future__ import division
 import numpy as np
 from . import algebra
 from .htk.matrixcomponent import spin_mixing_part
+from . import superconductivity
 
 def spin_channel(m,spin_column=None,spin_row=None,has_spin=True):
   """Extract a channel from a matrix"""

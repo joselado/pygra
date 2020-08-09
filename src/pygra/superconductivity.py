@@ -286,13 +286,10 @@ def add_pxipy(delta=0.0,is_sparse=False,r1=None,r2=None):
 add_pwave = add_pxipy
 
 
-def dvector2deltas(ds):
-  """Transform a certain dvector into deltauu, deltadd and deltaud"""
-  deltas = [0.,0.,0.]
-  deltas[0] = ds[0]+ds[1]
-  deltas[1] = -1j*(ds[0]-ds[1]) # this sign might not be ok
-  deltas[2] = ds[2]
-  return deltas
+# functions for d-vector computations
+from .sctk.dvector import dvector2deltas 
+from .sctk.dvector import delta2dvector 
+
 
 
 def add_pairing(deltas=[[0.,0],[0.,0.]],is_sparse=True,r1=[],r2=[]):
@@ -364,20 +361,7 @@ def nambu2block(m):
     return R@m@Rh
 
 
-def extract_pairing(m):
-  """Extract the pairing from a matrix, assuming it has the Nambu form"""
-  nr = m.shape[0]//4 # number of positions
-  uu = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  dd = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  ud = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  for i in range(nr): # loop over positions
-    for j in range(nr): # loop over positions
-        ud[i,j] = m[4*i,4*j+2]
-        dd[i,j] = m[4*i+1,4*j+2]
-        uu[i,j] = m[4*i,4*j+3]
-  return (uu,dd,ud) # return the three matrices
-
-
+from .sctk.extract import extract_pairing
 
 
 def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
@@ -658,6 +642,7 @@ def turn_nambu(self):
 
 
 from .sctk.extract import get_anomalous_hamiltonian
+from .sctk.dvector import average_hamiltonian_dvector
 
 
 

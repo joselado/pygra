@@ -506,6 +506,9 @@ class Hamiltonian():
       """Return the density matrix"""
       from . import densitymatrix
       return densitymatrix.full_dm(self,**kwargs)
+  def get_average_dvector(self,**kwargs):
+      """Return a square average of the d-vector in the BZ"""
+      return superconductivity.average_hamiltonian_dvector(self,**kwargs)
 
 
 hamiltonian = Hamiltonian

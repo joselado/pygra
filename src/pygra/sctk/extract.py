@@ -1,3 +1,4 @@
+import numpy as np
 from ..superconductivity import get_eh_sector
 from ..superconductivity import build_nambu_matrix
 from ..multihopping import MultiHopping
@@ -27,4 +28,16 @@ def get_anomalous_hamiltonian(self):
 
 
 
+def extract_pairing(m):
+  """Extract the pairing from a matrix, assuming it has the Nambu form"""
+  nr = m.shape[0]//4 # number of positions
+  uu = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  dd = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  ud = np.array(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
+  for i in range(nr): # loop over positions
+    for j in range(nr): # loop over positions
+        ud[i,j] = m[4*i,4*j+2]
+        dd[i,j] = m[4*i+1,4*j+2]
+        uu[i,j] = m[4*i,4*j+3]
+  return (uu,dd,ud) # return the three matrices
 
