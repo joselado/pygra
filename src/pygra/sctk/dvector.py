@@ -17,11 +17,10 @@ def dvector2deltas(ds):
 
 def extract_dvector_from_hamiltonian(h):
     """Return a function that computes the d-vector matrix at a k-point"""
-    ### WARNING, this assumes that the system has spin-triplet ###
     hk = h.get_hk_gen() # get Bloch Hamiltonian generator
     def f(k): # define function
         m = hk(k) # compute Bloch Hamiltonian
-        (uu,dd,ud) = extract.extract_pairing(m) # return the pairing matrices
+        (uu,dd,ud) = extract.extract_triplet_pairing(m) # pairing matrices
         return delta2dvector(uu,dd,ud) # return d-vector
     return f # return function
 

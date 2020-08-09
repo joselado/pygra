@@ -362,6 +362,8 @@ def nambu2block(m):
 
 
 from .sctk.extract import extract_pairing
+from .sctk.extract import extract_singlet_pairing
+from .sctk.extract import extract_triplet_pairing
 
 
 def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
@@ -570,29 +572,29 @@ def identify_superconductivity(h,tol=1e-5):
     if not h.has_eh: return [] # empty list
     dd = h.get_multihopping()
     if dd.norm()<tol: return [] # nothing
-    else: 
-        out = []
-        out.append("Superconductivity") # is superconducting
-        (uum,ddm,udm) = dict2absdeltas(dd.get_dict()) # extract absolute value of deltas
-        if np.max(uum)>tol: out.append("up-up pairing")
-        if np.max(ddm)>tol: out.append("down-down pairing")
-        if np.max(udm)>tol: out.append("up-down pairing")
+    out = [] # initialize the list
+    out.append("Superconductivity") # is superconducting
+    dv = h.get_average_dvector() # get the average d-vector
+    if dv[0]>tol: out.append("dx SC")
+    if dv[1]>tol: out.append("dy SC")
+    if dv[2]>tol: out.append("dz SC")
+    (uum,ddm,udm) = dict2absdeltas(dd.get_dict()) # extract absolute value of deltas
+    if np.max(uum)>tol: out.append("up-up pairing")
+    if np.max(ddm)>tol: out.append("down-down pairing")
+    if np.max(udm)>tol: out.append("up-down pairing")
 
-        if h.dimensionality==0: return out
-        k = np.random.random(3) # random k-vector
-        m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
-        m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
-        d1 = get_eh_sector(m1,i=0,j=1) # pairing matrix
-        d2 = get_eh_sector(m2,i=0,j=1) # pairing matrix
-        ddc = dd.get_dagger() # compute the dagger
-   #     if (dd+ddc).norm()<tol: out.append("Odd superconductivity")
-   #     if (dd-ddc).norm()<tol: out.append("Even superconductivity")
-
-        # now check if it has some symmetry
-        if np.max(np.abs(d1+d2))<tol: out.append("Odd superconductivity")
-        if np.max(np.abs(d1-d2))<tol: out.append("Even superconductivity")
-#        print(np.round(d1-d2,2),tol)
-        return out
+    if h.dimensionality==0: return out
+    k = np.random.random(3) # random k-vector
+    m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
+    m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
+    # now check if it has some symmetry
+    singletp = np.sum(np.abs(extract_singlet_pairing(m1))) # singlet
+    tripletp = np.sum(np.abs(extract_triplet_pairing(m1))) # triplet
+    print(singletp,tripletp)
+    if singletp<tol: out.append("Odd superconductivity")
+    if tripletp<tol: out.append("Even superconductivity")
+#    print(np.round(d1-d2,2),tol)
+    return out
 
 
 

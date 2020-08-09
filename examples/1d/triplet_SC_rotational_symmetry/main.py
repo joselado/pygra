@@ -22,6 +22,7 @@ def get():
     scf = meanfield.Vinteraction(h,V1=-2.0,nk=nk,filling=filling,mf=mf,
             constrains =["no_charge"],verbose=0)
     h = scf.hamiltonian # get the Hamiltonian
+    h.check()
     print(scf.identify_symmetry_breaking())
     d = np.round(h.get_average_dvector(),3)
     print("d-vector",d,np.sum(d))

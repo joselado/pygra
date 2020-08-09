@@ -15,6 +15,7 @@ U = -2.0
 
 mf = meanfield.guess(h,mode="random")
 scf = meanfield.Vinteraction(h,nk=4,U=U,filling=0.7,mf=mf,
-        compute_anomalous=True,compute_dd=False)
+        constrains = ["no_normal_term"])
 h = scf.hamiltonian # get the Hamiltonian
+print(scf.identify_symmetry_breaking())
 h.get_bands(operator="electron") # calculate band structure
