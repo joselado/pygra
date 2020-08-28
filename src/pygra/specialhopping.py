@@ -85,12 +85,16 @@ def multilayer(ti=0.3,dz=3.0):
       return 0.0 # else
     return fhop
 
+def phase_C3_matrix(*args,**kwargs):
+    f = phase_C3(*args,**kwargs)
+    def fout(rs1,rs2):
+        return np.array([[f(r1,r2) for r1 in rs1] for r2 in rs2])
+    return fout
 
 
 
 
-
-def phase_C3(g,phi=0.0):
+def phase_C3(g,phi=0.5,t=1.0):
     """Create a fucntion that computes hoppings that alternate
     between +\phi and -\phi every 60 degrees"""
     if len(g.r)==1:
@@ -111,12 +115,17 @@ def phase_C3(g,phi=0.0):
                 d = np.abs(zi/zj-1.0)
                 print(d)
                 if d<1e-2: 
-                    return np.exp(1j*phi)
-            else: return np.exp(-1j*phi)
+                    return t*np.exp(1j*phi*np.pi)
+            else: return np.exp(-1j*phi*np.pi)
         return 0.0
     return fun
 
 
+def neighbor_hopping_matrix(g,vs):
+    """Return a hopping matrix for the N first neighbors"""
+    ds = g.neighbor_distances() # get the different distances
+    ds = ds[0:len(vs)] # take only these
+    return distance_hopping_matrix(vs,ds)
 
 
 

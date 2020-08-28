@@ -4,7 +4,7 @@ import dill as pickle
 import os
 from . import filesystem as fs
 import signal
-
+import subprocess
 
 def pcall(fin,xs,time=10):
     """Run a parallel calculation with slurm"""
@@ -42,6 +42,7 @@ def pcall(fin,xs,time=10):
     pwd = os.getcwd() # current directory 
     os.chdir(pfolder) # go to the folder
     os.system("sbatch run.sh >> run.out") # run calculation
+#    out,err = subprocess.Popen(["sbatch","run.sh"],stdout=subprocess.PIPE).communicate()
     os.chdir(pwd) # back to main
     import time
     from os import path
