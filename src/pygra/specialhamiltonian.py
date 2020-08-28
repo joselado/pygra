@@ -45,6 +45,12 @@ def flux2d(g,n=1,m=1):
 
 
 
-
-
+def valence_TMDC(g,soc=0.0):
+    """Return the Hamiltonian for the valence band of a TMDC"""
+    f1 = specialhopping.neighbor_hopping_matrix(g,[1.0])
+    f2 = specialhopping.phase_C3_matrix(g,t=soc)
+    def ft(*args): return f1(*args) + f2(*args)
+    h = g.get_hamiltonian(mgenerator=ft,is_multicell=True,has_spin=False)
+    h.turn_spinful(enforce_tr=True)
+    return h # return the Hamiltonian
 
