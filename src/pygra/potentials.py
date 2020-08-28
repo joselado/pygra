@@ -119,3 +119,19 @@ def interpolate2d(r,v):
     f = interp2d(grid_x, grid_y, grid_z, kind='linear')
     return lambda ri: f(ri[0],ri[1])
 
+
+
+
+def normalize(f,a,g=None):
+    """Normalize the average value of a function for the geometry"""
+    if g is None: raise
+    m = np.mean([f(ri) for ri in g.r]) # average value
+    def fout(r):
+        return f(r) + a - m # return this value
+    return fout # return new function
+
+
+
+
+
+
