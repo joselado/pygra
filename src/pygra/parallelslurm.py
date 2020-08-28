@@ -3,6 +3,8 @@
 import dill as pickle
 import os
 from . import filesystem as fs
+import signal
+
 
 def pcall(fin,xs,time=10):
     """Run a parallel calculation with slurm"""

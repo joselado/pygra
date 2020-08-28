@@ -38,13 +38,14 @@ def aahf1d(n0=0,beta=0.0000001,k=None,b=None,v=1.0,normalize=False):
 
 
 
-def commensurate_potential(g,**kwargs):
+def commensurate_potential(g,k=1,**kwargs):
     """Return a potential that is commensurate with
     the lattice"""
     a12 = g.a2.dot(g.a1)/(np.sqrt(g.a1.dot(g.a1))*np.sqrt(g.a1.dot(g.a1)))
     if 0.49<abs(a12)<0.51: # angle is 60 degrees
       angle = np.pi/3.
-      return cnpot(n=6,k=2.*np.pi/np.sqrt(g.a1.dot(g.a1)),angle=angle,**kwargs)
+      return cnpot(n=6,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),
+              angle=angle,**kwargs)
     else: raise
 
 
