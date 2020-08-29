@@ -82,6 +82,7 @@ def jobkill(n):
     def killf(*args):
       subprocess.Popen(["scancel",str(n)],stdout=subprocess.PIPE).communicate()
       print("Job killed")
+      exit()
     signal.signal(signal.SIGINT, killf)
     signal.signal(signal.SIGTERM, killf)
 
