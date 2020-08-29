@@ -8,7 +8,26 @@ import subprocess
 
 #pickle.settings['recurse'] = True
 
-def pcall(fin,xs,time=10):
+def pcall(fin,xs,batch_size=1,**kwargs):
+    if batch_size==1: return pcall_single(fin,xs,**kwargs)
+    else: 
+        nx = len(xs) # number of xs
+        xsn = [] # empty list
+        o = []
+        for i in range(len(xs)):
+            o.append(xs[i]) # store
+            if i%batch_size==0: # reached the limit
+                xsn.appen(o) # store
+                o = [] # reset
+        def fnew(y): return [fin(x) for x in y] # call this batch
+        outs = pcall_single(fnew,xsn,**kwargs) # call the inputs
+        out = []
+        for o in outs: out += o # add
+        return out
+
+
+
+def pcall_single(fin,xs,time=10):
     """Run a parallel calculation with slurm"""
     n = len(xs) # number of calculations
     f = lambda x: fin(x)

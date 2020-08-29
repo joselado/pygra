@@ -115,7 +115,6 @@ def phase_C3(g,phi=0.5,t=1.0):
             zi = dr[0]+1j*dr[1]
             for zj in zs: # one of the three directions
                 d = np.abs(zi/zj-1.0)
-                print(d)
                 if d<1e-2: 
                     return t*np.exp(1j*phi*np.pi)
             else: return np.exp(-1j*phi*np.pi)
