@@ -6,9 +6,8 @@ from pygra import topology
 from pygra import specialhopping
 from pygra import dos
 g = geometry.honeycomb_lattice()
-g = geometry.triangular_lattice()
-g = g.supercell(3)
-mgen = specialhopping.strained_hopping_matrix(g,dt=0.2,k=2)
+g = g.supercell(11)
+mgen = specialhopping.strained_hopping_matrix(g,dt=1.0,k=1,v=1.0)
 h = g.get_hamiltonian(has_spin=False,mgenerator=mgen)
 h.write_hopping()
 h.get_bands()

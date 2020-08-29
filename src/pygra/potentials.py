@@ -41,12 +41,18 @@ def aahf1d(n0=0,beta=0.0000001,k=None,b=None,v=1.0,normalize=False):
 def commensurate_potential(g,k=1,amplitude=0.0,average=0.0,**kwargs):
     """Return a potential that is commensurate with
     the lattice"""
-    if g.dimensionality!=2: raise
-    a12 = g.a2.dot(g.a1)/(np.sqrt(g.a1.dot(g.a1))*np.sqrt(g.a1.dot(g.a1)))
-    if 0.49<abs(a12)<0.51: # angle is 60 degrees
-      angle = np.pi/3.
-      f = cnpot(n=6,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),
-              angle=angle,**kwargs)
+    if g.dimensionality==2:
+      a12 = g.a2.dot(g.a1)/(np.sqrt(g.a1.dot(g.a1))*np.sqrt(g.a1.dot(g.a1)))
+      if 0.49<abs(a12)<0.51: # angle is 60 degrees
+        angle = np.pi/3.
+        f = cnpot(n=6,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),
+                angle=angle,**kwargs)
+      elif abs(a12)<0.01: # square lattice
+        f = cnpot(n=4,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),
+                angle=0.0,**kwargs)
+      else: raise
+    elif g.dimensionality==1: 
+        raise # not imlemented
     else: raise
     f = enforce_amplitude(f,amplitude,g=g) # enforce the amplitude
     f = enforce_average(f,average,g=g) # enforce average
@@ -104,12 +110,6 @@ def tbgAA(g):
     rf = np.array([funr(ri) for ri in g.r])
     fint = interpolate2d(rf[:,0:2],d) # interpolation
     return lambda ri: fint(funr(ri))[0] 
-#    def f(ri):
-#        dr = rf[:,0:3] - funr(ri)[0:3]
-#        dr = np.sum(np.abs(dr),axis=1)
-#        i = np.argmin(dr)
-#        return d[i] # this one
-#    return f
 
 
 
