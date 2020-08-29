@@ -6,6 +6,8 @@ from . import filesystem as fs
 import signal
 import subprocess
 
+pickle.settings['recurse'] = True
+
 def pcall(fin,xs,time=10):
     """Run a parallel calculation with slurm"""
     n = len(xs) # number of calculations
