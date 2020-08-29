@@ -85,13 +85,15 @@ def multilayer(ti=0.3,dz=3.0):
       return 0.0 # else
     return fhop
 
-def phase_C3_matrix(*args,**kwargs):
-    f = phase_C3(*args,**kwargs)
+def entry2matrix(f):
     def fout(rs1,rs2):
-        return np.array([[f(r1,r2) for r1 in rs1] for r2 in rs2])
+        return np.array([[f(r1,r2) for r1 in rs1] for r2 in rs2]).T
     return fout
 
 
+def phase_C3_matrix(*args,**kwargs):
+    f = phase_C3(*args,**kwargs)
+    return entry2matrix(f) # return the matrix
 
 
 def phase_C3(g,phi=0.5,t=1.0):
@@ -157,6 +159,22 @@ def distance_hopping_matrix_jit(r1,r2,vs,ds2,out):
 
 
 
+def strained_hopping(g,t=1.0,dt=0.0,f=None,**kwargs):
+    """Return first neighbor hoppings with strain"""
+    if f is None: # no function provided
+        from . import potentials
+        f = potentials.commensurate_potential(g,average=t,amplitude=dt,
+                **kwargs)
+    def fout(r1,r2):
+        dr = r1-r2
+        dr2 = dr.dot(dr)
+        if .9<dr2<1.1: return f((r1+r2)/2.)
+        else: return 0.0
+    return fout
 
+
+def strained_hopping_matrix(*args,**kwargs):
+    f = strained_hopping(*args,**kwargs)
+    return entry2matrix(f) # return the matrix
 
 
