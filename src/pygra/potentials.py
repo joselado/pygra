@@ -138,8 +138,8 @@ def enforce_amplitude(f,a,g=None):
     """Normalize the average value of a function for the geometry"""
     if g is None: raise
     vs = [f(ri) for ri in g.r] 
-    minv = np,min(vs)
-    maxv = np,max(vs)
+    minv = np.min(vs)
+    maxv = np.max(vs)
     dv = maxv-minv # amplitude
     def fout(r):
         return f(r)*a/dv # return this value
