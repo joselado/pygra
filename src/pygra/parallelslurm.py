@@ -38,7 +38,7 @@ def pcall(fin,xs,time=10):
     open(pfolder+"/run.py","w").write(main) # write script
     hours = str(int(time)) # hours
     mins = int((time-int(time))*60)
-    mins = str(max[mins,1]) # at least 1 minute
+    mins = str(max([mins,1])) # at least 1 minute
     runsh = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -t "+str(int(time))+":"+str(mins)+":00\n"
     runsh += "#SBATCH --mem-per-cpu=5000\n"
     runsh += "#SBATCH --array=0-"+str(n-1)+"\n"
