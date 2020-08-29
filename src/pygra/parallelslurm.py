@@ -45,8 +45,10 @@ def pcall(fin,xs,time=10):
     open(pfolder+"/run.sh","w").write(runsh) # parallel file
     pwd = os.getcwd() # current directory 
     os.chdir(pfolder) # go to the folder
-    os.system("sbatch run.sh >> run.out") # run calculation
-#    out,err = subprocess.Popen(["sbatch","run.sh"],stdout=subprocess.PIPE).communicate()
+#    os.system("sbatch run.sh >> run.out") # run calculation
+    out,err = subprocess.Popen(["sbatch","run.sh"],stdout=subprocess.PIPE).communicate()
+    job = job_number(out) # job number
+    jobkill(job) # kill the job if exiting
     os.chdir(pwd) # back to main
     import time
     from os import path
@@ -67,6 +69,19 @@ def pcall(fin,xs,time=10):
 
 
 
+def job_number(out):
+    """Get the job number"""
+    out = str(out)
+    out = out.split("job")[1]
+    out = out.split("\\n")[0]
+    return int(out) # return the job
 
+
+def jobkill(n):
+    """Kill the job when the program is killed"""
+    def killf(*args):
+      subprocess.Popen(["scancel",str(n)],stdout=subprocess.PIPE).communicate()
+    signal.signal(signal.SIGINT, killf)
+    signal.signal(signal.SIGTERM, killf)
 
 
