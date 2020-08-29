@@ -17,7 +17,7 @@ def pcall(fin,xs,batch_size=1,**kwargs):
         for i in range(len(xs)):
             o.append(xs[i]) # store
             if i%batch_size==0: # reached the limit
-                xsn.appen(o) # store
+                xsn.append(o) # store
                 o = [] # reset
         def fnew(y): return [fin(x) for x in y] # call this batch
         outs = pcall_single(fnew,xsn,**kwargs) # call the inputs
