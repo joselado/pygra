@@ -36,7 +36,9 @@ def pcall(fin,xs,time=10):
     pickle.dump(f,open(pfolder+"/function.obj","wb")) # write function
     pickle.dump(xs,open(pfolder+"/array.obj","wb")) # write object
     open(pfolder+"/run.py","w").write(main) # write script
-    runsh = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -t "+str(int(time))+":00:00\n"
+    hours = str(int(time)) # hours
+    mins = str(int((time-int(time))*60))
+    runsh = "#!/bin/bash\n#SBATCH -n 1\n#SBATCH -t "+str(int(time))+":"+str(mins)+":00\n"
     runsh += "#SBATCH --mem-per-cpu=5000\n"
     runsh += "#SBATCH --array=0-"+str(n-1)+"\n"
     runsh += "srun python run.py\n"
