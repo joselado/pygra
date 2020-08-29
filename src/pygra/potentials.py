@@ -48,7 +48,7 @@ def commensurate_potential(g,k=1,amplitude=0.0,average=0.0,**kwargs):
               angle=angle,**kwargs)
     else: raise
     f = enforce_amplitude(f,amplitude,g=g) # enforce the amplitude
-    f = enforce_average(f,amplitude,g=g) # enforce average
+    f = enforce_average(f,average,g=g) # enforce average
     return f
 
 
