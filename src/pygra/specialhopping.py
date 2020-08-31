@@ -124,8 +124,9 @@ def phase_C3(g,phi=0.5,t=1.0):
 
 def neighbor_hopping_matrix(g,vs):
     """Return a hopping matrix for the N first neighbors"""
-    ds = g.neighbor_distances() # get the different distances
+    ds = g.neighbor_distances(n=len(vs)) # get the different distances
     ds = ds[0:len(vs)] # take only these
+    print(ds)
     return distance_hopping_matrix(vs,ds)
 
 

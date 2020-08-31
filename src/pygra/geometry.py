@@ -117,7 +117,7 @@ class Geometry:
     self.z = r[2]
   def get_hamiltonian(self,fun=None,has_spin=True,
                         is_sparse=False,spinful_generator=False,
-                        is_multicell=False,mgenerator=None):
+                        is_multicell=False,mgenerator=None,**kwargs):
     """ Create the hamiltonian for this geometry"""
     if self.dimensionality==3: is_multicell=True
     from .hamiltonians import hamiltonian
@@ -143,7 +143,7 @@ class Geometry:
       elif h.dimensionality==3:
         if mgenerator is not None: raise # not implemented
         from .multicell import parametric_hopping_hamiltonian
-        h = parametric_hopping_hamiltonian(h,fc=fun) # add hopping
+        h = parametric_hopping_hamiltonian(h,fc=fun,**kwargs) # add hopping
     if not is_sparse: h.turn_dense() # dense Hamiltonian
     return h # return the object
   def write(self,**kwargs):
@@ -233,7 +233,7 @@ class Geometry:
           return max([1,n])
   def write_profile(self,d,**kwargs):
       """Write a profile in a file"""
-      write_profile(self,np.array(d),**kwargs)
+      write_profile(self,d,**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
@@ -1539,6 +1539,7 @@ def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
   """Write a certain profile in a file"""
   if g.dimensionality == 0: nrep = 1
   if callable(d): d = np.array([d(ri) for ri in g.r]) # call
+  else: d = np.array(d)
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   if normal_order:
@@ -1675,8 +1676,9 @@ def sum_geometries(g1,g2):
         raise
 
 
-def neighbor_distances(g,nsuper=2):
+def neighbor_distances(g,n=4):
     """Return distances to neighbors"""
+    nsuper = max([n//len(g.r)+3,3])
     g = g.supercell(nsuper) # create supercell
     r = g.r # positions
     n = len(r)

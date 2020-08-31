@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 from scipy.sparse import csc_matrix,bmat
 from numba import jit
+from . import algebra
 
 
 minimum_hopping = 1e-3
@@ -164,15 +165,12 @@ def generate_parametric_hopping(h,f=None,mgenerator=None,
   else: raise
   # check that the sparse mde is set ok
   if is_sparse and type(h.intra)==type(np.matrix([[]])):
-    print("Matrices should be sparse, fixing")
     h.is_sparse = False
     h.turn_sparse() # turn the matrix sparse
   if not is_sparse and type(h.intra)!=type(np.matrix([[]])):
-    print("Matrices should be dense, fixing",type(h.intra),type(np.matrix))
     h.is_sparse = True
     h.turn_dense() # turn the matrix sparse
   if has_spin: # Hamiltonian should be spinful
-    print("Adding spin degree of freedom")
     h.has_spin = False
     h.turn_spinful()
   return h
