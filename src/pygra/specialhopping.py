@@ -26,7 +26,6 @@ def twisted(cutoff=5.0,ti=0.3,lambi=8.0,
     r = np.sqrt(rr)
 #    if r2>100.0: return 0.0 # too far
     if (r-1.0)<-0.1: 
-      print(r)
       raise
     out = -(dx*dx + dy*dy)/rr*np.exp(-lamb*(r-1.0))*np.exp(-lambz*dz*dz)
     out += -ti*(dz*dz)/rr*np.exp(-lambi*(r-dl))
@@ -126,7 +125,6 @@ def neighbor_hopping_matrix(g,vs):
     """Return a hopping matrix for the N first neighbors"""
     ds = g.neighbor_distances(n=len(vs)) # get the different distances
     ds = ds[0:len(vs)] # take only these
-    print(ds)
     return distance_hopping_matrix(vs,ds)
 
 
