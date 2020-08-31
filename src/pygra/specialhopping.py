@@ -95,7 +95,7 @@ def phase_C3_matrix(*args,**kwargs):
     return entry2matrix(f) # return the matrix
 
 
-def phase_C3(g,phi=0.5,t=1.0):
+def phase_C3(g,phi=0.5,t=1.0,d=1.0):
     """Create a fucntion that computes hoppings that alternate
     between +\phi and -\phi every 60 degrees"""
     if len(g.r)==1:
@@ -110,11 +110,11 @@ def phase_C3(g,phi=0.5,t=1.0):
     def fun(r1,r2):
         """Function to compute hoppings"""
         dr = r1-r2
-        if 0.99<dr.dot(dr)<1.01: # first neighbors
+        if (d-0.01)<dr.dot(dr)<(d+0.01): # first neighbors
             zi = dr[0]+1j*dr[1]
             for zj in zs: # one of the three directions
-                d = np.abs(zi/zj-1.0)
-                if d<1e-2: 
+                dd = np.abs(zi/zj-1.0)
+                if dd<1e-2: 
                     return t*np.exp(1j*phi*np.pi)
             else: return np.exp(-1j*phi*np.pi)
         return 0.0
