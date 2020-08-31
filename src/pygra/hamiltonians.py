@@ -56,6 +56,10 @@ class Hamiltonian():
     return get_spinful2full(self)(m) # return
   def kchain(self,k=0.):
     return kchain(self,k)
+  def get_fermi_surface(self,**kwargs):
+      return spectrum.fermi_surface(self,**kwargs)
+  def get_multi_fermi_surface(self,**kwargs):
+      return spectrum.multi_fermi_surface(self,**kwargs)
   def get_eigenvectors(self,**kwargs):
       from .htk.eigenvectors import get_eigenvectors
       return get_eigenvectors(self,**kwargs)

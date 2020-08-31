@@ -15,7 +15,7 @@ arpack_maxiter = 10000
 
 def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
                     energies=[0.0],nk=50,nsuper=1,reciprocal=True,
-                    delta=None,refine_delta=1.0,operator=None,
+                    delta=1e-2,refine_delta=1.0,operator=None,
                     numw=20,info=True):
   """Calculates the Fermi surface of a 2d system"""
   energies = np.array(energies) # convert to array

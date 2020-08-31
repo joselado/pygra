@@ -61,8 +61,8 @@ def NbSe2(soc=0.0):
     """Return the Hamiltonian of NbSe2"""
     g = geometry.triangular_lattice()  # triangular lattice
 #    ts = np.array([86.8,139.9,29.6,3.5,3.3])
-    ts = np.array([46.,257.5,4.4,-15,6])
-    ts = np.array([-0.2,1.,0.,0.,0.])
+#    ts = np.array([46.,257.5,4.4,-15,6])
+    ts = np.array([0.1,1.,0.,0.,0.])
     t = ts[0]/np.max(ts) # 1NN 
 #    ts[0] = 0.0 # set to zero
     ts = ts/np.max(ts) # normalize
@@ -73,7 +73,7 @@ def NbSe2(soc=0.0):
     if soc!=0.0:
       hsoc = valence_TMDC(g=h.geometry,soc=soc) # hamiltonian with SOC
       h = h + t*hsoc # add the two Hamiltonians
-    h.set_filling(.5)
+    h.set_filling(.5,nk=20)
 #    h = h.supercell(4)
 #    m = np.array(h.intra.todense()).reshape(h.intra.shape[0]**2)
     return h
