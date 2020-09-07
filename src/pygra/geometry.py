@@ -158,12 +158,18 @@ class Geometry:
   def copy(self):
       """Copy the geometry"""
       return deepcopy(self)
+  def set_origin(self,r=None):
+      if r is None: r = self.r[self.get_central()[0]]
+      self.x = self.x - r[0]
+      self.y = self.y - r[1]
+      self.z = self.z - r[2]
+      self.xyz2r() # update r
   def center(self):
-    """ Centers the geometry in (0,0,0)"""
-    self.x = self.x - sum(self.x)/len(self.x)
-    self.y = self.y - sum(self.y)/len(self.y)
-    self.z = self.z - sum(self.z)/len(self.z)
-    self.xyz2r() # update r
+      """ Centers the geometry in (0,0,0)"""
+      self.x = self.x - sum(self.x)/len(self.x)
+      self.y = self.y - sum(self.y)/len(self.y)
+      self.z = self.z - sum(self.z)/len(self.z)
+      self.xyz2r() # update r
   def get_lattice_name(self):
     if self.dimensionality==2:
       if np.abs(self.a1.dot(self.a2))<0.0001:        
