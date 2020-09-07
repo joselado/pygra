@@ -74,13 +74,13 @@ def NbSe2(soc=0.0,cdw=0.0):
         h.turn_spinful() # turn spinful
         d = g.neighbor_distances()[1]
         d = 1.0
-        print(d)
         hsoc = valence_TMDC(g=h.geometry,soc=soc,d=d) # hamiltonian with SOC
         h = h + t*hsoc # add the two Hamiltonians
     if cdw!=0.0: # add the CDW
         h = h.supercell(3) # create a supercell
         from . import potentials
-        f = potentials.commensurate_potential(h.geometry,amplitude=cdw)
+        f = potentials.commensurate_potential(h.geometry,amplitude=cdw,k=3.5)
+        h.geometry.write_profile(f)
         h.add_onsite(f)
     h.set_filling(.5)
 #    h = h.supercell(4)
