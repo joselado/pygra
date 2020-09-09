@@ -7,7 +7,9 @@ class Potential():
         if type(f)==Potential: self.f = f.f # store function
         elif callable(f): self.f = f # store function
         elif isnumber(f): self.f = lambda r: f # store function
-        else: raise
+        else: 
+            print("Unrecognized potential",f)
+            raise
     def __add__(self,a):
         a = Potential(a)
         g = lambda r: self.f(r) + a.f(r)
@@ -16,7 +18,7 @@ class Potential():
         a = Potential(a)
         g = lambda r: self.f(r)*a.f(r)
         return Potential(g)
-    def __rmul__(self,a): self*a
+    def __rmul__(self,a): return self*a
     def __neg__(self): return (-1)*self
     def __sub__(self,a): return self + (-1)*a
     def __rsub__(self,a): return self + (-1)*a
@@ -80,7 +82,9 @@ def commensurate_potential(g,k=1,amplitude=1.0,n=None,
     f = enforce_amplitude(f,amplitude,g=g) # enforce the amplitude
     f = enforce_average(f,average,g=g) # enforce average
     if minmax is not None: f = enforce_minmax(f,minmax,g=g) # enforce minmax
-    return Potential(f)
+    f = Potential(f)
+    print(f)
+    return f
 
 
 
@@ -179,8 +183,7 @@ def enforce_minmax(f,a,g=None):
     minv = np.min(vs)
     maxv = np.max(vs)
     dv = maxv-minv # amplitude
-    def fout(r):
-        return (f(r)-minv)*a[1]/dv + a[0] # return this value
+    fout = lambda r: (f(r)-minv)*a[1]/dv + a[0] # return this value
     return fout # return new function
 
 
