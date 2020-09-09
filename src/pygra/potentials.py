@@ -83,7 +83,6 @@ def commensurate_potential(g,k=1,amplitude=1.0,n=None,
     f = enforce_average(f,average,g=g) # enforce average
     if minmax is not None: f = enforce_minmax(f,minmax,g=g) # enforce minmax
     f = Potential(f)
-    print(f)
     return f
 
 
