@@ -19,6 +19,7 @@ from . import algebra
 from . import groundstate
 from . import rotate_spin
 from . import topology
+from . import ldos
 from . import increase_hilbert
 from .algebratk import hamiltonianalgebra
 from .bandstructure import get_bands_nd
@@ -312,6 +313,8 @@ class Hamiltonian():
       for t in self.hopping: hop[tuple(np.array(t.dir))] = t.m
       for t in self.hopping: hop[tuple(-np.array(t.dir))] = np.conjugate(t.m).T
       return hop # return dictionary
+  def get_multildos(self,**kwargs):
+      return ldos.multi_ldos(self,**kwargs)
   def get_multihopping(self):
       """Return a multihopping object"""
       from .multihopping import MultiHopping
