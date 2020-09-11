@@ -56,10 +56,10 @@ class Geometry:
   def plot_geometry(self):
     """Plots the system"""
     return plot_geometry(self)
-  def get_kmesh(self,nk=10):
+  def get_kmesh(self,**kwargs):
       """Return the k-mesh"""
       from . import klist
-      return klist.kmesh(self.dimensionality,nk=nk)
+      return klist.kmesh(self.dimensionality,**kwargs)
   def set_finite(self,periodic=False):
     """ Transfrom the geometry into a finite system"""
     if periodic:

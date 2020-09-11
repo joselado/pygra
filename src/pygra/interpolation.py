@@ -42,3 +42,13 @@ def interpolator2d(x,y,z):
   return f
 
 
+
+def interpolator2d(x,y,z):
+    from scipy.interpolate import griddata
+    from scipy.interpolate import NearestNDInterpolator
+    return NearestNDInterpolator(np.array([x,y]).T,z)
+    def f(p):
+
+        return griddata((x,y), z,p, method='nearest')
+    return f
+
