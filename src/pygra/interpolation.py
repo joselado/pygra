@@ -43,12 +43,21 @@ def interpolator2d(x,y,z):
 
 
 
-def interpolator2d(x,y,z):
+def interpolator2d(x,y,z,mode=None):
     from scipy.interpolate import griddata
     from scipy.interpolate import NearestNDInterpolator
-    return NearestNDInterpolator(np.array([x,y]).T,z)
     def f(p):
-
         return griddata((x,y), z,p, method='nearest')
-    return f
+    if mode is None: return f
+    elif mode=="periodic":
+        def f0(k):
+            """Define a periodic function"""
+            k = k[:,0:2]%1.
+            return f(k)
+        return f0
+    else: raise
+
+
+
+
 

@@ -116,7 +116,7 @@ class Hamiltonian():
       return symmetry.has_time_reversal_symmetry(self)
   def get_qpi(self,**kwargs):
       from .chitk import qpi
-      return qpi.poor_man_qpi(self,**kwargs)
+      return qpi.get_qpi(self,**kwargs)
   def get_ldos(self,**kwargs):
       from . import ldos
       return ldos.ldos(self,**kwargs)
