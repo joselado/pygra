@@ -3,8 +3,13 @@ from numba import jit
 import os
 from .. import filesystem as fs
 
-def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
-        ratomic=1.5,dr=0.2,**kwargs):
+
+
+
+
+
+def ldos_generator(h,delta=0.05,nrep=1,nk=20,dl=None,
+        ratomic=1.5,dr=0.2,num_bands=None,**kwargs):
     """Compute the LDOS at different eenrgies, and add an envelop atomic
     orbital"""
     h = h.copy() # copy the Hamiltonian
@@ -15,8 +20,10 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
             dr2 = np.sum(dr*dr,axis=1) # sum
             return np.exp(-np.sqrt(dr2)/ratomic)
         return f # return the wavefunction
-    evals,vs,ks = h.get_eigenvectors(nk=nk,kpoints=True) # compute wavefunctions
-    dl = h.geometry.neighbor_directions(nrep+int(ratomic)*10) # directions of the neighbors
+    evals,vs,ks = h.get_eigenvectors(nk=nk,kpoints=True,
+            numw=num_bands) # compute wavefunctions
+    if dl is None: dl = [[0,0,0]]
+    else: dl = h.geometry.neighbor_directions(nrep+int(ratomic)*10) # directions of the neighbors
     # generate a dictionary with all the real space local orbitals
     ##########################################################
     lodict = dict() # dictionary for the local orbitals
@@ -49,6 +56,23 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
         k = ks[i] # get the current bloch wavevector
         d = get_real_space_density(w,k,dl,lodict,h.geometry)
         ds[i] = d # store in the list
+    def f(e):
+        return ldos_at_energy(evals,ds,e,delta) # compute the LDOS
+    return f,evals,x,y # return generator
+
+
+def get_ldos(h,e=0.0,delta=0.05,**kwargs):
+    """Compute a single LDOS"""
+    ldos_gen,evals,x,y = ldos_generator(h,delta=delta,**kwargs) 
+    out = ldos_gen(e) # compute the LDOS
+    np.savetxt("LDOS.OUT",np.array([x,y,out]).T) # save
+    return x,y,out
+
+
+def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,**kwargs):
+    """Compute the LDOS at different eenrgies, and add an envelop atomic
+    orbital"""
+    ldos_gen,evals,x,y = ldos_generator(h,delta=delta,**kwargs) # get the generator
     # now compute all the LDOS
     fs.rmdir("MULTILDOS")
     fs.mkdir("MULTILDOS")
@@ -56,7 +80,7 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
     for e in es: # loop over energies
         name0 = "LDOS_"+str(e)+"_.OUT" # name of the output
         name = "MULTILDOS/" + name0
-        out = ldos_at_energy(evals,ds,e,delta) # compute the LDOS
+        out = ldos_gen(e) # compute the LDOS
         np.savetxt(name,np.array([x,y,out]).T) # save
         fo.write(name0+"\n") # name of the file
     fo.close()
