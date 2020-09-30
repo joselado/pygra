@@ -3,8 +3,8 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 
 from pygra import islands
 import numpy as np
-g = islands.get_geometry(name="honeycomb",n=2,nedges=3,rot=0.0) # get an island
+g = islands.get_geometry(name="honeycomb",n=4,nedges=3,rot=0.0) # get an island
 # maximum distance to the origin
 h = g.get_hamiltonian(has_spin=False) # get the Hamiltonian
 #h.get_multildos(projection="atomic")
-h.get_ldos(projection="atomic",e=-0.4)
+h.get_multildos(projection="atomic")
