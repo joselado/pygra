@@ -178,9 +178,10 @@ def indirect_gap(h,robust=True,**kwargs):
     from scipy.optimize import differential_evolution
     from scipy.optimize import minimize
     bounds = [(0.,1.) for i in range(h.dimensionality)]
-    x0 = np.random.random(h.dimensionality) # inital vector
     if robust: res = differential_evolution(f,bounds=bounds,**kwargs)
-    else: res = minimize(f,x0,method="Powell",bounds=bounds,**kwargs)
+    else: 
+        x0 = np.random.random(h.dimensionality) # inital vector
+        res = minimize(f,x0,method="Powell",bounds=bounds,**kwargs)
     return f(res.x)
   ev = opte(funv) # optimize valence band
 #  return ev
