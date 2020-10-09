@@ -332,7 +332,7 @@ def z2_invariant(h,nk=20,nt=20,nocc=None):
 
 def chern(h,**kwargs):
   """Compute Chern invariant with the pumping of Wannier centers"""
-  return int(np.round(mesh_chern(h,**kwargs),1)) # worksround
+  return mesh_chern(h,**kwargs) # workaround
   # the wannier winding does not work
   c = wannier_winding(h,full=True,**kwargs) 
   open("CHERN.OUT","w").write(str(c))

@@ -76,6 +76,8 @@ class Hamiltonian():
       """Transform a 1D array in the full space to the spatial basis"""
       from .htk.matrixcomponent import full2profile
       return full2profile(self,x,**kwargs)
+  def get_chern(h,**kwargs):
+      return topology.chern(h,**kwargs)
   def get_hopping_dict(self):
       """Return the dictionary with the hoppings"""
       return multicell.get_hopping_dict(self)
