@@ -145,7 +145,7 @@ def optimize_gap(h,direct=True,ntries=10):
 
 
 
-def indirect_gap(h,robust=True):
+def indirect_gap(h,robust=True,**kwargs):
   """Calculates the gap for a 2d Hamiltonian by doing
   a kmesh sampling. It will return the positive energy with smallest value"""
   from scipy.optimize import minimize
@@ -179,8 +179,8 @@ def indirect_gap(h,robust=True):
     from scipy.optimize import minimize
     bounds = [(0.,1.) for i in range(h.dimensionality)]
     x0 = np.random.random(h.dimensionality) # inital vector
-    if robust: res = differential_evolution(f,bounds=bounds)
-    else: res = minimize(f,x0,method="Powell")
+    if robust: res = differential_evolution(f,bounds=bounds,**kwargs)
+    else: res = minimize(f,x0,method="Powell",bounds=bounds,**kwargs)
     return f(res.x)
   ev = opte(funv) # optimize valence band
 #  return ev
