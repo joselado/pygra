@@ -28,6 +28,9 @@ class Potential():
         return self.f(r)
     def normalize(self):
         return Potential(enforce_minmax(self,[0.,1.],g=self.g),g=self.g)
+    def set_average(self,average):
+        out = enforce_average(self,average,g=self.g)
+        return Potential(out,g=self.g)
 
 
 
