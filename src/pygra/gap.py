@@ -148,6 +148,9 @@ def optimize_gap(h,direct=True,ntries=10):
 def indirect_gap(h,robust=True,**kwargs):
   """Calculates the gap for a 2d Hamiltonian by doing
   a kmesh sampling. It will return the positive energy with smallest value"""
+  if h.intra.shape[0]>30:
+      h = h.copy()
+      h.turn_sparse() # sparse Hamiltonian
   from scipy.optimize import minimize
   hk_gen = h.get_hk_gen() # generator
   def gete(k): # return the energies

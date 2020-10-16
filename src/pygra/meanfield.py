@@ -472,3 +472,5 @@ from .selfconsistency import densitydensity
 
 hubbardscf = densitydensity.hubbard
 Vinteraction = densitydensity.Vinteraction
+
+from .selfconsistency.potentials import keldysh

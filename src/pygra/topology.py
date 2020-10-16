@@ -229,7 +229,7 @@ def mesh_chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
     fo.write(str(b)+"\n")
   fo.close() # close file
   ################
-  c = sum(bs) # sum berry curvatures
+  c = np.sum(bs) # sum berry curvatures
   c = c/(2.*np.pi*nk*nk)
   open("CHERN.OUT","w").write(str(c)+"\n")
   return c

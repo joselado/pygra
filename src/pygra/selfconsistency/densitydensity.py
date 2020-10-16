@@ -474,7 +474,7 @@ def hubbard(h,U=1.0,**kwargs):
 
 
 def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
-        constrains=[],**kwargs):
+        constrains=[],Vr=None,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
@@ -484,6 +484,10 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
     mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.,V3/2.],nd[0:3])
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             mgenerator=mgenerator) 
+    if Vr is not None:
+      hv1 = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
+              fun=Vr)
+      hv = hv + hv1 # add the two Hamiltonians
     v = hv.get_hopping_dict() # hopping dictionary
     U = obj2geometryarray(U,h.geometry) # convert to array
     if h.has_spin: #raise # not implemented

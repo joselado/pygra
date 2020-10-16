@@ -332,7 +332,7 @@ def multi_ldos(h,projection="TB",**kwargs):
 
 
 def multi_ldos_tb(h,es=np.linspace(-1.0,1.0,100),delta=0.01,
-        nrep=3,nk=100,numw=3,
+        nrep=3,nk=100,num_bands=20,
         random=False,op=None,**kwargs):
   """Calculate many LDOS, by diagonalizing the Hamiltonian"""
   print("Calculating eigenvectors in LDOS")
@@ -350,7 +350,7 @@ def multi_ldos_tb(h,es=np.linspace(-1.0,1.0,100),delta=0.01,
       if random:
         k = np.random.random(3) # random vector
         print("RANDOM vector in LDOS")
-      e,w = smalleig(hk(k),numw=numw,evecs=True)
+      e,w = smalleig(hk(k),numw=num_bands,evecs=True)
       evals += [ie for ie in e]
       ws += [iw for iw in w]
       ps += [op(iw,k=k) for iw in w] # weights
