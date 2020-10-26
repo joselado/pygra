@@ -15,7 +15,7 @@ def keldysh(v0=1.0,alpha=1.0,rcut=10.):
     
     fint = interp1d(rs,vr,fill_value=0.0,bounds_error=False)
 #    return fint
-    def fout(r1,r2):
+    def fout(r1,r2=np.array([0.,0.,0.])):
         dr = r1-r2
         dr2 = dr.dot(dr)
         return fint(np.sqrt(dr2))
