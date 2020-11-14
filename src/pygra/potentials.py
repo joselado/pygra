@@ -15,6 +15,9 @@ class Potential():
         a = Potential(a)
         g = lambda r: self.f(r) + a.f(r)
         return Potential(g,g=self.g)
+    def redefine(self,f):
+        g = lambda r: f(self.f(r))
+        return Potential(g,g=self.g)
     def __mul__(self,a):
         a = Potential(a)
         g = lambda r: self.f(r)*a.f(r)

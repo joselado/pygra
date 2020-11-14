@@ -13,7 +13,7 @@ op = h.get_operator("valley",projector=True) # valley operator
 # if you want to use your custom operator, it should be of the form
 # def fun(A,k=[0.,0.,0.]): return A@Op(k)
 # where Op(k) is the k-dependent operator that you want
-# afterwards, redefine your oprator as
+# afterwards, redefine your operator as
 # op = operators.Operator(fun) 
 
 
