@@ -129,20 +129,6 @@ def optimize_gap(h,direct=True,ntries=10):
   for r in rs: # loop over gaps
     if r[0]==mg: return r # return minimum
 
-#
-#def closest_to_zero(h):
-#  """Returns the eigenvalue closest to zero energy,
-#     This is a simple way to calculate the gap for
-#     superconductors"""
-#  h = h.copy()
-#  h.turn_sparse() # sparse Hamiltonian
-#  hkgen = h.get_hk_gen() # get generator
-#
-
-  
-#  else: # indirect gap
-
-
 
 
 def indirect_gap(h,robust=True,**kwargs):
@@ -155,7 +141,7 @@ def indirect_gap(h,robust=True,**kwargs):
   hk_gen = h.get_hk_gen() # generator
   def gete(k): # return the energies
     hk = hk_gen(k) # Hamiltonian 
-    if h.is_sparse: es = algebra.smalleig(hk,numw=10) # sparse
+    if h.is_sparse: es = algebra.smalleig(hk,numw=3) # sparse
     else: es = algebra.eigvalsh(hk) # get eigenvalues
     return es # get the energies
   # We will assume that the chemical potential is at zero
@@ -188,7 +174,8 @@ def indirect_gap(h,robust=True,**kwargs):
     return f(res.x)
   ev = opte(funv) # optimize valence band
 #  return ev
-  ec = opte(func) # optimize conduction band
+  if h.has_eh: ec = ev # workaround for SC
+  else: ec = opte(func) # optimize conduction band
   return ec+ev # return result
 #  return np.min(gaps)
 
