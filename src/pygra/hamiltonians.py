@@ -70,6 +70,10 @@ class Hamiltonian():
   def get_filling(self,**kwargs):
       """Get the filling of a Hamiltonian at this energy"""
       return spectrum.get_filling(self,**kwargs) # eigenvalues
+  def project_interactions(self,**kwargs):
+      """Project interactions"""
+      from .interactions.vijkl import Vijkl
+      return Vijkl(self,**kwargs)
   def reduce(self):
       return hamiltonianmode.reduce_hamiltonian(self)
   def full2profile(self,x,**kwargs):
