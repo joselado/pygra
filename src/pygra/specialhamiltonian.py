@@ -98,6 +98,20 @@ def NbSe2(soc=0.0,cdw=0.0,g=None):
 
 
 
+def triangular_pi_flux(g=None,**kwargs):
+    """Return a pi-flux Hamiltonian"""
+    raise # this does not work yet
+    if g is None: # no geometry given
+        g = geometry.triangular_lattice() # geometry of a traingular lattice
+    g = g.supercell((1,2)) # create a supercell with 2 atoms
+    h = g.get_hamiltonian(**kwargs) # return the Hamiltonian
+    h.add_peierls(1*np.pi*2./np.sqrt(3.)) # add the magnetic field
+    if h.has_time_reversal_symmetry(): pass
+    else: 
+        print("Something wrong happened in pi-flux")
+        raise
+    return h
+
 
 
 

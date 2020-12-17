@@ -119,6 +119,7 @@ class Hamiltonian():
       else: return hk_gen(self) # for normal cells
   def has_time_reversal_symmetry(self):
       """Check if a Hamiltonian has time reversal symmetry"""
+      from .htk import symmetry
       return symmetry.has_time_reversal_symmetry(self)
   def get_qpi(self,**kwargs):
       from .chitk import qpi
@@ -406,12 +407,12 @@ class Hamiltonian():
       """Add a crystal field term to the Hamiltonian"""
       from . import crystalfield
       crystalfield.hartree(self,v=v) 
-  def add_peierls(self,mag_field,new=False):
+  def add_peierls(self,mag_field,**kwargs):
       """
       Add magnetic field
       """
       from .peierls import add_peierls
-      add_peierls(self,mag_field=mag_field,new=new)
+      add_peierls(self,mag_field=mag_field,**kwargs)
   def add_inplane_bfield(self,**kwargs):
       """Add in-plane magnetic field"""
       from .peierls import add_inplane_bfield

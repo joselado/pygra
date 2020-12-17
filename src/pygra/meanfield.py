@@ -247,6 +247,13 @@ def guess(h,mode="ferro",fun=0.1):
       if h.has_spin: h0.add_zeeman([0.,fun,0.])
   elif mode=="ferroZ":
       if h.has_spin: h0.add_zeeman([0.,0.,fun])
+  elif mode=="randomXY":
+      def f(r):
+          m = [np.random.random()-0.5,np.random.random()-0.5,0.]
+          m = np.array(m)
+          return m/np.sqrt(m.dot(m))
+      if h.has_spin: h0.add_zeeman(f)
+      return h0.get_hopping_dict()
   elif mode=="random":
       dd = h.get_dict()
       for key in dd:
