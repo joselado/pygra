@@ -24,7 +24,7 @@ h.turn_spinful()
 from pygra import meanfield
 
 mf = meanfield.guess(h,"randomXY") # random initial guess in XY plane
-# if you want to restart a calculation, just uncomment the previous line
+# if you want to restart a calculation, just uncomment the mf=None line
 # that will force the code to pick the latest mean field from a file
 #mf = None
 scf = meanfield.hubbardscf(h,U=6.0,mf=mf,
