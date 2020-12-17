@@ -5,7 +5,9 @@ import numpy as np
 def anderson(h,w=0.0,p=1.0):
   """Return a Hamiltonian with Anderson disorder"""
   def fdis(r):
-      return (np.random.random() - .5)*2*w # disorder
+      if np.random.random()<p: # probability of an impurity
+        return (np.random.random() - .5)*2*w # disorder
+      return 0.0
   h.add_onsite(fdis)
   return h
 
