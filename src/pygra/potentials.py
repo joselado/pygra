@@ -197,7 +197,17 @@ def enforce_minmax(f,a,g=None):
 
 
 
+def array2potential(x,y,v):
+    """Given an initial xyz array, return a function
+    that interpolates over them"""
+    from .interpolation import interpolator2d
+    if len(v)!=len(x): raise
+    return Potential(interpolator2d(x,y,v))
 
+
+def object2potential(V,r=None):
+    """Transform a generic object into a callable potential"""
+    return V
 
 
 

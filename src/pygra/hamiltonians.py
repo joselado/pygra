@@ -152,8 +152,8 @@ class Hamiltonian():
       from . import gauge
       return gauge.to_canonical_gauge(self,m,k) # return the matrix
   def print_hamiltonian(self):
-    """Print hamiltonian on screen"""
-    print_hamiltonian(self)
+      """Print hamiltonian on screen"""
+      print_hamiltonian(self)
   def check_mode(self,n):
       """Verify the type of Hamiltonian"""
       return hamiltonianmode.check_mode(self,n)

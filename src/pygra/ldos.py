@@ -139,7 +139,7 @@ def ldos_arpack(intra,num_wf=10,robust=False,tol=0,e=0.0,delta=0.01):
 
 
 def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,
-        num_bands=None,k=None):
+        num_bands=None,k=None,delta_discard=None):
   """Calculate the DOS in a set of energies by full diagonalization"""
   es = np.array(es) # array with energies
   if num_bands is None:
@@ -150,6 +150,10 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,
   ds = [] # empty list
   if operator is None: weights = eig*0. + 1.0
   else: weights = [operator.braket(v,k=k) for v in eigvec.transpose()] # weights
+  if delta_discard is not None: # discard too far values
+      for i in range(len(weights)):
+          e = eig[i]
+          if abs(e)>delta_discard*delta: weights[i] = 0.0 # set to zero
   v2s = [(np.conjugate(v)*v).real for v in eigvec.transpose()]
   ds = [[0.0 for i in range(intra.shape[0])] for e in es] # initialize
   ds = ldos_waves_jit(np.array(es),
@@ -253,13 +257,26 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 def ldos_projector(h,e=0.0,**kwargs):
     """Return an operator to project onto that region"""
-    (x,y,d) = ldos(h,e=0.0,mode="arpack",silent=True,write=False,**kwargs)
+    (x,y,d) = ldos(h,e=e,mode="arpack",silent=True,write=False,**kwargs)
     inds = np.array(range(len(d))) # indexes
     n = len(d)
     d = d/np.sum(d) # normalize
     m = csc_matrix((d,(inds,inds)),shape=(n,n),dtype=np.complex) # matrix
     m = h.spinless2full(m) # to full matrix
     return operators.Operator(m) # convert to operator
+
+def ldos_density(h,**kwargs):
+    """Return a normalized profile with the DOS"""
+    (x,y,d) = ldos(h,mode="arpack",silent=True,write=False,**kwargs)
+    d = d/np.sum(d) # normalize
+    return d
+
+
+def ldos_potential(h,**kwargs):
+    """Return a function that evaluates an LDOS profile"""
+    return # not finished yet
+
+
 
 
 def get_ldos(h,projection="TB",**kwargs):
