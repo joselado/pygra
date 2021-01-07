@@ -285,7 +285,7 @@ def guess(h,mode="ferro",fun=0.1):
   elif mode in ["CDW","Charge density wave"]:
       if h.geometry.has_sublattice:
         h0.add_onsite(h.geometry.sublattice)
-      else: guess(h,mode="random",fun=0.0)
+      else: return 0.0 #guess(h,mode="random",fun=0.0)
   elif mode=="potential":
       h0.add_onsite(fun)
   elif mode=="antiferro":
@@ -449,7 +449,7 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
     return interactions
 
 
-def identify_symmetry_breaking(h0,h,as_string=False,tol=1e-5):
+def identify_symmetry_breaking(h0,h,as_string=False,tol=1e-3):
     """Given two Hamiltonians, identify what is the symmetry
     breaking between them"""
     dt0 = h0.get_multihopping() # first multihopping

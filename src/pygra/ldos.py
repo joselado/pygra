@@ -151,9 +151,10 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,
   if operator is None: weights = eig*0. + 1.0
   else: weights = [operator.braket(v,k=k) for v in eigvec.transpose()] # weights
   if delta_discard is not None: # discard too far values
+      ewin = [min(es)-delta_discard*delta,min(es)+delta_discard*delta]
       for i in range(len(weights)):
           e = eig[i]
-          if abs(e)>delta_discard*delta: weights[i] = 0.0 # set to zero
+          if not ewin[0]<e<ewin[1]: weights[i] = 0.0
   v2s = [(np.conjugate(v)*v).real for v in eigvec.transpose()]
   ds = [[0.0 for i in range(intra.shape[0])] for e in es] # initialize
   ds = ldos_waves_jit(np.array(es),

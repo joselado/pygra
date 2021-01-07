@@ -457,8 +457,8 @@ def hubbard(h,U=1.0,**kwargs):
     h = h.copy() # copy Hamiltonian
     h.turn_multicell() # multicell Hamiltonian
     U = utilities.obj2fun(U) # redefine as a function
+    n = len(h.geometry.r) # number of spinless sites
     if h.has_spin:
-      n = len(h.geometry.r) # number of spinless sites
       zero = np.zeros((2*n,2*n),dtype=np.complex)
       for i in range(n): zero[2*i,2*i+1] = U(i) # Hubbard interaction
     else: 

@@ -461,7 +461,7 @@ def get_filling(h,**kwargs):
         return spinless.get_filling(h,**kwargs)
     elif h.check_mode("spinful_nambu"): raise # spinful Nambu
     else:
-        es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
+        es = eigenvalues(h,**kwargs) # eigenvalues
         es = np.array(es)
         esf = es[es<0.0]
         return len(esf)/len(es) # return filling
@@ -486,4 +486,20 @@ def eigenvalues_kmesh(h,nk=20):
         ei = algebra.eigvalsh(hk) # get the energies
         es[i,j,:] = ei # store energies
     return es # return all the energies
+
+
+
+
+def lowest_energies(h,n=4,k=None,**kwargs):
+    """Return the lowest energy states in a k-point"""
+    if k is None: raise
+    es,ws = h.get_eigenvectors(kpoints=False,k=k,numw=2*n,**kwargs)
+    es = [y for (x,y) in sorted(zip(np.abs(es),es))][0:n]
+    es = np.sort(es)
+    return es
+
+
+
+
+
 

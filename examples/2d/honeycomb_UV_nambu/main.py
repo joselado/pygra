@@ -7,12 +7,13 @@ from pygra import geometry
 from scipy.sparse import csc_matrix
 from pygra import meanfield
 g = geometry.honeycomb_lattice()
-#g = geometry.kagome_lattice()
-filling = 0.5
 nk = 10
 h = g.get_hamiltonian(has_spin=True) # create hamiltonian of the system
+filling = 0.7 # filling of the system
+h.turn_nambu() # setup nambu degree of freedom
 mf = meanfield.guess(h,"random")
-scf = meanfield.Vinteraction(h,U=0.0,V1=4.0,nk=nk,filling=filling,mf=mf)
+scf = meanfield.Vinteraction(h,U=-3.0,V1=0.0,nk=nk,filling=filling,mf=mf,
+        verbose=1) # perform the SCF calculation
 from pygra import scftypes
 print("Symmetry breaking",scf.identify_symmetry_breaking()) 
-scf.hamiltonian.get_bands() # get the Hamiltonian
+scf.hamiltonian.get_bands(operator="electron",nk=2000) # get the Hamiltonian
