@@ -82,7 +82,7 @@ def bilayer_aa(h,t = 0.1):
 
 def add_electric_field(h,e = 0.0):
   """Adds electric field to the system"""
-  h.add_onsite(lambda r: return e*r[2])
+  h.add_onsite(lambda r: e*r[2])
   return h
 
 def multilayered_hamiltonian(h,dr=np.array([0.,0.,0.])):
