@@ -456,15 +456,15 @@ def hubbard(h,U=1.0,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.copy() # copy Hamiltonian
     h.turn_multicell() # multicell Hamiltonian
-    U = utilities.obj2fun(U) # redefine as a function
+    U = obj2geometryarray(U,h.geometry) # redefine as array 
     n = len(h.geometry.r) # number of spinless sites
     if h.has_spin:
       zero = np.zeros((2*n,2*n),dtype=np.complex)
-      for i in range(n): zero[2*i,2*i+1] = U(i) # Hubbard interaction
+      for i in range(n): zero[2*i,2*i+1] = U[i] # Hubbard interaction
     else: 
       zero = np.zeros((n,n),dtype=np.complex)
       n = len(h.geometry.r) # number of spinless sites
-      for i in range(n): zero[i,i] = U(i) # Hubbard interaction
+      for i in range(n): zero[i,i] = U[i] # Hubbard interaction
     v = dict() # dictionary
     v[(0,0,0)] = zero 
     if h.has_spin:
