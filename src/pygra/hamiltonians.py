@@ -67,6 +67,13 @@ class Hamiltonian():
   def modify_hamiltonian_matrices(self,f):
       """Modify all the matrices of a Hamiltonian"""
       modify_hamiltonian_matrices(self,f)
+  def remove_sites(self,store):
+      from . import sculpt
+      self.geometry = sculpt.remove_sites(self.geometry,store)
+      from .algebratk.matrixcrop import crop_matrix
+      if self.has_spin: raise
+      f = lambda m: crop_matrix(m,store)
+      self.modify_hamiltonian_matrices(f) # modify all the matrices
   def get_filling(self,**kwargs):
       """Get the filling of a Hamiltonian at this energy"""
       return spectrum.get_filling(self,**kwargs) # eigenvalues
@@ -103,6 +110,7 @@ class Hamiltonian():
     self.get_eh_sector = None # no function for getting electrons
     self.fermi_energy = 0.0 # fermi energy at zero
     self.dimensionality = 0 # dimensionality of the Hamiltonian
+    self.temperature = 0.0 # temperature of the Hamiltonian
     self.is_sparse = False
     self.is_multicell = False # for hamiltonians with hoppings to several neighbors
     self.hopping_dict = {} # hopping dictonary
