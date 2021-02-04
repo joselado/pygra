@@ -5,7 +5,7 @@ import numpy as np
 
 
 def NN_exchange(h,J=0.1,nk=2,num_bands=None,full_energy=False,
-        mode="supercell"):
+        mode="supercell",filling=None):
     """Compute the nearest neighbor exchange using
     a brute force algorithm"""
     if not full_energy:  nbands = num_bands # just the same method for energy
@@ -25,7 +25,7 @@ def NN_exchange(h,J=0.1,nk=2,num_bands=None,full_energy=False,
             hs1.add_zeeman(ds1) # add the Zeeman field
             e0 = hs0.get_total_energy(nk=nk,nbands=nbands) # GS energy 
             e1 = hs1.get_total_energy(nk=nk,nbands=nbands) # GS energy 
-            return e1-e0
+            return (e1-e0)/2.
         else: # spinless version
             hs0u = hs.copy()
             hs0d = hs.copy()
@@ -36,14 +36,15 @@ def NN_exchange(h,J=0.1,nk=2,num_bands=None,full_energy=False,
             hs1u.add_onsite(ds1)
             hs1d.add_onsite(-ds1)
             gete = lambda h0: h0.get_total_energy(nk=nk,nbands=nbands) 
-            return gete(hs1u) + gete(hs1d) - gete(hs0u) - gete(hs0d)
+            return (gete(hs1u) + gete(hs1d) - gete(hs0u) - gete(hs0d))/2.
     elif mode=="spiral": # spin spiral mode
         dm = J*np.array([d,0*d,0*d]).T # magnetizations
         h = h.copy() # copy Hamiltonian
         h.turn_spinful() # add spin
         h.add_zeeman(dm) # add magnetic field
-        h0 = h.copy()
-        h1 = h.copy()
+        if filling is not None: h.set_filling(filling,nk=nk) # set filling
+        h0 = h.copy() # get the ferro
+        h1 = h.copy() # get the AF
         h1.generate_spin_spiral(vector=[0,0,1],qspiral=[1,0,0])
         e0 = h0.get_total_energy(nk=nk,nbands=nbands) # GS energy 
         e1 = h1.get_total_energy(nk=nk,nbands=nbands) # GS energy 
