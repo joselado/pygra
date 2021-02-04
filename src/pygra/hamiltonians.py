@@ -211,10 +211,14 @@ class Hamiltonian():
     """ Creates a supercell of a one dimensional system"""
     if nsuper==1: return self
     if self.dimensionality==0: return self
-    elif self.dimensionality==1: ns = [nsuper,1,1]
-    elif self.dimensionality==2: ns = [nsuper,nsuper,1]
-    elif self.dimensionality==3: ns = [nsuper,nsuper,nsuper]
-    else: raise
+    try: 
+        nsuper[2] 
+        ns = nsuper # array as input
+    except:
+        if self.dimensionality==1: ns = [nsuper,1,1]
+        elif self.dimensionality==2: ns = [nsuper,nsuper,1]
+        elif self.dimensionality==3: ns = [nsuper,nsuper,nsuper]
+        else: raise
     return multicell.supercell_hamiltonian(self,nsuper=ns)
   def set_finite_system(self,periodic=True):
     """ Transforms the system into a finite system"""

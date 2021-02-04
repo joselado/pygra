@@ -292,10 +292,11 @@ def real_space_vev(h,operator=None,nk=1,nrep=3,name="REAL_SPACE_VEV.OUT",
 def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
         kp=None,mode="mesh",tol=1e-1):
   """Return the total energy"""
-  h.turn_dense()
+  if nbands is None: h.turn_dense()
   if h.is_sparse and not use_kpm: 
-    print("Sparse Hamiltonian but no bands given, taking 20")
-    nbands=20
+      if nbands is None:
+        print("Sparse Hamiltonian but no bands given, taking 20")
+        nbands=20
   f = h.get_hk_gen() # get generator
   etot = 0.0 # initialize
   iv = 0
@@ -305,7 +306,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
     if use_kpm: # Kernel polynomial method
       return kpm.total_energy(hk,scale=10.,ntries=20,npol=100) # using KPM
     else: # conventional diagonalization
-      if nbands is None: vv = lg.eigvalsh(hk) # diagonalize k hamiltonian
+      if nbands is None: vv = algebra.eigvalsh(hk) # diagonalize k hamiltonian
       else: 
           vv,aa = slg.eigsh(hk,k=4*nbands,which="LM",sigma=0.0) 
           vv = -np.sort(-(vv[vv<0.0])) # negative eigenvalues

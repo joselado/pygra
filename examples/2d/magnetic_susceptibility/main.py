@@ -8,7 +8,7 @@ h = g.get_hamiltonian(has_spin=True)
 h.turn_dense()
 #h.shift_fermi(1.5)
 h.set_filling(0.5,nk=20)
-from pygra import response
+from pygra import magneticresponse as response
 from pygra import parallel
 parallel.cores = 6
 response.magnetic_response_map(h,nk=20,nq=40,j=[0.5,0.,0.])
