@@ -342,6 +342,8 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         t0 = time.perf_counter() # time
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
+        if callback_mf is not None: # redefine mean-field if necessary
+            mf = callback_mf(mf) # callback for the mean field
         t1 = time.perf_counter() # time
         if verbose>1: print("Time in mixing",t1-t0)
         if verbose>0: print("ERROR in the SCF cycle",diff)
@@ -467,10 +469,15 @@ def hubbard(h,U=1.0,**kwargs):
       for i in range(n): zero[i,i] = U[i] # Hubbard interaction
     v = dict() # dictionary
     v[(0,0,0)] = zero 
+    def callback_mf(mf):
+        """Put the constrains in the mean field if necessary"""
+        mf = mfconstrains.enforce_constrains(mf,h,constrains)
+        return mf
     if h.has_spin:
-      return densitydensity(h,v=v,**kwargs)
+      return densitydensity(h,v=v,callback_mf=callback_mf,**kwargs)
     else:
-      return densitydensity(h,v=v,compute_cross=False,**kwargs)
+      return densitydensity(h,v=v,compute_cross=False,
+              callback_mf=callback_mf,**kwargs)
 
 
 def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,

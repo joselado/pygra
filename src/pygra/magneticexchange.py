@@ -41,7 +41,7 @@ def NN_exchange(h,J=0.1,nk=2,num_bands=None,full_energy=False,
         dm = J*np.array([d,0*d,0*d]).T # magnetizations
         h = h.copy() # copy Hamiltonian
         h.turn_spinful() # add spin
-        h.add_zeeman(dm) # add magnetic field
+        h.add_zeeman(dm) # add exchange field
         if filling is not None: h.set_filling(filling,nk=nk) # set filling
         h0 = h.copy() # get the ferro
         h1 = h.copy() # get the AF
@@ -49,6 +49,7 @@ def NN_exchange(h,J=0.1,nk=2,num_bands=None,full_energy=False,
         e0 = h0.get_total_energy(nk=nk,nbands=nbands) # GS energy 
         e1 = h1.get_total_energy(nk=nk,nbands=nbands) # GS energy 
         return e1-e0
+    else: raise # unrecognized mode
 
 
 

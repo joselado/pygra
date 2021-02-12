@@ -6,5 +6,5 @@ g = geometry.triangular_lattice()
 h = g.get_hamiltonian(has_spin=True)
 h.set_filling(0.05,nk=10)
 from pygra import magneticexchange
-J = magneticexchange.NN_exchange(h,nk=10,J=0.2,mode="spiral")
+J = magneticexchange.NN_exchange(h,nk=100,J=1,mode="spiral",filling=0.5)
 print("Exchange is",J)
