@@ -472,11 +472,13 @@ def get_dos(h,energies=np.linspace(-4.0,4.0,400),
         return dos_kmesh(h,energies=energies,**kwargs)
       elif mode=="Green": # Green function formalism
         def fun(e):
-            return green.green_operator(h,operator,e=e,**kwargs) 
+            return green.green_operator(h,e=e,**kwargs) 
         ds = parallel.pcall(fun,energies) # compute DOS with an operator
-        np.savetxt("DOS.OUT",np.matrix([energies,ds]).T) # write in a file
+        np.savetxt("DOS.OUT",np.array([energies,ds]).T) # write in a file
         return (energies,ds)
-      else: raise
+      else: 
+          print("Unrecognized option in DOS")
+          raise
 
 
 dos = get_dos # redefine
