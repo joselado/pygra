@@ -15,7 +15,7 @@ for U in Us: # loop over Us
   h = g.get_hamiltonian() # create hamiltonian of the system
   mf = meanfield.guess(h,mode="antiferro") # antiferro initialization
   # perform SCF with specialized routine for Hubbard
-  scf = meanfield.hubbardscf(h,nk=20,filling=0.5,U=U,
+  scf = meanfield.hubbardscf(h,nk=20,filling=0.5,U=U,verbose=1,
                 mix=0.9,mf=mf)
   # alternatively use
 #  scf = scftypes.selfconsistency(h,nkp=20,filling=0.5,g=U,

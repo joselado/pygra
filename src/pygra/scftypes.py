@@ -590,5 +590,5 @@ def plain_expectation_value(self):
 
 
 # workaround
-from meanfield import Vinteraction as selfconsistency
+from .meanfield import Vinteraction as selfconsistency
 

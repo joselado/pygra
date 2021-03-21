@@ -454,7 +454,7 @@ def densitydensity(h,filling=0.5,mu=None,verbose=0,**kwargs):
 
 
 
-def hubbard(h,U=1.0,**kwargs):
+def hubbard(h,U=1.0,constrains=[],**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.copy() # copy Hamiltonian
     h.turn_multicell() # multicell Hamiltonian
@@ -469,6 +469,7 @@ def hubbard(h,U=1.0,**kwargs):
       for i in range(n): zero[i,i] = U[i] # Hubbard interaction
     v = dict() # dictionary
     v[(0,0,0)] = zero 
+    from . import mfconstrains
     def callback_mf(mf):
         """Put the constrains in the mean field if necessary"""
         mf = mfconstrains.enforce_constrains(mf,h,constrains)

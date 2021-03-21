@@ -14,7 +14,6 @@ U = 3.0
 from pygra import scftypes
 from pygra import meanfield
 hubbard = meanfield.hubbardscf
-#hubbard = scftypes.hubbardscf
 filling = 0.5
 mf = meanfield.guess(h,mode="antiferro")
 scf = hubbard(h,nk=5,U=U,filling=filling,mf=mf,solver="plain",maxerror=1e-5,
