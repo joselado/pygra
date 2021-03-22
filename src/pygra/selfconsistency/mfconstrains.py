@@ -114,7 +114,13 @@ def enforce_constrains(mf,h,constrains=[]):
 
 
 
-
+def obj2mf(mf):
+    import collections
+    if isinstance(mf, collections.Hashable): return mf
+    else: 
+        out = dict()
+        out[(0,0,0)] = mf
+        return out
 
 
 
