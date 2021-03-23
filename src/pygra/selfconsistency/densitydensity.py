@@ -269,11 +269,8 @@ def get_dc_energy(v,dm):
     return out.real
 
 
-def obj2mf(a):
-    if type(a)==np.ndarray or type(a)==np.matrix:
-        return {(0,0,0):a}
-    else: return a
 
+from .mfconstrains import obj2mf
 
 mf_file = "MF.pkl" 
 
@@ -289,7 +286,7 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
     h1 = h0.copy() # initial Hamiltonian
     h1.turn_dense()
     h1.nk = nk # store the number of kpoints
-    if mf is None:
+    if mf is None: # no mean field given
       try: 
           if load_mf: mf = inout.load(mf_file) # load the file
           else: raise
