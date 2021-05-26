@@ -4,9 +4,9 @@ import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 import numpy as np
 from pygra import geometry,potentials
 
-g = geometry.triangular_lattice() # create the geometry pof the lattice
+g = geometry.triangular_lattice() # create the geometry of the lattice
 g = g.supercell(7) # create a supercell of a certain size
-J = potentials.commensurate_potential(g) # get this potential
+J = potentials.commensurate_potential(g) # get this potential (C3 symmetry)
 J = J.normalize() # set the value of the potential between 0 and 1 
 Delta = 1.0 - J # define the SC order as 1 - the exchange
 J = J*0.3 # reduce the strength of the exchange
