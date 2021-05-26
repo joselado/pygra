@@ -12,7 +12,7 @@ Delta = 1.0 - J # define the SC order as 1 - the exchange
 J = J*0.3 # reduce the strength of the exchange
 Delta = Delta*0.3 # reduce the strength of the SC order
 g.write_profile(J,nrep=2,name="EXCHANGE.OUT") # write the exchange in file
-g.write_profile(Delta,nrep=2,name="DELTA.OUT") # write the exchange in file
+g.write_profile(Delta,nrep=2,name="DELTA.OUT") # write the SC in file
 h = g.get_hamiltonian(has_spin=True) # get the Hamiltonian
 h.add_zeeman(J) # add exchange coupling
 h.add_swave(Delta) # add the SC order
