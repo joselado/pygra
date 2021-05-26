@@ -16,4 +16,4 @@ g.write_profile(Delta,nrep=2,name="DELTA.OUT") # write the exchange in file
 h = g.get_hamiltonian(has_spin=True) # get the Hamiltonian
 h.add_zeeman(J) # add exchange coupling
 h.add_swave(Delta) # add the SC order
-#h.get_bands()
+h.get_bands() # compute the bands
