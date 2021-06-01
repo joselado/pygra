@@ -170,7 +170,7 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
       k = np.array((R*r).T)[0] # change of basis
       hk = hk_gen(k) # get hamiltonian
       if not h.is_sparse: evals,waves = lg.eigh(hk) # eigenvalues
-      else: evals,waves = slg.eigsh(hk,k=max(nindex)*2,sigma=0.0,
+      else: evals,waves = slg.eigsh(hk,k=max(np.abs(nindex))*2,sigma=0.0,
              tol=arpack_tol,which="LM") # eigenvalues
       waves = waves.transpose() # transpose
       epos,wfpos = [],[] # positive
@@ -201,7 +201,7 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
         if i<0: # negative
           fo[j].write(str(eneg[abs(i)-1])+"\n")
           for op in operator: # loop over operators
-            c = braket_wAw(wfneg[abs(i)-1],op).real # expectation value
+            c = op.braket(wfpos[abs(i)-1]).real # expectation value
             fo[j].write(str(c)+"  ") # write in file
           fo[j].write("\n") # write in file
   [f.close() for f in fo] # close file
