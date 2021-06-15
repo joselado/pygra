@@ -16,7 +16,7 @@ U = -2.0
 mf = meanfield.guess(h,mode="random")
 mf = None
 h = h.get_multicell()
-scf = meanfield.Vinteraction(h,nk=4,U=U,filling=0.7,mf=mf,
+scf = meanfield.Vinteraction(h,nk=4,U=U,filling=0.7,mf=mf,verbose=1,
         constrains = ["no_normal_term"])
 h = scf.hamiltonian # get the Hamiltonian
 print(scf.identify_symmetry_breaking())
