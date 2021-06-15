@@ -32,7 +32,7 @@ def kfun_map(h,nk=50,
 
 
 def conduction_texture(h,n=2,**kwargs):
-    """Compute the spin texture in the valence band"""
+    """Compute the spin texture in the conduction band"""
     def fun(hk,O=None):
         """Function to call"""
         es,ws = lg.eigh(hk) # diagonalize

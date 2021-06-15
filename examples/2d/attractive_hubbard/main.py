@@ -14,6 +14,8 @@ U = -2.0
 #hubbard = scftypes.hubbardscf
 
 mf = meanfield.guess(h,mode="random")
+mf = None
+h = h.get_multicell()
 scf = meanfield.Vinteraction(h,nk=4,U=U,filling=0.7,mf=mf,
         constrains = ["no_normal_term"])
 h = scf.hamiltonian # get the Hamiltonian
