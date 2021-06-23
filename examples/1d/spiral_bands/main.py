@@ -1,3 +1,4 @@
+import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
 from pygra import geometry
 from pygra import scftypes
 import numpy as np
