@@ -21,7 +21,7 @@ for U in Us: # loop over Hubbard U
 
 import matplotlib.pyplot as plt
 
-plt.plot(Us,mz,marker="o",label="Site #1",c="red") 
+plt.plot(Us,mz,marker="o",c="red") 
 plt.legend()
 plt.xlabel("Hubbard U")
 plt.ylabel("Magnetic moment")
