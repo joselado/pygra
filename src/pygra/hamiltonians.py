@@ -36,7 +36,6 @@ from .htk import symmetry
 #import data
 
 from .limits import densedimension as maxmatrix
-#maxmatrix = 4000 # maximum dimension
 optimal = False
 
 class Hamiltonian():
