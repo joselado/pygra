@@ -49,10 +49,7 @@ class Hamiltonian():
     def __rmul__(self,h):  return hamiltonianalgebra.rmul(self,h)
     def __mul__(self,h):  return hamiltonianalgebra.mul(self,h)
     def __neg__(self):  return (-1)*self
-    def __sub__(self,a):
-        """Substraction method"""
-        return self + (-a)
-
+    def __sub__(self,a):  return self + (-a)
     def spinless2full(self,m,time_reversal=False):
       """Transform a spinless matrix in its full form"""
       return get_spinless2full(self,time_reversal=time_reversal)(m) # return
