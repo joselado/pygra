@@ -22,7 +22,6 @@ def func_to_parallelize(U):
 
 from pygra import parallelslurm
 
-Us = np.linspace(0.,3.0,10) # 10 different calculations
+Us = np.linspace(0.,3.0,100) # 100 different calculations
 gs = parallelslurm.pcall(func_to_parallelize,Us) # compute for all the inputs
-print(gs)
-np.savetxt("SWEEP.OUT",np.array([Us,gs]).T)
+np.savetxt("SWEEP.OUT",np.array([Us,gs]).T) # write in a file
