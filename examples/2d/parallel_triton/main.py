@@ -10,8 +10,6 @@ def func_to_parallelize(U):
     from pygra import geometry
     from pygra import meanfield
     g = geometry.honeycomb_lattice()
-    g.write()
-    Us = np.linspace(0.,4.,10) # different Us
     h = g.get_hamiltonian() # create hamiltonian of the system
     mf = meanfield.guess(h,mode="antiferro") # antiferro initialization
     # perform SCF with specialized routine for Hubbard
