@@ -6,7 +6,7 @@ import numpy as np
 
 def func_to_parallelize(U):
     """Function to parallelize"""
-    # all the variables should be internal!
+    # all the variables must be internal!
     from pygra import geometry
     from pygra import meanfield
     g = geometry.honeycomb_lattice()
@@ -26,5 +26,5 @@ from pygra import parallelslurm
 
 Us = np.linspace(0.,3.0,10) # 10 different calculations
 gs = parallelslurm.pcall(func_to_parallelize,Us) # compute for all the inputs
-
+print(gs)
 np.savetxt("SWEEP.OUT",np.array([Us,gs]).T)
