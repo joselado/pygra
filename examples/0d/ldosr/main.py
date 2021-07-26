@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import islands
 import numpy as np
@@ -19,3 +24,9 @@ for x in np.linspace(-9.,9.,80):
         fo.write(str(ei)+"  ")
         fo.write(str(di)+"\n")
 fo.close()
+
+
+
+
+
+

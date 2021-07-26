@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -36,3 +41,9 @@ def get(U):
 
 ms = [get(U) for U in Us]
 np.savetxt("M_VS_U.OUT",np.array([Us,np.abs(ms)]).T)
+
+
+
+
+
+

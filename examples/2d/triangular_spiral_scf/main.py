@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 # traingular lattice Hamiltonian
@@ -31,5 +36,11 @@ scf = meanfield.hubbardscf(h,U=6.0,mf=mf,
         verbose=1,filling=0.5,nk=6,mix=0.5) # perform SCF calculation 
 # this will write the magnetization to MAGNETISM.OUT
 scf.hamiltonian.write_magnetization(nrep=2) # write magnetization in a file
+
+
+
+
+
+
 
 

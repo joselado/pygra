@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import heterostructures
@@ -17,3 +22,9 @@ es = np.linspace(-.2,.2,21) # grid of energies
 ts = [hfun.didv(e,error=0.1,nk=500) for e in es] # calculate the transmissions
 plt.plot(es,ts,marker="o") # plot result
 plt.show()
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import hamiltonians
@@ -15,3 +20,9 @@ h.set_filling(0.5,nk=2)
 #exit()
 spectrum.multi_fermi_surface(h,nk=60,energies=np.linspace(-0.05,0.05,100),
         delta=0.0005,nsuper=1)
+
+
+
+
+
+

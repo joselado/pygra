@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -23,3 +28,9 @@ from pygra import groundstate
 groundstate.hopping(h,nrep=3) # write three replicas
 h.write_onsite(nrep=3) # write three replicas
 #spectrum.fermi_surface(h)
+
+
+
+
+
+

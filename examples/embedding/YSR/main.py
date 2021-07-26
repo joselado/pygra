@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 from pygra import geometry
@@ -42,3 +47,9 @@ eb = embedding.Embedding(h,m=vintra)
 import matplotlib.pyplot as plt
 plt.plot(es,ds)
 plt.show()
+
+
+
+
+
+

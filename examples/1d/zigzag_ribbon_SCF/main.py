@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 from pygra import geometry
@@ -10,3 +15,9 @@ mf = scftypes.guess(h,"ferro",fun=lambda r: [0.,0.,1.])
 scf = scftypes.hubbardscf(h,nkp=30,filling=0.5,mf=mf)
 h = scf.hamiltonian # get the Hamiltonian
 h.get_bands(operator="sz") # calculate band structure
+
+
+
+
+
+

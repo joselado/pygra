@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import topology
@@ -16,3 +21,9 @@ for mu in mus:
   print(mu,sigmaxy)
   fo.write(str(mu)+"  "+str(sigmaxy)+"\n")
 fo.close()
+
+
+
+
+
+

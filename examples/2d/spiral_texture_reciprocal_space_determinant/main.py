@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 from pygra import specialgeometry
 import numpy as np
 from pygra import geometry,spintexture
@@ -17,4 +22,10 @@ ops = [h.get_operator("sx"),h.get_operator("sy")]
 n = [1] # index of the band above the fermi energy you want
 spintexture.conduction_texture(h,n=1, # number of valence states to consider
                      nsuper=1,nk=20)
+
+
+
+
+
+
 

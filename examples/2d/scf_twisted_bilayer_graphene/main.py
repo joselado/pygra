@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 import numpy as np
 from pygra import geometry
@@ -36,3 +41,9 @@ scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=g,
 #                mix=0.9,mf=mf)
 scf.hamiltonian.get_bands(num_bands=40,operator="sz")
 #print(scf.total_energy-scf1.total_energy)
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra importgeometry
 from pygra importhamiltonians
@@ -17,3 +22,9 @@ g.write() # write structure
 import ldos
 ldos.ldos(h,mode="arpack",nk=10,delta=0.1,nrep=3) # write the LDOS
 h.get_bands(num_bands=20,operator="yposition") # write the bands
+
+
+
+
+
+

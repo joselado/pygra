@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 from pygra import geometry
@@ -17,3 +22,9 @@ for a in np.linspace(0.,.2,20): # loop over angles, in units of pi
   fo.write(str(a)+"    "+str(scf.total_energy)+"\n") # write
   print(a,scf.total_energy)
 fo.close()
+
+
+
+
+
+

@@ -1,4 +1,10 @@
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+# Add the root path of the pygra library
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import scftypes
@@ -49,4 +55,10 @@ for iq in range(len(qpath)): # loop over qy
     print("Doing",iq,e)
     fo.flush() # save result
 fo.close()
+
+
+
+
+
+
 

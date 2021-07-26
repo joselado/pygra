@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 import numpy as np
 from pygra import geometry,potentials
@@ -17,3 +22,9 @@ h = g.get_hamiltonian(has_spin=True) # get the Hamiltonian
 h.add_zeeman(J) # add exchange coupling
 h.add_swave(Delta) # add the SC order
 h.get_bands() # compute the bands
+
+
+
+
+
+

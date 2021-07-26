@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 import numpy as np
 from pygra import geometry
@@ -10,4 +15,10 @@ g.center() # center the geometry
 g.write()
 ms = [-ri for ri in g.r] # magnetizations
 h.get_bands()
+
+
+
+
+
+
 

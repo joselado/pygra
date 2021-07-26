@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 import numpy as np
 
 ### WARNING, this script only works in a special cluster! (Triton) ###
@@ -25,3 +30,9 @@ from pygra import parallelslurm
 Us = np.linspace(0.,3.0,10) # 10 different calculations
 gs = parallelslurm.pcall(func_to_parallelize,Us) # compute for all the inputs
 np.savetxt("SWEEP.OUT",np.array([Us,gs]).T) # write in a file
+
+
+
+
+
+

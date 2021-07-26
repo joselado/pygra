@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -16,3 +21,9 @@ U = 3.0
 scf = scftypes.hubbardscf(h,nkp=10,filling=0.5,g=U,
               mix=0.9,mf=mf)
 scf.hamiltonian.get_bands(operator="sz")
+
+
+
+
+
+

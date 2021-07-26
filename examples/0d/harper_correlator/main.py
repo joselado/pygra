@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import densitymatrix
@@ -15,3 +20,9 @@ import matplotlib.pyplot as plt
 x = np.array(range(len(y)))
 plt.plot(x,y*x)
 plt.show()
+
+
+
+
+
+

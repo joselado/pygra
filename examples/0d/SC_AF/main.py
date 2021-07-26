@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import hamiltonians
@@ -26,3 +31,9 @@ h.add_swave(fs)
 from pygra import ldos
 #ldos.multi_ldos(h,np.linspace(-3.0,3.0,40),delta=0.1)
 h.get_bands()
+
+
+
+
+
+

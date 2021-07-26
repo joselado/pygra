@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 import numpy as np
 from pygra import geometry
@@ -17,3 +22,9 @@ mf = meanfield.guess(h,mode="ferro") # antiferro initialization
 scf = meanfield.hubbardscf(h,filling=0.5,U=1.0,mf=mf,nk=5,verbose=1) # perform SCF
 scf.hamiltonian.write_magnetization(nrep=4) # write selfconsistent magnetization
 scf.hamiltonian.get_bands(operator="sz")
+
+
+
+
+
+

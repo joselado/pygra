@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,3 +23,9 @@ h.shift_fermi(1.0)
 cs = [correlator.gs_correlator(h.intra,i=0,j=i) for i in range(n)]
 plt.plot(range(n),cs,marker="o")
 plt.show()
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import hamiltonians
@@ -23,3 +28,9 @@ h.generate_spin_spiral(qspiral=[1./3.,1./3.,0.])
 #h.shift_fermi(d)
 h.turn_sparse()
 h.get_bands(num_bands=20)
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import specialhamiltonian
 from pygra import geometry
@@ -16,3 +21,9 @@ h.get_bands(operator="sz")
 #h.turn_dense()
 #h.get_multi_fermi_surface(energies=np.linspace(-6.,6.,100),
 #        delta=3e-2,nk=100)
+
+
+
+
+
+

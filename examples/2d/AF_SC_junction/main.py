@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 import numpy as np
@@ -25,3 +30,9 @@ def get_hamiltonian():
 h = get_hamiltonian()
 h.get_bands(operator="sz",nk=100)
 #kdos.kdos_bands(h,delta=0.01)
+
+
+
+
+
+

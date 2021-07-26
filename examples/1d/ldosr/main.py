@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 from pygra import geometry
@@ -19,4 +24,10 @@ for y in np.linspace(-30,30,80):
         fo.write(str(ei)+"  ")
         fo.write(str(di)+"\n")
 fo.close()
+
+
+
+
+
+
 

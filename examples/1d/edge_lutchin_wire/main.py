@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 from pygra importgeometry
@@ -21,3 +26,9 @@ kdos.write_surface(h)
 #hf = h.supercell(100) # do a supercell
 #hf = hf.set_finite_system(periodic=False) # do an open finite system
 #hf.get_bands()
+
+
+
+
+
+

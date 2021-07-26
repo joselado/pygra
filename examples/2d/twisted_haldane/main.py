@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra importgeometry
 from pygra importhamiltonians
@@ -35,3 +40,9 @@ h.turn_dense()
 import parallel
 parallel.cores = 6
 topology.mesh_chern(h,nk=10)
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import topology
@@ -16,3 +21,9 @@ h = g.get_hamiltonian(has_spin=False)
 (es,ds) = ldos.dos_site(h,nk=5,mode="KPM",i=g.closest_index(r0))
 plt.plot(es,ds)
 plt.show()
+
+
+
+
+
+

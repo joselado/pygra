@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import heterostructures
@@ -11,3 +16,9 @@ h.get_bands() # get bandstructure
 es = np.linspace(-1.,1.,50)
 ts = [ht.landauer(e) for e in es]
 np.savetxt("TRANSPORT.OUT",np.matrix([es,ts]).T)
+
+
+
+
+
+

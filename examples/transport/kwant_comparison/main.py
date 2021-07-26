@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import disorder
 from pygra import geometry
@@ -34,3 +39,9 @@ print("Error",np.sum(np.abs(ts1-ts2)))
 #print(ts2)
 plt.scatter(es,ts1-ts2)
 plt.show()
+
+
+
+
+
+

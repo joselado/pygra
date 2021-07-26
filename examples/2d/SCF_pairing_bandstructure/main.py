@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 import numpy as np
 from pygra import geometry
 from pygra import meanfield
@@ -25,4 +30,10 @@ print("SCF symmetry breaking",scf.identify_symmetry_breaking())
 
 ha = hscf-h0 # this yields a Hamiltonian only with anomalous term
 ha.get_bands() # band structure of only the anomalous term
+
+
+
+
+
+
 

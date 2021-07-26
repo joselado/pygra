@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -27,3 +32,9 @@ hscf.get_bands(operator="electron",nk=4000)
 print("CDW order",np.abs(hscf.extract("CDW")))
 print("SC order",np.abs(hscf.extract("swave")))
 print("Gap",np.abs(hscf.get_gap()))
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import potentials
@@ -35,6 +40,12 @@ for phi in phis:
     es = get_energies(omega=0.1,phi=phi) # return energies
     for e in es: f.write(str(phi)+"  "+str(e)+"\n") # write in file
 f.close()
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -18,3 +23,9 @@ def getz2(x1,x2):
   return np.abs(phi/np.pi)
 # now write the Phase diagram in a file
 phasediagram.diagram2d(getz2,x=np.linspace(-1,1,20,endpoint=True),y=np.linspace(-1,2.,20,endpoint=True),nite=4)
+
+
+
+
+
+

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import islands
 from pygra import interactions
@@ -30,3 +35,9 @@ mf = scftypes.guess(h,mode="antiferro")
 scf = scftypes.selfconsistency(h,filling=0.5,g=1.0,
                 mix=0.9,mf=mf,mode="U")
 #scf.hamiltonian.get_bands()
+
+
+
+
+
+

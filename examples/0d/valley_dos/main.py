@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import islands
 from pygra import spectrum
@@ -23,4 +28,10 @@ fv = operators.get_valley(h,projector=True)() # valley function
 #fv = h.get_operator("sublattice")
 #fv = np.abs(fv)
 h.get_dos(operator=fv,delta=0.02,use_kpm=False)
+
+
+
+
+
+
 

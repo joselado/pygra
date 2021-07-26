@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import islands
 
@@ -24,4 +29,10 @@ from pygra import chi
 #chi.chargechi_reciprocal(h) ;  exit()
 timeevolution.evolve_local_state(h,i=0,ts=np.linspace(0.,100,100),
         mode="green")
+
+
+
+
+
+
 

@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import multicell
@@ -12,3 +17,9 @@ h.add_onsite(lambda r: 0.2*np.sign(r[2])) # add a perpendicular electric field
 h.add_kane_mele(0.1) # add Kane Mele SOC
 
 h.get_bands(operator="sz") # compute band structure
+
+
+
+
+
+

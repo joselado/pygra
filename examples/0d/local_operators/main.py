@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import islands
 from pygra import spectrum
@@ -27,6 +32,12 @@ print(ops[0].shape)
 ys = spectrum.ev(h,operator=ops).real
 
 np.savetxt("EV.OUT",np.array([g.x,g.y,ys]).T)
+
+
+
+
+
+
 
 
 

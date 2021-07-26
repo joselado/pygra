@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -14,3 +19,9 @@ h = h.get_multicell()
 h.add_pwave(0.5)
 from pygra import dos
 dos.dos1d(h)
+
+
+
+
+
+

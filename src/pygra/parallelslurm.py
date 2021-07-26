@@ -6,6 +6,8 @@ from . import filesystem as fs
 import signal
 import subprocess
 
+srcpath = os.path.dirname(os.path.realpath(__file__)) 
+
 #pickle.settings['recurse'] = True
 
 def pcall(fin,xs,batch_size=1,**kwargs):
@@ -27,13 +29,12 @@ def pcall(fin,xs,batch_size=1,**kwargs):
         return out
 
 
-
 def pcall_single(fin,xs,time=10,error=None):
     """Run a parallel calculation with slurm"""
     n = len(xs) # number of calculations
     f = lambda x: fin(x)
     main = "import dill as pickle\nimport os\n"
-    main += "import sys ; sys.path.append(os.environ['PYGRAROOT'])\n"
+    main += "import sys ; sys.path.append("+srcpath+")\n"
     main += "try: ii = int(os.environ['SLURM_ARRAY_TASK_ID'])\n"
     main += "except: ii = 0\n"
     main += "f = pickle.load(open('function.obj','rb'))\n"

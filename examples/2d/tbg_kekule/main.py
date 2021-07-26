@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 import numpy as np
 from pygra import specialgeometry
@@ -19,3 +24,9 @@ h = scf.hamiltonian # get the Hamiltonian
 groundstate.hopping(h,nrep=1,skip = lambda r1,r2: r1[2]*r2[2]<0) # write three replicas
 h.get_bands() # calculate band structure
 h.write_onsite()
+
+
+
+
+
+

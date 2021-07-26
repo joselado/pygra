@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -23,3 +28,9 @@ h = scf.hamiltonian # get the Hamiltonian
 #h.write_magnetization()
 print(scf.identify_symmetry_breaking())
 h.get_bands() # calculate band structure
+
+
+
+
+
+

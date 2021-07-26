@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 from pygra import geometry
 from pygra import topology
@@ -18,3 +23,9 @@ def getz2(x1,x2):
   return z2
 # now write the Phase diagram in a file
 phasediagram.diagram2d(getz2,x=np.linspace(-.0,0.3,30,endpoint=True),y=np.linspace(0.,4.,30,endpoint=True),nite=1)
+
+
+
+
+
+

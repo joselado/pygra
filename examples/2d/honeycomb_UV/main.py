@@ -1,5 +1,10 @@
 # Add the root path of the pygra library
-import os ; import sys ; sys.path.append(os.environ['PYGRAROOT'])
+import os ; import sys 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../src")
+
+
+
+
 
 # zigzag ribbon
 import numpy as np
@@ -16,3 +21,9 @@ scf = meanfield.Vinteraction(h,U=0.0,V1=4.0,nk=nk,filling=filling,mf=mf)
 from pygra import scftypes
 print("Symmetry breaking",scf.identify_symmetry_breaking()) 
 scf.hamiltonian.get_bands() # get the Hamiltonian
+
+
+
+
+
+
