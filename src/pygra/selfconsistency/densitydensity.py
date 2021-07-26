@@ -282,7 +282,6 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
     """Perform the SCF mean field"""
     if verbose>1: info=True
 #    if not h0.check_mode("spinless"): raise # sanity check
-    mf = obj2mf(mf)
     h1 = h0.copy() # initial Hamiltonian
     h1.turn_dense()
     h1.nk = nk # store the number of kpoints
@@ -296,7 +295,11 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
           mf = dict()
           for d in v: mf[d] = np.exp(1j*np.random.random(h1.intra.shape))
           mf[(0,0,0)] = mf[(0,0,0)] + mf[(0,0,0)].T.conjugate()
-    else: pass # initial guess
+    elif type(mf):
+        from ..meanfield import guess
+        mf = guess(h0,mode=mf) # overwrite
+    else: pass # assume that it is a valid mf
+    mf = obj2mf(mf) # convert to MF
     ii = 0
     os.system("rm -f STOP") # remove stop file
     hop0 = hamiltonian2dict(h1) # create dictionary
@@ -500,6 +503,7 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
     if h.has_spin: #raise # not implemented
         for d in v: # loop
             m = v[d] ; n = m.shape[0]
+    #        print(m)
             m1 = np.zeros((2*n,2*n),dtype=np.complex)
             for i in range(n):
               for j in range(n): 

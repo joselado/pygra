@@ -139,7 +139,7 @@ def distance_hopping_matrix(vs,ds):
         r2 = np.array(r2)
         n = len(r1)
         out = np.zeros((n,n),dtype=np.complex) # output
-        return distance_hopping_matrix_jit(r1,r2,vs,ds**2,out) 
+        return distance_hopping_matrix_jit(r1,r2,vs,ds*ds,out) 
     return mgenerator
 
 @jit(nopython=True)
@@ -152,7 +152,7 @@ def distance_hopping_matrix_jit(r1,r2,vs,ds2,out):
           dr = r1[i] - r2[j] # difference
           dr2 = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]
           for k in range(nn):
-              if np.abs(ds2[k]-dr2)<1e-6: out[i,j] = vs[k]
+              if np.abs(ds2[k]-dr2)<1e-4: out[i,j] = vs[k]
     return out
 
 
