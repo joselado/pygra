@@ -475,6 +475,17 @@ def identify_symmetry_breaking(h0,h,as_string=False,tol=1e-3):
     return out
 
 
+def order_parameter(self,name):
+    mf = self.hamiltonian - self.hamiltonian0 # mean field
+    if name=="even_SC":
+        from .sctk.orderparameter import singlet
+        return singlet(mf)
+    elif name=="odd_SC":
+        from .sctk.orderparameter import triplet
+        return triplet(mf)
+    else: raise
+
+
 
 
 from .selfconsistency import densitydensity

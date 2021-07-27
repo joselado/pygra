@@ -338,11 +338,15 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       return scf
     if solver=="plain":
       do_scf = True
+#      from .mixing import Mixing
+#      Mxg = Mixing() # initialize
       while do_scf:
         scf = f(mf) # new vector
         mfnew = scf.mf # new vector
         t0 = time.perf_counter() # time
         diff = diff_mf(mfnew,mf) # mix mean field
+#        mix = Mxg.get_mix(diff) # add error
+#        print("Mixing",mix)
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
         if callback_mf is not None: # redefine mean-field if necessary
             mf = callback_mf(mf) # callback for the mean field
@@ -531,6 +535,9 @@ class SCF():
     def identify_symmetry_breaking(self,**kwargs):
         return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0,
                 tol=10*self.tol,**kwargs)
+    def order_parameter(self,name):
+        from ..meanfield import order_parameter
+        return order_parameter(self,name)
 
 
 
