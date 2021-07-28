@@ -2,6 +2,10 @@
 This is a Python library to compute tight binding models in different
 dimensionalities and based on a variety of different lattices.
 
+A generic version of this library is called pyqula, and can be downlaoded from
+[https://github.com/joselado/pyqula](https://github.com/joselado/pyqula)
+
+
 # CAPABILITIES #
 - 0d, 1d, 2d and 3d systems
 - Band structures
