@@ -6,7 +6,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--m",default="Update",
         help='Message')
 
-# overwrite the python libraries
+path = os.path.dirname(os.path.realpath(__file__)) # real path
+os.chdir(path) # go to the home folder
+
+# overwrite the python libraries with the pyqula version
 os.system("rm -rf src/pygra") # remove
 os.system("cp -r ../pyqula/src/pyqula src/pygra") # overwrite folder
 
