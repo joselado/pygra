@@ -10,7 +10,7 @@ def NN_exchange(h,J=0.1,nk=2,num_bands=None,full_energy=False,
     a brute force algorithm"""
     if not full_energy:  nbands = num_bands # just the same method for energy
     else: nbands = None # enforce full calculation
-    from pygra import ldos
+    from . import ldos
     d = ldos.ldos_density(h,nk=nk,delta=1e-3,num_bands=num_bands) # density
     if mode=="supercell":
         hs = h.supercell([2,1,1]) # get a supercell

@@ -33,8 +33,8 @@ def multilayer_graphene(l=[0],real=False,**kwargs):
 
 def flux2d(g,n=1,m=1):
     """Return a Hamiltonian with a certain commensurate flux per unit cell"""
-    from pygra import sculpt
-    from pygra import supercell
+    from . import sculpt
+    from . import supercell
     g = supercell.target_angle(g,0.5) # target a orthogonal cell
     g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])) # set in the x direction
     g = g.supercell([1,n,1])
