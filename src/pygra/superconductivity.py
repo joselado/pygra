@@ -582,7 +582,8 @@ def identify_superconductivity(h,tol=1e-5):
     if np.max(uum)>tol: out.append("up-up pairing")
     if np.max(ddm)>tol: out.append("down-down pairing")
     if np.max(udm)>tol: out.append("up-down pairing")
-
+    if np.sqrt(np.sum(h.get_average_dvector(non_unitarity=True)))>tol:
+        out.append("Non-unitary superconductivity")
     if h.dimensionality==0: return out
     k = np.random.random(3) # random k-vector
     m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
