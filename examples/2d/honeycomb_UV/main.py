@@ -16,8 +16,7 @@ g = geometry.honeycomb_lattice()
 filling = 0.5
 nk = 10
 h = g.get_hamiltonian(has_spin=True) # create hamiltonian of the system
-mf = meanfield.guess(h,"random")
-scf = meanfield.Vinteraction(h,U=0.0,V1=4.0,nk=nk,filling=filling,mf=mf)
+scf = meanfield.Vinteraction(h,U=0.0,V1=4.0,nk=nk,filling=filling,mf="random")
 from pygra import scftypes
 print("Symmetry breaking",scf.identify_symmetry_breaking()) 
 scf.hamiltonian.get_bands() # get the Hamiltonian
