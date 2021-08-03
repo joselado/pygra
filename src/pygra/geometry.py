@@ -15,7 +15,7 @@ try:
   use_fortran = True
 except: 
   use_fortran = False
-  print("FORTRAN routines not present in geometry.py")
+#  print("FORTRAN routines not present in geometry.py")
 
 class Geometry:
   """ Class for a geometry in a system """
@@ -1652,5 +1652,6 @@ def array2function_jit(r,v,ir):
 from .sculpt import image2island
 
 
-from .geometrytk.readgeometry import read_xyz
+from .geometrytk import readgeometry 
+read_xyz = readgeometry.read_xyz
 
