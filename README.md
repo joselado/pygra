@@ -2,7 +2,7 @@
 This is a Python library to compute tight binding models in different
 dimensionalities and based on a variety of different lattices.
 
-A generic version of this library is called pyqula, and can be downlaoded from
+A generic version of this library is called pyqula, and can be downloaded from
 [https://github.com/joselado/pyqula](https://github.com/joselado/pyqula)
 
 
