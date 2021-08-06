@@ -22,6 +22,7 @@ from . import rotate_spin
 from . import topology
 from . import ldos
 from . import increase_hilbert
+from .meanfield import Vinteraction
 from .sctk import dvector
 from .algebratk import hamiltonianalgebra
 from .bandstructure import get_bands_nd
@@ -204,9 +205,9 @@ class Hamiltonian():
     def get_anomalous_hamiltonian(self):
         """Return a Hamiltonian only with the anomalous part"""
         return superconductivity.get_anomalous_hamiltonian(self)
-    def add_pairing(self,delta=0.0,**kwargs):
+    def add_pairing(self,**kwargs):
       """ Add a general pairing matrix, uu,dd,ud"""
-      superconductivity.add_pairing_to_hamiltonian(self,delta=delta,**kwargs)
+      superconductivity.add_pairing_to_hamiltonian(self,**kwargs)
     def same_hamiltonian(self,*args,**kwargs):
         """Check if two hamiltonians are the same"""
         return hamiltonianmode.same_hamiltonian(self,*args,**kwargs)
@@ -345,6 +346,9 @@ class Hamiltonian():
         """Return a multihopping object"""
         from .multihopping import MultiHopping
         return MultiHopping(self.get_dict())
+    @get_docstring(Vinteraction)
+    def get_mean_field_hamiltonian(self,**kwargs):
+        return Vinteraction(self,**kwargs).hamiltonian
     def copy(self):
         """
         Return a copy of the hamiltonian
